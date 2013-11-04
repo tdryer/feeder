@@ -1,6 +1,6 @@
 # server the API server and public files using the reverse proxy "tape"
 
-tape1 --version >/dev/null 2>&1 || { echo >&2 "Development server requires tape. Get it from https://github.com/wspringer/tape (version in pip is broken)."; exit 1; }
+tape --version >/dev/null 2>&1 || { echo >&2 "Development server requires tape. Get it from https://github.com/wspringer/tape (version in pip is broken)."; exit 1; }
 
 PORT=8080
 API_SERVER_PORT=8081
