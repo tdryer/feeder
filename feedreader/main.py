@@ -5,6 +5,8 @@ import tornado.web
 import sys
 import base64
 
+from feedreader.auth_provider import DummyAuthProvider
+
 
 class APIRequestHandler(tornado.web.RequestHandler):
     """Base RequestHandler for use by API endpoints."""
@@ -26,7 +28,7 @@ class APIRequestHandler(tornado.web.RequestHandler):
             user, passwd = base64.decodestring(auth_digest).split(":")
             if auth_type != "Basic":
                 raise ValueError("Authorization type is not Basic")
-            if user != "demo" or passwd != "demo":
+            if not self.auth_provider.authenticate(user, passwd):
                 raise ValueError("Invalid username or password")
         except ValueError as e:
             msg = "Authorization failed: {}".format(e)
@@ -49,9 +51,19 @@ class MainHandler(APIRequestHandler):
         self.write("Hello, {}.".format(username))
 
 
-if __name__ == "__main__":
+def main():
+    """Main entry point for the server."""
+    # create an AuthProvider that lets anyone log in with username/password
+    auth_provider = DummyAuthProvider()
+    auth_provider.register("username", "password")
+
+    # create tornado application and listen on the provided port
     application = tornado.web.Application([
-        (r"/", MainHandler, dict(auth_provider=None)),
+        (r"/", MainHandler, dict(auth_provider=auth_provider)),
     ])
     application.listen(int(sys.argv[1]))
     tornado.ioloop.IOLoop.instance().start()
+
+
+if __name__ == "__main__":
+    main()

@@ -3,6 +3,7 @@ from tornado.web import Application
 import base64
 
 from feedreader.main import APIRequestHandler
+from feedreader.auth_provider import DummyAuthProvider
 
 
 def get_basic_auth(user, passwd):
@@ -19,7 +20,10 @@ class TestHandler(APIRequestHandler):
 class AuthorizationTest(AsyncHTTPTestCase):
 
     def get_app(self):
-        return Application([("/", TestHandler, dict(auth_provider=None))])
+        auth_provider = DummyAuthProvider()
+        auth_provider.register("demo", "demo")
+        return Application([("/", TestHandler,
+                             dict(auth_provider=auth_provider))])
 
     def assert_auth_failed(self, response):
         self.assertEqual(response.code, 401)
