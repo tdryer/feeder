@@ -27,5 +27,5 @@ def test_wrong_username(auth_provider):
 
 
 def test_register_taken_username(auth_provider):
-    assert not auth_provider.register("foo", "otherpass")
-    assert auth_provider.authenticate("foo", "foopass")
+    with pytest.raises(ValueError):
+        auth_provider.register("foo", "otherpass")

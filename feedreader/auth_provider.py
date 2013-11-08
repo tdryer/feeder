@@ -42,11 +42,10 @@ class AuthProvider(object):
     def register(self, username, password):
         """Register a new user.
 
-        Does something if the username already exists.
+        Raises ValueError if the username is already taken.
         """
         if self._user_exists(username):
-            # TODO: do something more helpful here
-            return False
+            raise ValueError("Username already registered")
         else:
             self._set_credentials(username, password)
             return True

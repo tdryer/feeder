@@ -1,5 +1,7 @@
 """APIRequestHandler subclasses for API endpoints."""
 
+from tornado.web import HTTPError
+
 from feedreader.api_request_handler import APIRequestHandler
 
 
@@ -23,5 +25,8 @@ class UsersHandler(APIRequestHandler):
             "required": ["username", "password"],
         })
         # TODO: handle username already being taken, empty password
-        self.auth_provider.register(body["username"], body["password"])
+        try:
+            self.auth_provider.register(body["username"], body["password"])
+        except ValueError as e:
+            raise HTTPError(400, reason=e.message)
         self.set_status(201)

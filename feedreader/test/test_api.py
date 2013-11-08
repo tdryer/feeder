@@ -17,6 +17,11 @@ class UsersTest(AsyncHTTPTestCase):
     def get_app(self):
         return feedreader.main.get_application()
 
+    def assert_validation_failed(self, response):
+        self.assertEqual(response.code, 400)
+        self.assertIn("Body input validation failed",
+                      json.loads(response.body)["error"]["message"])
+
     def test_create_new_user(self):
         response = self.fetch('/users', method="POST", body=json.dumps(
             {"username": "foo", "password": "bar"})
@@ -31,6 +36,28 @@ class UsersTest(AsyncHTTPTestCase):
         response = self.fetch('/users', method="POST", body=json.dumps(
             {"username": "foo"})
         )
+        self.assert_validation_failed(response)
+
+    def test_create_new_user_empty_username(self):
+        response = self.fetch('/users', method="POST", body=json.dumps(
+            {"username": ""}, {"password": "bar"})
+        )
+        self.assert_validation_failed(response)
+
+    def test_create_new_user_empty_password(self):
+        response = self.fetch('/users', method="POST", body=json.dumps(
+            {"username": "foo"}, {"password": ""})
+        )
+        self.assert_validation_failed(response)
+
+    def test_create_duplicate_username(self):
+        response = self.fetch('/users', method="POST", body=json.dumps(
+            {"username": "foo", "password": "bar"})
+        )
+        self.assertEqual(response.code, 201)
+        response = self.fetch('/users', method="POST", body=json.dumps(
+            {"username": "foo", "password": "bar"})
+        )
         self.assertEqual(response.code, 400)
-        self.assertIn("Body input validation failed",
+        self.assertIn("Username already registered",
                       json.loads(response.body)["error"]["message"])
