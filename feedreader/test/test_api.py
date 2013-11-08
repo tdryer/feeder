@@ -28,5 +28,11 @@ class UsersTest(AsyncHTTPTestCase):
         })
         self.assertEqual(response.code, 200)
 
+    def test_create_new_user_invalid_body(self):
+        response = self.fetch('/users', method="POST", body=json.dumps(
+            {"username": "foo"})
+        )
+        self.assertEqual(response.code, 400)
+
 if __name__ == "__main__":
     unittest.main()

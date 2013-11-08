@@ -5,6 +5,8 @@ import tornado.web
 import sys
 import base64
 import json
+import jsonschema
+import httplib
 
 from feedreader.auth_provider import DummyAuthProvider
 
@@ -37,12 +39,31 @@ class APIRequestHandler(tornado.web.RequestHandler):
         else:
             return user
 
+    def require_body_schema(self, schema):
+        """Return json body of the request.
+
+        Raises 400 if the body does not match the given schema.
+        """
+        try:
+            body_json = json.loads(self.request.body)
+            jsonschema.validate(body_json, schema)
+            return body_json
+        except jsonschema.ValidationError:
+            raise tornado.web.HTTPError(400)
+
     def write_error(self, status_code, **kwargs):
         # if unauthorized, tell client that authorization is required
         if status_code == 401:
             self.set_header('WWW-Authenticate', 'Basic realm=Restricted')
-        # use default errors
-        super(APIRequestHandler, self).write_error(status_code, **kwargs)
+
+        # return errors in JSON
+        json_error = {
+            "error": {
+                "code": status_code,
+                "message": httplib.responses[status_code],
+            }
+        }
+        self.finish(json.dumps(json_error))
 
 
 class MainHandler(APIRequestHandler):
@@ -56,15 +77,21 @@ class UsersHandler(APIRequestHandler):
 
     def post(self):
         """Create a new user."""
-        # TODO: handle bad requests through schema validation
-        j = json.loads(self.request.body)
-        user = j["username"]
-        passwd = j["password"]
-        self.auth_provider.register(user, passwd)
+        body = self.require_body_schema({
+            "type": "object",
+            "properties": {
+                "username": {"type": "string"},
+                "password": {"type": "string"},
+            },
+            "required": ["username", "password"],
+        })
+        # TODO: handle username already being taken, empty password
+        self.auth_provider.register(body["username"], body["password"])
         self.set_status(201)
 
 
 def get_application():
+    """Return Tornado application instance."""
     # create an AuthProvider that lets anyone log in with username/password
     auth_provider = DummyAuthProvider()
     auth_provider.register("username", "password")
