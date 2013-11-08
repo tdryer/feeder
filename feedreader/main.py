@@ -63,14 +63,14 @@ class APIRequestHandler(tornado.web.RequestHandler):
                 "message": httplib.responses[status_code],
             }
         }
-        self.finish(json.dumps(json_error))
+        self.finish(json_error)
 
 
 class MainHandler(APIRequestHandler):
 
     def get(self):
         username = self.require_auth()
-        self.write("Hello, {}.".format(username))
+        self.write({"message": "Hello world!"})
 
 
 class UsersHandler(APIRequestHandler):
