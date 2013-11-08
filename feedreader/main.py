@@ -4,6 +4,7 @@ import tornado.ioloop
 import tornado.web
 import sys
 import base64
+import json
 
 from feedreader.auth_provider import DummyAuthProvider
 
@@ -51,17 +52,34 @@ class MainHandler(APIRequestHandler):
         self.write("Hello, {}.".format(username))
 
 
-def main():
-    """Main entry point for the server."""
+class UsersHandler(APIRequestHandler):
+
+    def post(self):
+        """Create a new user."""
+        # TODO: handle bad requests through schema validation
+        j = json.loads(self.request.body)
+        user = j["username"]
+        passwd = j["password"]
+        self.auth_provider.register(user, passwd)
+        self.set_status(201)
+
+
+def get_application():
     # create an AuthProvider that lets anyone log in with username/password
     auth_provider = DummyAuthProvider()
     auth_provider.register("username", "password")
 
     # create tornado application and listen on the provided port
     application = tornado.web.Application([
-        (r"/", MainHandler, dict(auth_provider=auth_provider)),
+        (r"^/?$", MainHandler, dict(auth_provider=auth_provider)),
+        (r"^/users/?$", UsersHandler, dict(auth_provider=auth_provider)),
     ])
-    application.listen(int(sys.argv[1]))
+    return application
+
+
+def main():
+    """Main entry point for the server."""
+    get_application().listen(int(sys.argv[1]))
     tornado.ioloop.IOLoop.instance().start()
 
 
