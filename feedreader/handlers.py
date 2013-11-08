@@ -24,7 +24,6 @@ class UsersHandler(APIRequestHandler):
             },
             "required": ["username", "password"],
         })
-        # TODO: handle username already being taken, empty password
         try:
             self.auth_provider.register(body["username"], body["password"])
         except ValueError as e:
