@@ -1,15 +1,14 @@
-import unittest
+"""Functional tests for the API."""
+
 from tornado.testing import AsyncHTTPTestCase
-from tornado.web import Application
 import base64
 import json
 
 import feedreader.main
-from feedreader.main import APIRequestHandler
-from feedreader.auth_provider import DummyAuthProvider
 
 
 def get_basic_auth(user, passwd):
+    """Return basic auth header."""
     return "Basic " + base64.b64encode("{}:{}".format(user, passwd))
 
 
@@ -35,6 +34,3 @@ class UsersTest(AsyncHTTPTestCase):
         self.assertEqual(response.code, 400)
         self.assertIn("Body input validation failed",
                       json.loads(response.body)["error"]["message"])
-
-if __name__ == "__main__":
-    unittest.main()

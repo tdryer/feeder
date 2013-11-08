@@ -3,7 +3,7 @@ from tornado.web import Application
 import base64
 import json
 
-from feedreader.main import APIRequestHandler
+from feedreader.api_request_handler import APIRequestHandler
 from feedreader.auth_provider import DummyAuthProvider
 
 
