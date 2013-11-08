@@ -33,6 +33,8 @@ class UsersTest(AsyncHTTPTestCase):
             {"username": "foo"})
         )
         self.assertEqual(response.code, 400)
+        self.assertIn("Body input validation failed",
+                      json.loads(response.body)["error"]["message"])
 
 if __name__ == "__main__":
     unittest.main()

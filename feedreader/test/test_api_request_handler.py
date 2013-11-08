@@ -86,6 +86,8 @@ class ValidationTest(AsyncHTTPTestCase):
     def test_failure_empty(self):
         response = self.fetch("/", method="POST", body=json.dumps({}))
         self.assertEqual(response.code, 400)
+        self.assertIn("Body input validation failed",
+                      json.loads(response.body)["error"]["message"])
 
     def test_failure_invalid_type(self):
         response = self.fetch("/", method="POST", body=json.dumps({
@@ -93,9 +95,13 @@ class ValidationTest(AsyncHTTPTestCase):
             "bar": "NaN",
         }))
         self.assertEqual(response.code, 400)
+        self.assertIn("Body input validation failed",
+                      json.loads(response.body)["error"]["message"])
 
     def test_failure_missing_property(self):
         response = self.fetch("/", method="POST", body=json.dumps({
             "foo": "baz",
         }))
         self.assertEqual(response.code, 400)
+        self.assertIn("Body input validation failed",
+                      json.loads(response.body)["error"]["message"])
