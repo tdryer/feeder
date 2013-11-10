@@ -61,3 +61,29 @@ class UsersTest(AsyncHTTPTestCase):
         self.assertEqual(response.code, 400)
         self.assertIn("Username already registered",
                       json.loads(response.body)["error"]["message"])
+
+
+class FeedsTest(AsyncHTTPTestCase):
+
+    def setUp(self):
+        super(FeedsTest, self).setUp()
+        self.headers = {
+            'Authorization': get_basic_auth('foo', 'bar'),
+        }
+
+    def get_app(self):
+        return feedreader.main.get_application()
+
+    def test_get_feeds_success(self):
+        response = self.fetch('/feeds/', method='GET', headers={
+            'Authorization': get_basic_auth('foo', 'bar')
+        })
+        self.assertEqual(response.code, 200)
+
+    def test_add_feed_success(self):
+        response = self.fetch('/feeds/', method='POST', headers=self.headers,
+                              body=json.dumps({
+                                  'url': 'http://awesome-blog.github.io'
+                              }),
+        )
+        self.assertEqual(response.code, 201)
