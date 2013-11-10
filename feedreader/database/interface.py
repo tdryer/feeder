@@ -11,6 +11,8 @@ collects a subset of users from the database
 input: a list of usernames to filter for, or an empty list
 output: a list of users with names in the input, no users, or all users
 """
+
+
 def fetchUsers(names):
     session = Session()
     if names == []:
@@ -28,18 +30,17 @@ Feed functions
 
 """
 collects a subset of feeds from the database
-input: a list of filters, or an empty list
+input: a list of titles to filter for, or an empty list
 output: a list of feeds with attributes in the input, no feeds, or all feeds
 """
 
 
-def fetchFeeds(*args, **kwargs):
+def fetchFeeds(titles):
     session = Session()
-    if filters == []:
+    if titles == []:
         feed_list = session.query(Feed).all()
     else:
-        # TODO
-        pass
+        feed_list = session.query(Feed).filter(Feed.title.in_(titles)).all()
     session.close()
 
     return feed_list

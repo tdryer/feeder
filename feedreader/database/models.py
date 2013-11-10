@@ -9,6 +9,7 @@ Base = declarative_base()
 # hard coded might not be the best approach
 engine = create_engine('sqlite:///dbtest', echo=False)
 
+
 class User(Base):
     __tablename__ = 'users'
 
@@ -29,7 +30,9 @@ class User(Base):
     def remove(self, session):
         session.delete(self)
         # also remove subscriptions for this user
-        subs = session.query(Subscription).filter(Subscription.username == self.username).all()
+        subs = session.query(
+            Subscription).filter(
+            Subscription.username == self.username).all()
         for sub in subs:
             session.delete(sub)
         session.commit()
@@ -41,7 +44,12 @@ class User(Base):
         session.commit()
 
     def unsubscribe(self, session, feed_id):
-        sub = session.query(Subscription).filter(and_(Subscription.username == self.username, Subscription.feed_id == feed_id)).one()
+        sub = session.query(
+            Subscription).filter(
+            and_(
+                Subscription.username == self.username,
+                Subscription.feed_id == feed_id)).one(
+        )
         session.delete(sub)
         session.commit()
 
@@ -52,18 +60,25 @@ class User(Base):
 
     def getReadIds(self, session):
         id_list = []
-        reads = session.query(Read).filter(Read.username == self.username).all()
+        reads = session.query(
+            Read).filter(
+            Read.username == self.username).all(
+        )
         for read in reads:
             id_list.append(read.entry_id)
         return id_list
 
     def getFeeds(self, session):
         id_list = []
-        subs = session.query(Subscription).filter(Subscription.username == self.username).all()
+        subs = session.query(
+            Subscription).filter(
+            Subscription.username == self.username).all(
+        )
         for sub in subs:
             id_list.append(sub.feed_id)
         feeds = session.query(Feed).filter(Feed.id.in_(id_list)).all()
         return feeds
+
 
 class Feed(Base):
     __tablename__ = 'feeds'
@@ -90,7 +105,8 @@ class Feed(Base):
 
     def remove(self, session):
         # check that no users are subscribed
-        if session.query(Subscription).filter(Subscription.feed_id == self.id).count() == 0:
+        if session.query(Subscription).filter(
+                Subscription.feed_id == self.id).count() == 0:
             session.delete(self)
             session.commit()
             make_transient(self)
@@ -100,16 +116,22 @@ class Feed(Base):
         return entries
 
     def getUnreadEntries(self, session, id_list):
-        entries = session.query(Entry).filter(and_(Entry.feed_id == self.id, ~Entry.id.in_(id_list))).all()
+        entries = session.query(
+            Entry).filter(and_(Entry.feed_id == self.id,
+                               ~Entry.id.in_(id_list))).all()
         return entries
 
     def getUsers(self, session):
         name_list = []
-        subs = session.query(Subscription).filter(Subscription.feed_id == self.id).all()
+        subs = session.query(
+            Subscription).filter(
+            Subscription.feed_id == self.id).all(
+        )
         for sub in subs:
             name_list.append(sub.username)
         users = session.query(User).filter(User.username.in_(name_list)).all()
         return users
+
 
 class Entry(Base):
     __tablename__ = 'entries'
@@ -130,7 +152,9 @@ class Entry(Base):
         self.date = date
 
     def __repr__(self):
-        return "<FeedItem('%s','%s','%s')>" % (self.title, self.author, self.date)
+        return (
+            "<FeedItem('%s','%s','%s')>" % (self.title, self.author, self.date)
+        )
 
     def save(self, session):
         session.add(self)
@@ -140,6 +164,7 @@ class Entry(Base):
         session.delete(self)
         session.commit()
         make_transient(self)
+
 
 class Subscription(Base):
     __tablename__ = 'subscriptions'
