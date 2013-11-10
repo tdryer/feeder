@@ -11,7 +11,14 @@ None
 
 ### Response
     {
-      'feeds': [feed_id]
+      "feeds": [{
+        "id": 123,
+        "name": "David yan blog",
+        "url": "awesome-blog.com",
+        "unreads": 123
+        }, {
+          ...
+        }]
     }
 
   - 200 Success
@@ -25,8 +32,8 @@ Used to add a new feed for the user.
 
 ### Request
     {
-      'name': feed_name,
-      'url': feed_url
+      "name": feed_name,
+      "url": any_url
     }
 
 ### Response
@@ -36,22 +43,16 @@ Used to add a new feed for the user.
   - 401 Unauthorized: if user credentials are bad
 
 ## Get feed items and details
-GET /feeds/:feed\_id
+GET /feeds/:feed\_id/entries[?filter="all|read|unread"]
 
 ### Description
-Get the details of a feed that the user has access to, including the items (in the form of
-item_id) that the feed has.
+Get the entries (articles) of a feed that the user has access to.
 
 ### Request
-None
 
 ### Response
     {
-      'name': feed_name,
-      'url': feed_url,
-      'last_update': feed_last_update,
-      'next_update': feed_next_update,
-      'items': [item_id]
+      "entries": [123, 345, 878978]
     }
 
   - 200 Success
@@ -59,30 +60,13 @@ None
   - 403 Forbidden: if the user does not have permission to access this feed
   - 404 Not Found: if the feed does not exist
 
-## Update feed details
-PATCH /feeds/:feed\_id
 
-### Description
-Update any modifiable metadata of the feed that is specific to the user.
-
-### Request
-    {
-      'name': new_feed_name
-    }
-
-### Response
-
-  - 200 Success
-  - 400 Bad Request: if any of the feed parameters were invalid
-  - 401 Unauthorized: if user credentials are bad
-  - 403 Forbidden: if the user does not have permission to access this feed
-  - 404 Not Found: if the feed does not exist
 
 ## Delete feed
 DELETE /feeds/:feed\_id
 
 ### Description
-Deletes a feed for the user.
+Unsubscribes the user from a feed.
 
 ### Request
 None
@@ -94,21 +78,26 @@ None
   - 403 Forbidden: if the user does not have permission to access this feed
   - 404 Not Found: if the feed does not exist
 
+
+
 ## Get feed item
-GET /feeds/:feed\_id/:item\_id
+GET /feeds/:feed\_id/:entry\_id
 
 ### Description
-Get the details of a specific feed item.
+Get the details of a specific entry.
 
 ### Request
 None
 
 ### Response
     {
-      'title': item_title,
-      'posted_on': item_date,
-      'content': item_content,
-      'read': item_read
+      "title": item_title,
+      "pub-date": item_date,
+      "status": "read"|"unread",
+      "author": author_name,
+      "feed_id": feed_id,
+      "url": permalink
+      "content": item_content
     }
 
   - 200 Success
@@ -117,19 +106,20 @@ None
   - 404 Not Found: if the feed/item does not exist
 
 ## Update item details
-PATCH /feeds/:feed\_id/:item\_id
+PATCH /feeds/:feed\_id/:entry\_id
 
 ### Description
 Update any modifiable item metadata that is specific to the user.
 
 ### Request
     {
-      'read': true/false
+      "status": "read"|"unread"
     }
 
 ### Response
 
   - 200 Success
+  - 400 Bad Request: if I send gibberish
   - 401 Unauthorized: if user credentials are bad
   - 403 Forbidden: if the user does not have permission to access this feed
   - 404 Not Found: if the feed/item does not exist
