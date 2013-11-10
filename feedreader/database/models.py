@@ -7,7 +7,7 @@ from sqlalchemy import Column, ForeignKey, Integer, Sequence, String
 
 Base = declarative_base()
 # hard coded might not be the best approach
-engine = create_engine('sqlite:///dbtest', echo=False)
+engine = create_engine('sqlite://', echo=False)
 
 
 class User(Base):
