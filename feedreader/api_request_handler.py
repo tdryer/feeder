@@ -1,8 +1,13 @@
-import tornado.web
+from contextlib import contextmanager
 import base64
-import json
 import httplib
+import json
+
 import jsonschema
+import tornado.web
+
+from feedreader.database.models import Session
+
 
 class APIRequestHandler(tornado.web.RequestHandler):
     """Base RequestHandler for use by API endpoints."""
@@ -64,3 +69,21 @@ class APIRequestHandler(tornado.web.RequestHandler):
                 "message": message,
             }
         })
+
+    @contextmanager
+    def get_session(self):
+        """Creates a SQLAlchemy Session instance that auto-commits and rollsback.
+
+        Example:
+            with self.get_session() as session:
+                session.add(blah)
+        """
+        session = Session()
+        try:
+            yield session
+            session.commit()
+        except:
+            session.rollback()
+            raise
+        finally:
+            session.close()
