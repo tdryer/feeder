@@ -1,10 +1,11 @@
 """APIRequestHandler subclasses for API endpoints."""
 
-import time
-
+from lxml import html
 from tornado.web import HTTPError
+import requests
 
 from feedreader.api_request_handler import APIRequestHandler
+from feedreader.database.models import Feed
 from feedreader.stub import generate_slipsum_entry
 
 
@@ -37,24 +38,16 @@ class UsersHandler(APIRequestHandler):
 class FeedsHandler(APIRequestHandler):
 
     def get(self):
-        self.write({
-            'feeds': [{
-                'id': 1,
-                'name': 'David Yan\'s CMPT 376W Blog',
-                'url': 'http://awesome-blog.github.io/',
-                'unreads': 1337,
-            }, {
-                'id': 2,
-                'name': 'Michael\'s Blog Posts',
-                'url': 'https://mtomwing.com/blog/',
-                'unreads': 666,
-            }, {
-                'id': 3,
-                'name': 'Tombuntu',
-                'url': 'http://tombuntu.com/',
-                'unreads': 69,
-            }],
-        })
+        feeds = []
+        with self.get_session() as session:
+            for feed in session.query(Feed).all():
+                feeds.append({
+                    'id': feed.id,
+                    'name': feed.title,
+                    'url': feed.site_url,
+                    'unreads': 1337,
+                })
+        self.write({'feeds': feeds})
         self.set_status(200)
 
     def post(self):
@@ -65,22 +58,16 @@ class FeedsHandler(APIRequestHandler):
             },
             'required': ['url'],
         })
+        with self.get_session() as session:
+            dom = html.fromstring(requests.get(body['url']).content)
+            title = dom.cssselect('title')[0].text_content()
+            session.add(Feed(title, body['url'], body['url']))
         self.set_status(201)
 
 
 class EntriesHandler(APIRequestHandler):
 
     def get(self, dirty_entry_ids):
-        entries = []
-        for entry_id in [int(id_) for id_ in dirty_entry_ids.split(',')]:
-            entries.append({
-                'title': 'My Blog Post {}'.format(entry_id),
-                'pub_date': time.time(),
-                'status': 'read',
-                'feed_id': 1,
-                'url': 'https://mtomwing.com/blog/post/week-5-freeseer',
-                'content': generate_slipsum_entry(),
-            })
-
+        entries = [generate_slipsum_entry() for _ in dirty_entry_ids.split(',')]
         self.write({'entries': entries})
         self.set_status(200)

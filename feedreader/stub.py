@@ -1,4 +1,5 @@
 import random
+import time
 
 stub_entry_template = '''
 <h1>{}</h1>
@@ -35,6 +36,10 @@ short_slipsum = [
     'No man, I don\'t eat pork',
     'Uuummmm, this is a tasty burger!'
 ]
+database = {
+    'feeds': {},
+    'entries': {},
+}
 
 
 def generate_slipsum_paragraph():
@@ -43,7 +48,7 @@ def generate_slipsum_paragraph():
 
 
 def generate_slipsum_entry():
-    return stub_entry_template.format(
+    content = stub_entry_template.format(
         random.choice(short_slipsum),
         random.randint(200, 800),
         random.randint(200, 800),
@@ -53,3 +58,11 @@ def generate_slipsum_entry():
         random.choice(short_slipsum),
         random.choice(short_slipsum)
     )
+    return {
+        'title': random.choice(short_slipsum),
+        'pub_date': time.time(),
+        'status': 'read',
+        'feed_id': 1,
+        'url': 'https://mtomwing.com/blog/post/week-5-freeseer',
+        'content': content,
+    }
