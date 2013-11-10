@@ -1,8 +1,11 @@
 """APIRequestHandler subclasses for API endpoints."""
 
+import time
+
 from tornado.web import HTTPError
 
 from feedreader.api_request_handler import APIRequestHandler
+from feedreader.stub import generate_slipsum_entry
 
 
 class MainHandler(APIRequestHandler):
@@ -52,6 +55,7 @@ class FeedsHandler(APIRequestHandler):
                 'unreads': 69,
             }],
         })
+        self.set_status(200)
 
     def post(self):
         body = self.require_body_schema({
@@ -62,3 +66,21 @@ class FeedsHandler(APIRequestHandler):
             'required': ['url'],
         })
         self.set_status(201)
+
+
+class EntriesHandler(APIRequestHandler):
+
+    def get(self, dirty_entry_ids):
+        entries = []
+        for entry_id in [int(id_) for id_ in dirty_entry_ids.split(',')]:
+            entries.append({
+                'title': 'My Blog Post {}'.format(entry_id),
+                'pub_date': time.time(),
+                'status': 'read',
+                'feed_id': 1,
+                'url': 'https://mtomwing.com/blog/post/week-5-freeseer',
+                'content': generate_slipsum_entry(),
+            })
+
+        self.write({'entries': entries})
+        self.set_status(200)

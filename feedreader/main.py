@@ -22,6 +22,8 @@ def get_application():
          dict(auth_provider=auth_provider)),
         (r'^/feeds/?$', handlers.FeedsHandler,
          dict(auth_provider=auth_provider)),
+        (r'^/entries/((?:[^/]|\d)+)$', handlers.EntriesHandler,
+         dict(auth_provider=auth_provider)),
     ])
 
 

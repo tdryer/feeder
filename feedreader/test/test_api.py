@@ -75,9 +75,7 @@ class FeedsTest(AsyncHTTPTestCase):
         return feedreader.main.get_application()
 
     def test_get_feeds_success(self):
-        response = self.fetch('/feeds/', method='GET', headers={
-            'Authorization': get_basic_auth('foo', 'bar')
-        })
+        response = self.fetch('/feeds/', method='GET', headers=self.headers)
         self.assertEqual(response.code, 200)
 
     def test_add_feed_success(self):
@@ -87,3 +85,24 @@ class FeedsTest(AsyncHTTPTestCase):
                               }),
         )
         self.assertEqual(response.code, 201)
+
+
+class EntriesTest(AsyncHTTPTestCase):
+
+    def setUp(self):
+        super(EntriesTest, self).setUp()
+        self.headers = {
+            'Authorization': get_basic_auth('foo', 'bar'),
+        }
+
+    def get_app(self):
+        return feedreader.main.get_application()
+
+    def test_get_entries_success(self):
+        response = self.fetch('/entries/1234', method='GET', headers=self.headers)
+        self.assertEqual(response.code, 200)
+
+        # TODO: Validate against schema instead
+        body = json.loads(response.body)
+        self.assertIn('entries', body)
+        self.assertIsInstance(body['entries'], list)
