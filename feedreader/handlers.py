@@ -37,9 +37,19 @@ class FeedsHandler(APIRequestHandler):
         self.write({
             'feeds': [{
                 'id': 1,
-                'name': 'Awesome Blog',
-                'url': 'http://awesome-blog.github.io',
+                'name': 'David Yan\'s CMPT 376W Blog',
+                'url': 'http://awesome-blog.github.io/',
                 'unreads': 1337,
+            }, {
+                'id': 2,
+                'name': 'Michael\'s Blog Posts',
+                'url': 'https://mtomwing.com/blog/',
+                'unreads': 666,
+            }, {
+                'id': 3,
+                'name': 'Tombuntu',
+                'url': 'http://tombuntu.com/',
+                'unreads': 69,
             }],
         })
 
