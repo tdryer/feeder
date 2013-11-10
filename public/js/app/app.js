@@ -2,6 +2,7 @@
 
   var app = angular.module('feeder', [
     'ngRoute',
+    'ngSanitize',
     'restangular',
     'feeder.controllers',
     'feeder.directives',

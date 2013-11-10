@@ -3,5 +3,12 @@
   <a href="{{ feed.url }}">{{ feed.name }}</a> - {{ feed.unreads }}
 </p>
 
+<div ng-repeat="entry in entries">
+  <p>{{ entry.pub_date | format_date:'LLLL' }}</p>
+  <p><a href="{{ entry.url }}">{{ entry.title }}</a> is {{ entry.status }}</p>
+  <div ng-bind-html="entry.content"></div>
+  <hr>
+</div>
+
 <input ng-model="addFeed.url" placeholder="enter any url">
 <button ng-click="addFeed.add()">add</button>
