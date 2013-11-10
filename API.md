@@ -16,9 +16,9 @@ None
         "name": "David yan blog",
         "url": "awesome-blog.com",
         "unreads": 123
-        }, {
-          ...
-        }]
+      }, {
+        ...
+      }]
     }
 
   - 200 Success
@@ -81,23 +81,25 @@ None
 
 
 ## Get feed item
-GET /feeds/:feed\_id/:entry\_id
+GET /entries/:entry\_id(,entry\_id,...)
 
 ### Description
-Get the details of a specific entry.
+Get the details of entries.
 
 ### Request
 None
 
 ### Response
     {
-      "title": item_title,
-      "pub-date": item_date,
-      "status": "read"|"unread",
-      "author": author_name,
-      "feed_id": feed_id,
-      "url": permalink
-      "content": item_content
+      "entries": [{
+          "title": item_title,
+          "pub-date": item_date,
+          "status": "read"|"unread",
+          "author": author_name,
+          "feed_id": feed_id,
+          "url": permalink
+          "content": item_content
+      }, { ... }]
     }
 
   - 200 Success
@@ -106,10 +108,10 @@ None
   - 404 Not Found: if the feed/item does not exist
 
 ## Update item details
-PATCH /feeds/:feed\_id/:entry\_id
+PATCH /entries/:entry\_id(,entry\_id,...)
 
 ### Description
-Update any modifiable item metadata that is specific to the user.
+Update any modifiable entry metadata for that user.
 
 ### Request
     {
