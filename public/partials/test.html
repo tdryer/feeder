@@ -1,4 +1,8 @@
 <p>TODO: Insert feed reader frontend here.</p>
+
+<input ng-model="addFeed.url" placeholder="enter any url">
+<button ng-click="addFeed.add()">add</button>
+
 <p ng-repeat="feed in testApi">
   <a href="{{ feed.url }}">{{ feed.name }}</a> - {{ feed.unreads }}
 </p>
@@ -9,6 +13,3 @@
   <div ng-bind-html="entry.content"></div>
   <hr>
 </div>
-
-<input ng-model="addFeed.url" placeholder="enter any url">
-<button ng-click="addFeed.add()">add</button>

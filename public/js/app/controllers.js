@@ -13,9 +13,19 @@
 
     $scope.addFeed = {};
     $scope.addFeed.add = function() {
+
       feeds.post({
         url: this.url
+      }).then(function() {
+
+        feeds.getList().then(function(data) {
+          $scope.testApi = data.feeds;
+        });
+
+      }, function() {
+        // if the thing 500s
       });
+
     }
 
     entries.getList().then(function(data) {
