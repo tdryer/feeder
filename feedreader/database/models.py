@@ -66,12 +66,12 @@ class User(BASE):
         session.delete(sub)
         session.commit()
 
-    def markRead(self, session, entry_id):
+    def mark_read(self, session, entry_id):
         read = Read(self.username, entry_id)
         session.add(read)
         session.commit()
 
-    def getReadIds(self, session):
+    def get_read_ids(self, session):
         id_list = []
         reads = session.query(
             Read).filter(
@@ -81,7 +81,7 @@ class User(BASE):
             id_list.append(read.entry_id)
         return id_list
 
-    def getFeeds(self, session):
+    def get_feeds(self, session):
         id_list = []
         subs = session.query(
             Subscription).filter(
@@ -124,17 +124,17 @@ class Feed(BASE):
             session.commit()
             make_transient(self)
 
-    def getEntries(self, session):
+    def get_entries(self, session):
         entries = session.query(Entry).filter(Entry.feed_id == self.id).all()
         return entries
 
-    def getUnreadEntries(self, session, id_list):
+    def get_unread_entries(self, session, id_list):
         entries = session.query(
             Entry).filter(and_(Entry.feed_id == self.id,
                                ~Entry.id.in_(id_list))).all()
         return entries
 
-    def getUsers(self, session):
+    def get_users(self, session):
         name_list = []
         subs = session.query(
             Subscription).filter(
@@ -210,5 +210,4 @@ class Read(BASE):
         self.entry_id = entry_id
 
     def __repr__(self):
-        return "<Read('%s','%s')>" % (self.username, self.entry)
-
+        return "<Read('%s','%s')>" % (self.username, self.entry_id)
