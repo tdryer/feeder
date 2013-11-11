@@ -8,7 +8,7 @@
 </p>
 
 <div ng-repeat="entry in entries">
-  <p>{{ entry.pub_date | format_date:'LLLL' }}</p>
+  <p>{{ entry.pub_date | moment }}</p>
   <p><a href="{{ entry.url }}">{{ entry.title }}</a> is {{ entry.status }}</p>
   <div ng-bind-html="entry.content"></div>
   <hr>
