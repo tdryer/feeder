@@ -3,6 +3,7 @@
 import tornado.ioloop
 import tornado.web
 import sys
+import pbkdf2
 
 from feedreader.auth_provider import DummyAuthProvider
 from feedreader.database import models
@@ -14,13 +15,14 @@ def get_application():
     # initialize the DB so sessions can be created
     create_session = models.initialize_db()
 
-    # create an AuthProvider that lets anyone log in with username/password
-    auth_provider = DummyAuthProvider()
-    auth_provider.register("username", "password")
+    # XXX create test user
+    session = create_session()
+    session.add(models.User("username", pbkdf2.crypt("password")))
+    session.commit()
+    session.close()
 
     # create tornado application and listen on the provided port
-    default_injections = dict(auth_provider=auth_provider,
-                              create_session=create_session)
+    default_injections = dict(create_session=create_session)
     return tornado.web.Application([
         (r"^/?$", handlers.MainHandler, default_injections),
         (r"^/users/?$", handlers.UsersHandler, default_injections),

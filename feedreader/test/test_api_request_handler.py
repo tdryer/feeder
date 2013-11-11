@@ -1,31 +1,43 @@
+"""Tests for APIRequestHandler."""
+
 from tornado.testing import AsyncHTTPTestCase
 from tornado.web import Application
 import base64
 import json
+import pbkdf2
 
 from feedreader.api_request_handler import APIRequestHandler
-from feedreader.auth_provider import DummyAuthProvider
+from feedreader.database import models
 
 
 def get_basic_auth(user, passwd):
     return "Basic " + base64.b64encode("{}:{}".format(user, passwd))
 
 
+def get_application(handler):
+    """Return Tornado application with demo user."""
+    create_session = models.initialize_db()
+    app = Application([("/", handler, dict(create_session=create_session))])
+    session = create_session()
+    # TODO: better way of creating the demo user
+    session.add(models.User("demo", pbkdf2.crypt("demo")))
+    session.commit()
+    session.close()
+    return app
+
+
 class AuthorizationTestHandler(APIRequestHandler):
 
     def get(self):
-        username = self.require_auth()
+        with self.get_db_session() as session:
+            username = self.require_auth(session)
         self.write("ok")
 
 
 class AuthorizationTest(AsyncHTTPTestCase):
 
     def get_app(self):
-        auth_provider = DummyAuthProvider()
-        auth_provider.register("demo", "demo")
-        return Application([("/", AuthorizationTestHandler,
-                             dict(auth_provider=auth_provider,
-                                  create_session=None))])
+        return get_application(AuthorizationTestHandler)
 
     def assert_auth_failed(self, response):
         self.assertEqual(response.code, 401)
@@ -73,10 +85,7 @@ class ValidationTestHandler(APIRequestHandler):
 class ValidationTest(AsyncHTTPTestCase):
 
     def get_app(self):
-        auth_provider = DummyAuthProvider()
-        return Application([("/", ValidationTestHandler,
-                             dict(auth_provider=auth_provider,
-                                  create_session=None))])
+        return get_application(ValidationTestHandler)
 
     def test_success(self):
         response = self.fetch("/", method="POST", body=json.dumps({

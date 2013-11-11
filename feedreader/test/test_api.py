@@ -12,6 +12,13 @@ def get_basic_auth(user, passwd):
     return "Basic " + base64.b64encode("{}:{}".format(user, passwd))
 
 
+def create_user(test_case):
+    response = test_case.fetch('/users', method="POST", body=json.dumps(
+        {"username": "foo", "password": "bar"})
+    )
+    test_case.assertEqual(response.code, 201)
+
+
 class UsersTest(AsyncHTTPTestCase):
 
     def get_app(self):
@@ -23,10 +30,7 @@ class UsersTest(AsyncHTTPTestCase):
                       json.loads(response.body)["error"]["message"])
 
     def test_create_new_user(self):
-        response = self.fetch('/users', method="POST", body=json.dumps(
-            {"username": "foo", "password": "bar"})
-        )
-        self.assertEqual(response.code, 201)
+        create_user(self)
         response = self.fetch('/', headers={
             "Authorization": get_basic_auth("foo", "bar"),
         })
@@ -67,6 +71,7 @@ class FeedsTest(AsyncHTTPTestCase):
 
     def setUp(self):
         super(FeedsTest, self).setUp()
+        create_user(self)
         self.headers = {
             'Authorization': get_basic_auth('foo', 'bar'),
         }
@@ -91,6 +96,7 @@ class EntriesTest(AsyncHTTPTestCase):
 
     def setUp(self):
         super(EntriesTest, self).setUp()
+        create_user(self)
         self.headers = {
             'Authorization': get_basic_auth('foo', 'bar'),
         }

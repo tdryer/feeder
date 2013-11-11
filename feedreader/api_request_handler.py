@@ -4,16 +4,18 @@ import httplib
 import json
 import jsonschema
 import tornado.web
+import pbkdf2
+
+from feedreader.database import models
 
 
 class APIRequestHandler(tornado.web.RequestHandler):
     """Base RequestHandler for use by API endpoints."""
 
-    def initialize(self, auth_provider, create_session):
-        self.auth_provider = auth_provider
+    def initialize(self, create_session):
         self.create_session = create_session
 
-    def require_auth(self):
+    def require_auth(self, session):
         """Return the authorized user's username.
 
         If authorization fails, raise HTTPError. This doesn't attempt to
@@ -27,7 +29,11 @@ class APIRequestHandler(tornado.web.RequestHandler):
             user, passwd = base64.decodestring(auth_digest).split(":")
             if auth_type != "Basic":
                 raise ValueError("Authorization type is not Basic")
-            if not self.auth_provider.authenticate(user, passwd):
+            user_model = session.query(models.User).get(user)
+            if user_model is None:
+                raise ValueError("Invalid username or password")
+            passwd_hash = user_model.password_hash
+            if pbkdf2.crypt(passwd, passwd_hash) != passwd_hash:
                 raise ValueError("Invalid username or password")
         except ValueError as e:
             msg = "Authorization failed: {}".format(e)
