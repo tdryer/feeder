@@ -39,7 +39,7 @@ class FeedsHandler(APIRequestHandler):
 
     def get(self):
         feeds = []
-        with self.get_session() as session:
+        with self.get_db_session() as session:
             for feed in session.query(Feed).all():
                 feeds.append({
                     'id': feed.id,
@@ -58,7 +58,7 @@ class FeedsHandler(APIRequestHandler):
             },
             'required': ['url'],
         })
-        with self.get_session() as session:
+        with self.get_db_session() as session:
             dom = html.fromstring(requests.get(body['url']).content)
             title = dom.cssselect('title')[0].text_content()
             session.add(Feed(title, body['url'], body['url']))

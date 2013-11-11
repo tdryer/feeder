@@ -2,18 +2,16 @@ from contextlib import contextmanager
 import base64
 import httplib
 import json
-
 import jsonschema
 import tornado.web
-
-from feedreader.database.models import Session
 
 
 class APIRequestHandler(tornado.web.RequestHandler):
     """Base RequestHandler for use by API endpoints."""
 
-    def initialize(self, auth_provider):
+    def initialize(self, auth_provider, create_session):
         self.auth_provider = auth_provider
+        self.create_session = create_session
 
     def require_auth(self):
         """Return the authorized user's username.
@@ -71,14 +69,17 @@ class APIRequestHandler(tornado.web.RequestHandler):
         })
 
     @contextmanager
-    def get_session(self):
-        """Creates a SQLAlchemy Session instance that auto-commits and rollsback.
+    def get_db_session(self):
+        """Return SQLAlchemy session context manager.
+
+        Commit or rollback is handled authmatically when the context manager
+        exits.
 
         Example:
-            with self.get_session() as session:
-                session.add(blah)
+        with self.get_session() as session:
+            session.add(blah)
         """
-        session = Session()
+        session = self.create_session()
         try:
             yield session
             session.commit()

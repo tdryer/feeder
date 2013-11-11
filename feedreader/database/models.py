@@ -1,16 +1,29 @@
-import types
+"""SQLAlchemy models."""
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.session import make_transient
-from sqlalchemy.orm import backref, relationship, sessionmaker
-from sqlalchemy import and_, create_engine
-from sqlalchemy import Column, ForeignKey, Integer, Sequence, String
-
-Base = declarative_base()
-# hard coded might not be the best approach
-engine = create_engine('sqlite://', echo=False)
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import (and_, create_engine, Column, ForeignKey, Integer,
+                        Sequence, String)
 
 
-class User(Base):
+BASE = declarative_base()
+
+
+def initialize_db():
+    """Initialize the DB and return SQLAlchemy Session class.
+
+    This should only be called once when the server starts.
+    """
+    # hard coded might not be the best approach
+    engine = create_engine('sqlite://', echo=False)
+
+    # create tables and prepare to make sessions
+    BASE.metadata.create_all(engine)
+    return sessionmaker(bind=engine)
+
+
+class User(BASE):
     __tablename__ = 'users'
 
     username = Column(String, primary_key=True)
@@ -80,7 +93,7 @@ class User(Base):
         return feeds
 
 
-class Feed(Base):
+class Feed(BASE):
     __tablename__ = 'feeds'
 
     id = Column(Integer, Sequence('feed_id_seq'),
@@ -133,7 +146,7 @@ class Feed(Base):
         return users
 
 
-class Entry(Base):
+class Entry(BASE):
     __tablename__ = 'entries'
 
     id = Column(Integer, Sequence('entry_id_seq'), primary_key=True)
@@ -166,7 +179,7 @@ class Entry(Base):
         make_transient(self)
 
 
-class Subscription(Base):
+class Subscription(BASE):
     __tablename__ = 'subscriptions'
 
     username = Column(
@@ -183,7 +196,7 @@ class Subscription(Base):
         return "<Subscription('%s','%s')>" % (self.username, self.feed_id)
 
 
-class Read(Base):
+class Read(BASE):
     __tablename__ = 'reads'
 
     username = Column(
@@ -199,6 +212,3 @@ class Read(Base):
     def __repr__(self):
         return "<Read('%s','%s')>" % (self.username, self.entry)
 
-# create tables and prepare to make sessions
-Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)

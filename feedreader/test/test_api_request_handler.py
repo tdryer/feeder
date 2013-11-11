@@ -24,7 +24,8 @@ class AuthorizationTest(AsyncHTTPTestCase):
         auth_provider = DummyAuthProvider()
         auth_provider.register("demo", "demo")
         return Application([("/", AuthorizationTestHandler,
-                             dict(auth_provider=auth_provider))])
+                             dict(auth_provider=auth_provider,
+                                  create_session=None))])
 
     def assert_auth_failed(self, response):
         self.assertEqual(response.code, 401)
@@ -74,7 +75,8 @@ class ValidationTest(AsyncHTTPTestCase):
     def get_app(self):
         auth_provider = DummyAuthProvider()
         return Application([("/", ValidationTestHandler,
-                             dict(auth_provider=auth_provider))])
+                             dict(auth_provider=auth_provider,
+                                  create_session=None))])
 
     def test_success(self):
         response = self.fetch("/", method="POST", body=json.dumps({
