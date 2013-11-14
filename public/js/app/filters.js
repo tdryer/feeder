@@ -5,6 +5,7 @@
   /**
    * Exposes the power of Moment.js parsing and formatting.
    *
+   * @filter
    * @param {*} date The date to parse.
    * @param {String} [format='LLL'] The format to format `date` with.
    * @returns {String} Returns `date` in the format `format`.

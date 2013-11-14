@@ -1,6 +1,7 @@
 (function(angular) {
 
   var app = angular.module('feeder', [
+    'ngCookies',
     'ngRoute',
     'ngSanitize',
     'restangular',
@@ -11,22 +12,42 @@
   ]);
 
   app.config(function($locationProvider) {
-    $locationProvider.html5Mode(true);
+    $locationProvider.html5Mode(false);
   });
 
   app.config(function($routeProvider) {
     $routeProvider.when('/', {
-      controller: 'TestCtrl',
-      templateUrl: 'partials/test.html'
+      controller: 'IndexCtrl',
+      template: ' '
+    });
+
+    $routeProvider.when('/home', {
+      controller: 'HomeCtrl',
+      templateUrl: 'partials/home.html'
+    });
+
+    $routeProvider.when('/home/:feed', {
+      controller: 'HomeCtrl',
+      templateUrl: 'partials/home.html'
+    });
+
+    $routeProvider.when('/home/:feed/:article', {
+      controller: 'HomeCtrl',
+      templateUrl: 'partials/home.html'
+    });
+
+    $routeProvider.when('/login', {
+      controller: 'LoginCtrl',
+      templateUrl: 'partials/login.html'
+    });
+
+    $routeProvider.otherwise({
+      redirectTo: '/'
     });
   });
 
   app.config(function(RestangularProvider) {
     RestangularProvider.setBaseUrl('/api');
-
-    RestangularProvider.setDefaultHeaders({
-      Authorization: 'Basic ' + btoa('username:password')
-    });
   });
 
 }).call(this, angular);

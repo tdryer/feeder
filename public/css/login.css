@@ -1,0 +1,79 @@
+.login {
+  background: #f7f7f7;
+  margin: 2em auto 0;
+  width: 16em;
+  padding: 2em 1em;
+  border-radius: 0.4em;
+  text-align: center;
+  max-width: 100%;
+  border: 2px solid #eaeaea;
+  -webkit-transition: all 0.4s;
+}
+
+.login.loading {
+  border: 2px solid #1abc9c;
+}
+
+.login.error {
+  border: 2px solid #e74c3c;
+}
+
+.login .avatar {
+  width: 8em;
+  border-radius: 8em;
+  margin: 0 0 1em;
+}
+
+.login label {
+  font-size: 0;
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  color: #7f8c8d;
+}
+
+.login label:before {
+  line-height: 0;
+  font-size: 1rem;
+  color: inherit;
+  -webkit-transition: all 0.4s;
+  transition: all 0.4s;
+}
+
+.login .usr,
+.login .pwd {
+  position: relative;
+  margin: 0 0 1em;
+}
+
+.login input {
+  -webkit-appearance: none;
+  -webkit-transition: all 0.4s;
+  transition: all 0.4s;
+  border: 2px solid #eaeaea;
+  padding: 0.5em;
+  padding-right: 1.6em;
+  border-radius: 0.2em;
+  width: 100%;
+  color: #7f8c8d;
+}
+
+.login input:focus {
+  outline: 0;
+  border-color: #1abc9c;
+}
+
+.login input:focus + label {
+  color: #1abc9c;
+}
+
+.login .submit {
+  border: 0;
+  background: #1abc9c;
+  padding: 0.5em;
+  color: #fff;
+}
+
+.login .submit:hover {
+  background: #16a085;
+}

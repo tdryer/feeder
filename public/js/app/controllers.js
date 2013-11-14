@@ -1,11 +1,44 @@
 (function(angular) {
 
-  var controllers = angular.module('feeder.controllers', []);
+  angular.module('feeder.controllers', [])
 
-  controllers.controller('TestCtrl', function($scope, Restangular) {
+  /**
+   * Routes the user to their home page.
+   * Routes a visitor to the login page.
+   *
+   * @controller
+   * @route '/'
+   */
+  .controller('IndexCtrl', function($location, UserService) {
+    if (UserService.isLoggedIn()) {
+      $location.path('/home');
+    } else {
+      $location.path('/login');
+    }
+  })
 
-    var feeds = Restangular.all('feeds')
-      , entries = Restangular.several('entries', [1, 2, 3, 4]);
+  /**
+   * Displays a user's list of subscriptions.
+   * Allows a user to add subscriptions.
+   *
+   * @controller
+   * @route '/home'
+   */
+  .controller('HomeCtrl', function($scope, $cookies, Restangular, UserService) {
+    var feeds, entries;
+
+    if (!UserService.isLoggedIn()) {
+      $location.path('/login');
+    }
+
+    Restangular = Restangular.withConfig(function(RestangularProvider) {
+      RestangularProvider.setDefaultHeaders({
+        Authorization: 'Basic ' + $cookies.auth
+      });
+    });
+
+    feeds = Restangular.all('feeds');
+    entries = Restangular.several('entries', [1, 2, 3, 4]);
 
     feeds.getList().then(function(data) {
       $scope.testApi = data.feeds;
@@ -32,6 +65,41 @@
       $scope.entries = data.entries;
     });
 
+  })
+
+  /**
+   * Routes the user to their home page upon successful authentication.
+   *
+   * @controller
+   * @route '/login'
+   * @scope {Function} login Hits the authentication server on button click.
+   * @scope {String} username Value of the username input field.
+   * @scope {String} password Value of the password input field.
+   * @scope {Boolean} error Error state of authentication.
+   * @scope {Boolean} loading Loading state of authentication.
+   */
+  .controller('LoginCtrl', function($scope, $location, $timeout, UserService) {
+    var timeout;
+
+    $scope.error = false;
+    $scope.loading = false;
+
+    $scope.login = function() {
+      $timeout.cancel(timeout);
+
+      $scope.loading = true;
+      UserService.login($scope.username, $scope.password).then(function() {
+        $location.path('/');
+      }, function() {
+        $scope.error = true;
+
+        timeout = $timeout(function() {
+          $scope.error = false;
+        }, 200);
+      }).then(function() {
+        $scope.loading = false;
+      });
+    }
   });
 
 }).call(this, angular);

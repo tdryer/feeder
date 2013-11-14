@@ -56,8 +56,8 @@ class APIRequestHandler(tornado.web.RequestHandler):
 
     def write_error(self, status_code, **kwargs):
         # if unauthorized, tell client that authorization is required
-        if status_code == 401:
-            self.set_header('WWW-Authenticate', 'Basic realm=Restricted')
+        # if status_code == 401:
+            # self.set_header('WWW-Authenticate', 'Basic realm=Restricted')
 
         # use generic error message, or reason if provided
         message = httplib.responses[status_code]
