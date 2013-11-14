@@ -13,6 +13,7 @@ from feedreader.stub import generate_slipsum_entry
 class MainHandler(APIRequestHandler):
 
     def get(self):
+        """Return a hello world message."""
         with self.get_db_session() as session:
             username = self.require_auth(session)
             self.write({"message": "Hello, {}.".format(username)})
@@ -45,6 +46,7 @@ class UsersHandler(APIRequestHandler):
 class FeedsHandler(APIRequestHandler):
 
     def get(self):
+        """Return a list of the user's subscribed feeds."""
         feeds = []
         with self.get_db_session() as session:
             self.require_auth(session)
@@ -53,12 +55,13 @@ class FeedsHandler(APIRequestHandler):
                     'id': feed.id,
                     'name': feed.title,
                     'url': feed.site_url,
-                    'unreads': 1337,
+                    'unreads': 1337, # TODO
                 })
         self.write({'feeds': feeds})
         self.set_status(200)
 
     def post(self):
+        """Subscribe the user to a new feed."""
         body = self.require_body_schema({
             'type': 'object',
             'properties': {

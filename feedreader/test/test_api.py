@@ -5,6 +5,7 @@ import base64
 import json
 
 import feedreader.main
+from feedreader.database import models
 
 
 def get_basic_auth(user, passwd):
@@ -77,11 +78,43 @@ class FeedsTest(AsyncHTTPTestCase):
         }
 
     def get_app(self):
-        return feedreader.main.get_application()
+        def hook(Session): self.Session = Session
+        return feedreader.main.get_application(db_setup_f=hook)
 
-    def test_get_feeds_success(self):
+    def test_get_feeds_requires_auth(self):
+        response = self.fetch('/feeds/', method='GET')
+        self.assertEqual(response.code, 401)
+
+    def test_get_feeds_empty(self):
         response = self.fetch('/feeds/', method='GET', headers=self.headers)
         self.assertEqual(response.code, 200)
+        self.assertEqual(json.loads(response.body), {
+            "feeds": [],
+        })
+
+    def test_get_feeds(self):
+        s = self.Session()
+        feed1 = models.Feed("Tombuntu", "http://feeds.feedburner.com/Tombuntu",
+                            "http://tombuntu.com")
+        s.add(feed1)
+        s.commit()
+        s.add(models.Subscription("foo", feed1.id))
+        s.add(models.Entry(feed1.id, "This is test content.", "Test title",
+                           "Tom", 1384402853))
+        s.commit()
+        response = self.fetch('/feeds/', method='GET', headers=self.headers)
+        self.assertEqual(response.code, 200)
+        self.assertEqual(json.loads(response.body), {
+            "feeds": [
+                {
+                    "id": feed1.id,
+                    "name": feed1.title,
+                    "url": feed1.site_url,
+                    "unreads": 1337, # TODO
+                },
+            ],
+        })
+        s.close()
 
     def test_add_feed_success(self):
         response = self.fetch('/feeds/', method='POST', headers=self.headers,

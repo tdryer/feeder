@@ -10,10 +10,13 @@ from feedreader.database import models
 from feedreader import handlers
 
 
-def get_application():
+def get_application(db_setup_f=None):
     """Return Tornado application instance."""
     # initialize the DB so sessions can be created
     create_session = models.initialize_db()
+
+    if db_setup_f is not None:
+        db_setup_f(create_session)
 
     # XXX create test user
     session = create_session()
