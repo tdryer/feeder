@@ -74,6 +74,10 @@ class FeedsHandler(APIRequestHandler):
             dom = html.fromstring(requests.get(body['url']).content)
             title = dom.cssselect('title')[0].text_content()
             session.add(Feed(title, body['url'], body['url']))
+            # TODO: If the feed doesn't already exist, retrive it and add new
+            # feed and entries.
+            # TODO: Subscribe the user to the feed.
+        # TODO: we should indicate the ID of the new feed (location header?)
         self.set_status(201)
 
 

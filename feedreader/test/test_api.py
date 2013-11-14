@@ -116,7 +116,14 @@ class FeedsTest(AsyncHTTPTestCase):
         })
         s.close()
 
+    def test_add_feed_requires_auth(self):
+        response = self.fetch('/feeds/', method='POST', body=json.dumps({
+          'url': 'http://awesome-blog.github.io'
+        }))
+        self.assertEqual(response.code, 401)
+
     def test_add_feed_success(self):
+        # TODO: mock this so we're not (slowly) fetching a real feed here
         response = self.fetch('/feeds/', method='POST', headers=self.headers,
                               body=json.dumps({
                                   'url': 'http://awesome-blog.github.io'
