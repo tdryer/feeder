@@ -12,7 +12,7 @@
   ]);
 
   app.config(function($locationProvider) {
-    $locationProvider.html5Mode(true);
+    $locationProvider.html5Mode(false);
   });
 
   app.config(function($routeProvider) {
