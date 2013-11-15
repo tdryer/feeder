@@ -4,6 +4,7 @@ from lxml import html
 from tornado.web import HTTPError
 import requests
 import pbkdf2
+import re
 
 from feedreader.api_request_handler import APIRequestHandler
 from feedreader.database.models import Feed, User
@@ -34,8 +35,17 @@ class UsersHandler(APIRequestHandler):
         body = self.require_body_schema({
             "type": "object",
             "properties": {
-                "username": {"type": "string"},
-                "password": {"type": "string"},
+                "username": {
+                    "type": "string",
+                    "pattern": "^[\w-]*$",
+                    "minLength": 5,
+                    "maxLength": 32
+                },
+                "password": {
+                    "type": "string",
+                    "pattern": "^[\w-]*$",
+                    "minLength": 5
+                },
             },
             "required": ["username", "password"],
         })
