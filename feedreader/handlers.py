@@ -36,12 +36,10 @@ class UsersHandler(APIRequestHandler):
                 "username": {
                     "type": "string",
                     "pattern": "^[^:\s]*$",
-                    "minLength": 5,
                     "maxLength": 32
                 },
                 "password": {
-                    "type": "string",
-                    "minLength": 5
+                    "type": "string"
                 },
             },
             "required": ["username", "password"],
