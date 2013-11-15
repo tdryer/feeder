@@ -52,7 +52,7 @@
   });
 
   app.config(function(RestangularProvider) {
-    RestangularProvider.setBaseUrl('/api');
+    RestangularProvider.setBaseUrl('api');
   });
 
 }).call(this, angular);
