@@ -55,7 +55,7 @@ class FeedsHandler(APIRequestHandler):
                     'id': feed.id,
                     'name': feed.title,
                     'url': feed.site_url,
-                    'unreads': user.num_unread_in_feed(session, feed),
+                    'unreads': user.num_unread_in_feed(session, feed.id),
                 })
         self.write({'feeds': feeds})
         self.set_status(200)
