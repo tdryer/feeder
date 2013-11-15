@@ -81,6 +81,18 @@ class FeedsHandler(APIRequestHandler):
         self.set_status(201)
 
 
+class FeedEntriesHandler(APIRequestHandler):
+
+    def get(self, feed_id):
+        """Return a list of entry IDs for a feed."""
+        with self.get_db_session() as session:
+            self.require_auth(session)
+        # TODO: check if feed_id exists and the user is subscribed to that feed
+        # TODO: return read/unread/all entry IDs for the feed
+        #self.write({'entries': []})
+        self.set_status(404)
+
+
 class EntriesHandler(APIRequestHandler):
 
     def get(self, dirty_entry_ids):

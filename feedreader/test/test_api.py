@@ -131,6 +131,15 @@ class FeedsTest(AsyncHTTPTestCase):
         )
         self.assertEqual(response.code, 201)
 
+    def test_get_feed_entries_feed_does_not_exist(self):
+        response = self.fetch('/feeds/1/entries', method='GET',
+                              headers=self.headers)
+        self.assertEqual(response.code, 404)
+
+    def test_get_feed_entries_requires_auth(self):
+        response = self.fetch('/feeds/1/entries', method='GET')
+        self.assertEqual(response.code, 401)
+
 
 class EntriesTest(AsyncHTTPTestCase):
 
