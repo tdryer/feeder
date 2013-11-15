@@ -12,41 +12,48 @@
   ]);
 
   app.config(function($locationProvider) {
-    $locationProvider.html5Mode(false);
+    $locationProvider.html5Mode(true);
   });
 
   app.config(function($routeProvider) {
-    $routeProvider.when('/', {
+    $routeProvider
+
+    .when('/', {
       controller: 'IndexCtrl',
       template: ' '
-    });
+    })
 
-    $routeProvider.when('/home', {
+    .when('/home', {
       controller: 'HomeCtrl',
       templateUrl: 'partials/home.html'
-    });
+    })
 
-    $routeProvider.when('/home/:feed', {
+    .when('/home/:feed', {
       controller: 'HomeCtrl',
       templateUrl: 'partials/home.html'
-    });
+    })
 
-    $routeProvider.when('/home/:feed/:article', {
+    .when('/home/:feed/:article', {
       controller: 'HomeCtrl',
       templateUrl: 'partials/home.html'
-    });
+    })
 
-    $routeProvider.when('/login', {
+    .when('/login', {
       controller: 'LoginCtrl',
       templateUrl: 'partials/login.html'
-    });
+    })
 
-    $routeProvider.when('/register', {
+    .when('/logout', {
+      controller: 'LogoutCtrl',
+      template: ' '
+    })
+
+    .when('/register', {
       controller: 'RegisterCtrl',
       templateUrl: 'partials/register.html'
-    });
+    })
 
-    $routeProvider.otherwise({
+    .otherwise({
       redirectTo: '/'
     });
   });

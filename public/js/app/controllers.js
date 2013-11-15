@@ -131,6 +131,11 @@
         $scope.loading = false;
       });
     }
+  })
+
+  .controller('LogoutCtrl', function($location, UserService) {
+    UserService.logout();
+    $location.path('/login');
   });
 
 }).call(this, angular);
