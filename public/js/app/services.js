@@ -6,15 +6,23 @@
     var User = angular.noop
       , cookieKey = 'auth';
 
+    function genAuth(username, password) {
+      return btoa(username + ':' + password);
+    }
+
     User.prototype.register = function(username, password) {
       return Restangular.all('users').post({
         username: username,
         password: password
+      }).then(function(result) {
+        $cookieStore.put(cookieKey, genAuth(username, password));
+      }, function(reason) {
+        return $q.reject(reason);
       });
     }
 
     User.prototype.login = function(username, password) {
-      var auth = btoa(username + ':' + password);
+      var auth = genAuth(username, password);
 
       Restangular = Restangular.withConfig(function(RestangularProvider) {
         RestangularProvider.setDefaultHeaders({

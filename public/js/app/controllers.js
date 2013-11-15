@@ -33,7 +33,7 @@
 
     Restangular = Restangular.withConfig(function(RestangularProvider) {
       RestangularProvider.setDefaultHeaders({
-        Authorization: 'Basic ' + $cookies.auth
+        Authorization: 'xBasic ' + $cookies.auth
       });
     });
 

@@ -1,18 +1,17 @@
-<div class="login">
-  <form ng-class="{error: error, loading: loading}">
+<div class="form-container">
+  <form class="form" ng-class="{error:error,loading:loading}">
     <img src="img/avatar_2x.png" class="avatar">
-    <p><b>Demo username password is "username" and "password".</b></p>
     <div class="usr">
       <input type="text" ng-model="username" placeholder="Username" id="usr">
-      <label for="usr" class="fui-user">Username</label>
+      <label for="usr" class="fui fui-user">Username</label>
     </div>
     <div class="pwd">
       <input type="password" ng-model="password" placeholder="Password" id="pwd">
-      <label for="pwd" class="fui-lock">Password</label>
+      <label for="pwd" class="fui fui-lock">Password</label>
     </div>
     <input type="submit" ng-click="login()" value="Login" class="submit">
   </form>
-  <p class="register">
+  <p class="center-text">
     <a href="#/register">Create an account</a>
   </p>
 </div>

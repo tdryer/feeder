@@ -205,3 +205,21 @@ body {
 .fui-check-inverted-2:before {
   content: "\e000";
 }
+
+/**
+ * @util
+ */
+.center-text {
+  text-align: center;
+}
+
+/**
+ * @tag img
+ * @route '/login'
+ * @route '/register'
+ */
+.avatar {
+  width: 8em;
+  border-radius: 8em;
+  margin: 0 0 1em;
+}
