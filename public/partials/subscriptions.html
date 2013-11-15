@@ -6,10 +6,16 @@
           id="new-sub"
           ng-model="addFeed.url"
           placeholder="Enter a URL"
+          tabindex="1"
           type="text">
         <label for="new-sub" class="fui fui-new">New subscription</label>
       </div>
-      <input type="submit" ng-click="addFeed.add()" value="Add" class="submit">
+      <input
+        class="submit"
+        ng-click="addFeed.add()"
+        tabindex="2"
+        type="submit"
+        value="Add">
     </form>
   </div>
 
