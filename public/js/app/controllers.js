@@ -24,7 +24,7 @@
    * @controller
    * @route '/home'
    */
-  .controller('HomeCtrl', function($scope, $cookies, $location, Restangular, UserService) {
+  .controller('HomeCtrl', function($scope, $location, $cookieStore, Restangular, UserService) {
     var feeds, entries;
 
     if (!UserService.isLoggedIn()) {
@@ -33,7 +33,7 @@
 
     Restangular = Restangular.withConfig(function(RestangularProvider) {
       RestangularProvider.setDefaultHeaders({
-        Authorization: 'xBasic ' + $cookies.auth
+        Authorization: 'xBasic ' + $cookieStore.get('auth')
       });
     });
 
@@ -130,20 +130,6 @@
       }).then(function() {
         $scope.loading = false;
       });
-    }
-  })
-
-  /**
-   * Logs a user out of their account.
-   * Routes the user to the login page.
-   *
-   * @controller
-   */
-  .controller('LogoutCtrl', function($scope, $location, $timeout, UserService) {
-    $scope.logout = function() {
-      UserService.logout();
-
-      $location.path('/login');
     }
   });
 
