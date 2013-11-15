@@ -16,7 +16,7 @@ def initialize_db():
     This should only be called once when the server starts.
     """
     # hard coded might not be the best approach
-    engine = create_engine('sqlite:///dbtest', echo=False)
+    engine = create_engine('sqlite://', echo=False)
 
     # create tables and prepare to make sessions
     BASE.metadata.create_all(engine)
