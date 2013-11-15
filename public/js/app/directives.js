@@ -1,6 +1,6 @@
 (function(angular) {
 
-  var directives = angular.module('feeder.directives', [])
+  angular.module('feeder.directives', [])
 
   /**
    * Displays the user's list of subscriptions.
@@ -35,8 +35,8 @@
    */
   .directive('username', function() {
     return {
-      controller: function($scope, UserService) {
-        UserService.getUsername().then(function(username) {
+      controller: function($scope, User) {
+        User.getUsername().then(function(username) {
           $scope.username = username;
         });
       }

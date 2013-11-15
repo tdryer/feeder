@@ -9,8 +9,8 @@
    * @controller
    * @route '/'
    */
-  .controller('IndexCtrl', function($location, UserService) {
-    if (UserService.isLoggedIn()) {
+  .controller('IndexCtrl', function($location, User) {
+    if (User.isLoggedIn()) {
       $location.path('/home');
     } else {
       $location.path('/login');
@@ -23,48 +23,27 @@
    *
    * @controller
    * @route '/home'
+   * @scope {Function} addFeed Adds a new feed.
+   * @scope {String} newFeed The URL of the new feed to add.
    */
-  .controller('HomeCtrl', function($scope, $location, $cookieStore, Restangular, UserService) {
-    var feeds, entries;
-
-    if (!UserService.isLoggedIn()) {
+  .controller('HomeCtrl', function($scope, $location, User, Feeds) {
+    if (!User.isLoggedIn()) {
       $location.path('/login');
     }
 
-    Restangular = Restangular.withConfig(function(RestangularProvider) {
-      RestangularProvider.setDefaultHeaders({
-        Authorization: 'xBasic ' + $cookieStore.get('auth')
+    function updateFeeds() {
+      Feeds.get().then(function(feeds) {
+        $scope.subscriptions = feeds;
       });
-    });
-
-    feeds = Restangular.all('feeds');
-    entries = Restangular.several('entries', [1, 2, 3, 4]);
-
-    feeds.getList().then(function(data) {
-      $scope.testApi = data.feeds;
-    });
-
-    $scope.addFeed = {};
-    $scope.addFeed.add = function() {
-
-      feeds.post({
-        url: this.url
-      }).then(function() {
-
-        feeds.getList().then(function(data) {
-          $scope.testApi = data.feeds;
-        });
-
-      }, function() {
-        // if the thing 500s
-      });
-
     }
 
-    entries.getList().then(function(data) {
-      $scope.entries = data.entries;
-    });
+    $scope.addFeed = function() {
+      Feeds.add($scope.newFeed).then(function(feeds) {
+        updateFeeds();
+      });
+    }
 
+    updateFeeds();
   })
 
   /**
@@ -74,7 +53,7 @@
    * @controller
    * @route '/register'
    */
-  .controller('RegisterCtrl', function($scope, $location, $timeout, UserService) {
+  .controller('RegisterCtrl', function($scope, $location, $timeout, User) {
     var timeout;
 
     $scope.error = false;
@@ -84,7 +63,7 @@
       $timeout.cancel(timeout);
 
       $scope.loading = true;
-      UserService.register($scope.username, $scope.password).then(function() {
+      User.register($scope.username, $scope.password).then(function() {
         $location.path('/');
       }, function() {
         $scope.error = true;
@@ -109,7 +88,7 @@
    * @scope {Boolean} error Error state of authentication.
    * @scope {Boolean} loading Loading state of authentication.
    */
-  .controller('LoginCtrl', function($scope, $location, $timeout, UserService) {
+  .controller('LoginCtrl', function($scope, $location, $timeout, User) {
     var timeout;
 
     $scope.error = false;
@@ -119,7 +98,7 @@
       $timeout.cancel(timeout);
 
       $scope.loading = true;
-      UserService.login($scope.username, $scope.password).then(function() {
+      User.login($scope.username, $scope.password).then(function() {
         $location.path('/');
       }, function() {
         $scope.error = true;
@@ -133,8 +112,8 @@
     }
   })
 
-  .controller('LogoutCtrl', function($location, UserService) {
-    UserService.logout();
+  .controller('LogoutCtrl', function($location, User) {
+    User.logout();
     $location.path('/login');
   });
 

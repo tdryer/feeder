@@ -4,7 +4,7 @@
       <div class="new-subscription">
         <input
           id="new-sub"
-          ng-model="addFeed.url"
+          ng-model="newFeed"
           placeholder="Enter a URL"
           tabindex="1"
           type="text">
@@ -12,7 +12,7 @@
       </div>
       <input
         class="submit"
-        ng-click="addFeed.add()"
+        ng-click="addFeed()"
         tabindex="2"
         type="submit"
         value="Add">
@@ -20,8 +20,8 @@
   </div>
 
   <ul>
-    <li ng-repeat="feed in testApi">
-      <a href="#/home/{{feed.id}}">{{ feed.name }}</a> - {{ feed.unreads }}
+    <li ng-repeat="feed in subscriptions">
+      <a href="#/home/{{feed.id}}">{{feed.name}}</a> - {{feed.unreads}}
     </li>
   </ul>
 </div>
