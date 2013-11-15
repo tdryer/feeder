@@ -1,68 +1,45 @@
 import random
 import time
 
-stub_entry_template = '''
-<h1>{}</h1>
-<img src="http://placekitten.com/{}/{}">
-<p>{}</p>
-<p>{}</p>
-<ul>
-<li>{}</li>
-<li>{}</li>
-<li>{}</li>
-</ul>
-'''
-long_slipsum = [
-    'Normally, both your asses would be dead as fucking fried chicken, but you happen to pull this shit while I\'m in a transitional period so I don\'t wanna kill you, I wanna help you. But I can\'t give you this case, it don\'t belong to me. Besides, I\'ve already been through too much shit this morning over this case to hand it over to your dumb ass.',
-    'Well, the way they make shows is, they make one show. That show\'s called a pilot. Then they show that show to the people who make shows, and on the strength of that one show they decide if they\'re going to make more shows. Some pilots get picked and become television programs. Some don\'t, become nothing. She starred in one of the ones that became nothing.',
-    'The path of the righteous man is beset on all sides by the iniquities of the selfish and the tyranny of evil men. Blessed is he who, in the name of charity and good will, shepherds the weak through the valley of darkness, for he is truly his brother\'s keeper and the finder of lost children. And I will strike down upon thee with great vengeance and furious anger those who would attempt to poison and destroy My brothers. And you will know My name is the Lord when I lay My vengeance upon thee.',
-    'Do you see any Teletubbies in here? Do you see a slender plastic tag clipped to my shirt with my name printed on it? Do you see a little Asian child with a blank expression on his face sitting outside on a mechanical helicopter that shakes when you put quarters in it? No? Well, that\'s what you see at a toy store. And you must think you\'re in a toy store, because you\'re here shopping for an infant named Jeb.',
-    'Your bones don\'t break, mine do. That\'s clear. Your cells react to bacteria and viruses differently than mine. You don\'t get sick, I do. That\'s also clear. But for some reason, you and I react the exact same way to water. We swallow it too fast, we choke. We get some in our lungs, we drown. However unreal it may seem, we are connected, you and I. We\'re on the same curve, just on opposite ends.',
-    'Now that we know who you are, I know who I am. I\'m not a mistake! It all makes sense! In a comic, you know how you can tell who the arch-villain\'s going to be? He\'s the exact opposite of the hero. And most times they\'re friends, like you and me! I should\'ve known way back when... You know why, David? Because of the kids. They called me Mr Glass.',
-    'You think water moves fast? You should see ice. It moves like it has a mind. Like it knows it killed the world once and got a taste for murder. After the avalanche, it took us a week to climb out. Now, I don\'t know exactly when we turned on each other, but I know that seven of us survived the slide... and only five made it out. Now we took an oath, that I\'m breaking now. We said we\'d say it was the snow that killed the other two, but it wasn\'t. Nature is lethal but it doesn\'t hold a candle to man.',
-    'Look, just because I don\'t be givin\' no man a foot massage don\'t make it right for Marsellus to throw Antwone into a glass motherfuckin\' house, fuckin\' up the way the nigger talks. Motherfucker do that shit to me, he better paralyze my ass, \'cause I\'ll kill the motherfucker, know what I\'m sayin\'?',
-    'Now that there is the Tec-9, a crappy spray gun from South Miami. This gun is advertised as the most popular gun in American crime. Do you believe that shit? It actually says that in the little book that comes with it: the most popular gun in American crime. Like they\'re actually proud of that shit. ',
-    'My money\'s in that office, right? If she start giving me some bullshit about it ain\'t there, and we got to go someplace else and get it, I\'m gonna shoot you in the head then and there. Then I\'m gonna shoot that bitch in the kneecaps, find out where my goddamn money is. She gonna tell me too. Hey, look at me when I\'m talking to you, motherfucker. You listen: we go in there, and that nigga Winston or anybody else is in there, you the first motherfucker to get shot. You understand?',
+quotes = [
+    "<h1>Marceline's Closet</h1>\n<p>Do you think it's right for Marceline to invite us to jam without Princess and BMO? It's just a jam sesh. Is that what you're gonna jam with? Yeah, man. Balloon music is the future. Listen. Pretty good. I don't think you mastered it yet. Well, duh. I just started.</p>\n<p>Oh, dude. There's a note. What's it say? Hey, guys, I had to run out, but I'll be back, blee-bloo-blop, Don't go in my house. That's it? Yeah. Just Don't go in my house in all caps... written in blood. </p>\n<h2>Hmm. What are you doing?</h2>\n<p>Eliminating desire from my heart. It helps pass the time. Come on! I can't do that! Let's play Cloud Hunt 'til she gets here. No, man, I got a mental block with Cloud Hunt! Yeah, that's what makes it awesome, 'cause I know I'll win. Oh, what?! Bring it on, brother! Now explain the rules 'cause I forget. Okay. I count to ten and you go hide somewhere. Then, I gotta try to find you. You can hide... anywhere in here. Anywhere in here, ...but Marcy's house is off limits because she said so. Okay? Got it. Okay. I'm gonna start counting. Ready? Yes. Go! </p>\n<ol>\n<li>One... </li>\n<li>Two... </li>\n<li>Three... </li>\n<li>Four... </li>\n<li>Five... </li>\n<li>Four...</li>\n</ol>\n<h3>Cloud Hunt...</h3>\n<p>GOTCHA! Huh. Hmm. AH-HA! JAKE! Get out of there! Marcelines gonna kill you! Jake! I know this isnt a mirror. What the--?! Youre doing it wrong, even! Get out! Get out!! (Finn goes inside. Jake spots him and continues mirroring him.) Dude, get out of there! Shes gonna kill us! Shell be home any minute! Did you read the note?! I mean, you read the note! You told it to me!!</p>\n<ul>\n<li>This is Jake! And this is Finn!</li>\n<li>Were not home right now, so...</li>\n<li>...leave a message! Leave a message!</li>\n</ul>\n<h4>Smells like sourdough in here.</h4>\n<p>Shes gonna kill us. Once she finds out shes gonna tie us up and eat us like a spider. You dont think I know that?! Hmmmmmmm... Well wait for the right moment and sneak out... right under her big, fat caboose. Okay, man. I can do this. Egh! Egh! Egh!! Shh, here she comes! Here she comes... Shh, shh!!</p>\n<h5>Huh. Lets get outta here.</h5>\n<p>Hello? She didnt wash hands! Is someone here? Shh!! Thats what stinks! Where are those dweebs? Uh... Yeah, hey, you guys. Are you still coming over? S jam time, so, like, call me, kay?</p>",
+    "<h1>Throw it, Cake! </h1>\n<p>Eyahh! These jelly kinders arent... alive, are they? What? No, they cant even talk. Kick it! Thanks for helping me out guys. What are these buggers for, anyway? Oh, theyre decorations for my Biennial Gumball Ball. Tonight!</p>\n<p>Sounds like it gonna be large. Yes! So very large. Id like you to be there as my special guest. You want me to go with you to the ball? Heck yes. As my pal! Oh. Right. It starts at seven, so dont be late! Fionna, we got trouble! My tail is totally frizzin out! Ill check it out.</p>\n<h2>Its Ice Queen!</h2>\n<ol>\n<li>No! No retreat, girl.</li>\n<li>Hello, Fionna.</li>\n<li>And I see you brought Cake.</li>\n<li>Thats cool, right?</li>\n<li>Only if its cool that I brought... Lord Monochromicorn!</li>\n</ol>\n<p>The Prince shall be mine! Back inside! Outta my way, tomboy! Ice Queen, why are you always predatoring on dudes? Ha! You should to talk! Keeping all the babes to yourself, totally ice-blocking my game! What? Not this time! Gah! Slush Beast!</p>\n<h3>Cake! Morning-star mode!</h3>\n<p>You saved me from the Ice Queen! Oh, uh, yeah I guess. Is she gone? She must have fled. Fionna, youre so strong. And you look so beautiful in the snow. What are you doing later? I was just going to go home, I... Come with me. Lets go out. Go... out? Yeah. Lets go somewhere. What? Wed love to! Great! Meet me in the castle gardens in an hour! Yes, well be there!</p>\n<ul>\n<li>Hiya, gorgeous.</li>\n<li>H-E-Y.</li>\n<li>Accept these tokens of our esteem.</li>\n<li>Hey you didnt have to, guy...</li>\n<li>Nonsense. For you, Cake, a satchel of nepetalactone. Mo-Chro picked it himself.</li>\n</ul>\n<h4>Oh, its a date!</h4>\n<p>No, its not. Im sure when he said go out, he meant go out, not go out! Shut up, hes into you! Come on, you heard what he said. Im like his guy-friend. Well, that could change tonight. If its a date, why are you coming? Im coming to help you! Hold on, Im bringing my dulcimer. Man.</p>\n<h5>Its a conversation starter.</h5>\n<p>Fine, Ill do this if only to prove you wrong. Mm... Lets just bail, I changed my mind.</p>",
+    "<h1>Dads Dungeon</h1>\n<p>Alright. Whaddaya wanna see next? A cheetah! A fart! A cookie! An external hard drive! Ooh, ooh! Change into Finn, but give him my body! BMO, your ideas are boring. What? Your head on my body isnt boring! Its weird!  Alright, Ill try to turn into a cheetah farting. I cant do the spots. Sparkles on the house? LETS SQUISH EM!</p>\n<p>Did you squish the sparkles? No. Theyre around this holo-message player. Its got a cartridge with it. Oh, snap!</p>\n<h2>Well, plop that cartridge in the slot, playah!</h2>\n<ol>\n<li>What? What was that about?</li>\n<li>Uh...</li>\n<li>Duh... duh... du-ugh...</li>\n<li>duh...</li>\n</ol>\n<p>Yeah! Okay!Hello, boys. Dad! If youre hearing this prerecorded hologram message, its because I passed on, and my spirit sparkles guided you to its secret hiding place. Right now, Im holding both of you in my hands. Youre both still little squishy babies. I made you boys something. Its a dungeon. A proper dungeon. Full of evil monsters, traps, and magic.</p>\n<h3>The whole kazoo!</h3>\n<ul>\n<li>Whoo!</li>\n<li>Whoa! Burgers and hotdogs!</li>\n<li>Yeah, yeah, YEAH!</li>\n<li>Wait, Jake!</li>\n<li>But... burgers and hotdogs..</li>\n</ul>\n<p>Whoa! Kickin! Kickin! Now, this next part of the message is just for you, Jake, so Finn, cover your ears. Jake... really, this dungeon is for Finn. I know I wont be around forever, and I wanna make something that will force Finn to toughen up. What? Now, tell Finn to uncover his ears now. Dude, take your hands off your head.</p>\n<h4>WHAT?</h4>\n<p>Alright, boys. Now to give you some incentive, at the end of the dungeon, Im going to put the family sword. Its made out of demons blood. Whoa, what the..? Whoa, dang! Give me back my blood, Joshua!</p>\n<h5>Kee Oth Rama Pancake</h5>\n<p>Blood Demon. Waaaaah! Whoa! Geez-louise! The dungeons eighty paces west of here under a dumb-lookin rock. And Finn, this dungeons gonna kick your tail. I bet you wont even get past the first trial, ya whiny baby!</p>",
+    "<h1>Hug Wolf</h1>\n<p>Every hundred years, it spews evil spores across the land. Then lets burn its butt down to the roof rubbins. (The duo walks forward.) Finn, I can feel a bunch a eyeballs peepin us from the woods. Hhyuuugs!</p>\n<p>What the?! Is this an extra butt?! Quick, Jake! Burn the tree! Huuuugs! (Finn grunts and they begin circling each other) Gonna cut you up, boy! Im gonna snuggle you to pieces!</p>\n<h2>Dude! The trees about to splode its evil juice all over!</h2>\n<ul>\n<li>I didnt hug you last night.</li>\n<li>Yes, you did!</li>\n<li>My love handles still hurt!</li>\n<li>You came into my room around midnight and gave me a squeeze</li>\n<li>a really strong one!</li>\n</ul>\n<p>No! Jake, hurry! Is he crushin you, man?! No, hes just... hugging me gently! Oh...! When you see the wicker devil in tree afterlife, tell im Jake says, Hello.</p>\n<p>Hey, buddy, you okay? Didnt even tell me its name. Wha? Oh, sweet! Hahaha!</p>\n<h3>Hot to the touch!</h3>\n<ol>\n<li>Like last night!</li>\n<li>Yes. So you must be a beta hug wolf. A lower-level creature.</li>\n<li>Well, how can I get uncursed?</li>\n<li>Lemme, um... read the book a little more. Says there's no known cure.</li>\n<li>Uh... I'm scared, Jake...</li>\n<li>No hugs!!</li>\n</ol>\n<p>Hmmmm... Dude, whyre you so huggy? I just feel affectionate, I guess. Hugging helps. Hmm... You got a fever, man. I feel hot. Finn, youre hurting me. I think you need a good nights sleep.</p>\n<h4>You feelin better today?</h4>\n<p>Yeah. I feel like a million clams. Good. Hey, you think we have enough candy litter? Litter for lunch! Mmm! Huh? Not again! Whats the matter, Cinnamon Bun? Please, Finn. If youre gonna hug me again, dont make it as hard as you hugged me last night.</p>\n<h5>CB says I hugged im.</h5>\n<p>Haha. Cinnamon Bun, you got some crazy notions. I tell ya. Oh, Cinnamon Bun. What a crazy story, buddy. Yeah, buddy, but you were pretty huggy last night... buddy. Wait. You dont think I actually snuck into Cinnamon Buns room and hugged him, do you? Im just sayin you were really clingy. But no. Why would I? And dont tell me its because I have repressed emotional feelings for Cinnamon Bun.</p>",
+    "<h1>Beautopia</h1>\n<p>Hey, what kind of coffee do you want? Hazelnut! Hazelnut! What if your name was Zelnut? And then I would be all like Hey, Zelnut. Thats terrible. Hey, Zelnut. Stop!</p>\n<ul>\n<li>That was awesome.</li>\n<li>See, Jake. We can trust Susan.</li>\n<li>Shes on the trolley.</li>\n<li>Keeps looking for Lubglubs.</li>\n</ul>\n<p>You hear that? Yeah.Finn and Susan Strong! Finn, help Susan. Of course I will. Excuse us for a moment, Strong. Dude, you know youre my bro, but that girl is bad news.</p>\n<ol>\n<li>What? Naw.</li>\n<li>Shes crazy, man. Shes a fish person!</li>\n<li>We dont know that!</li>\n</ol>\n<h2>Dude, she tried to eat Peppermint Butler!</h2>\n<p>Shed probably be worse if she was so scared of everything. Whatever, look she needs my help. And Im gonna help her whether youre coming with me or not. Oh, Im coming with you if only to be disruptive and obnoxious! Susan, what can we do?</p>\n<h3>I need your hero heart and your magic.</h3>\n<p>My magic? Magic of red flower. Fish people. Long ago, my people live in Beautopia. But driven out by Glubs Glubs. We come here. We too scared to fight back. This why we need your hero heart. Hyoomans! Ill be back!</p>\n<h4>Fish People!</h4>\n<p>Ill be, um, a dolphin! Come on, we swim there. No, you dont understand. Im not a fish person. Im human. We go. Grrr... What? Hey, hey. What? You no gills. We take boat.</p>\n<p>So where we headed, Susan? There. Oh, no. Oh, no. No, no, no! No, Susan, no!</p>",
+    "<h1>Too Young</h1>\n<p>Finn? Finn? Finn! Where are you? I need you to try this! Ill be there in a sec! Whats the status? Good, man! Nice! Seal the deal, bro! Okay, man! Whatevs! You can do it, you hear me?! Im playin BMO--call me later, bye! Hows Finns date? I think its goin good. Unlike your game, boiiiii!</p>\n<ol>\n<li>Thats bunk!</li>\n<li>Right, Preebos?</li>\n<li>No... He is rightful ruler under kingdom law.</li>\n<li>Its complicated.</li>\n<li>I created Lemongrab.</li>\n</ol>\n<p>Wheres the key to the tower, BMO?! Tell me! AAAGH!</p>\n<h2>Okay, Finn.</h2>\n<p>Shes 13, youre 13. Just have fun! Be yourself. Wooooo! Whats that? Are you trying to make yourself 18 again? Nah. This is an instant bath serum. It makes you sweat cleaning agents. I dont bathe. I want that!</p>\n<h3>WAAAUGH!</h3>\n<p>Hot, hot, oh  WAAAAUGH! Oh... so spice! So spice! YOURE so spice! Bwaaa bwaaa bwaaaaaa! Announcing the arrival of the Earl of Lemongrab!</p>\n<ul>\n<li>Heh hah hah</li>\n<li>AAAAUGH!</li>\n<li>Oof!</li>\n<li>Ha ha ha!</li>\n</ul>\n<h4>This castle is...</h4>\n<p>in... Unacceptable Conditiiiioooon! UNACCEPTABLLLEEE! Thirty days in the dungeon! For who? Everyone in this ROOM! MMMLLUUUUUGH!!!</p>\n<p>Wait, wait! You cant give orders like that! Im in charge here, Lemongrab! TOO YOUNG! TOO YOUNG TO RULE THE KINGDOM! Watch your manners with the princess..! HHHHUUUUOOOOOOOOOOOH?! What the huh? MMMM! HAH! I am next in line to thee throne! Sooo... I will be in charge... UNTIL PRINCESS BUBBLEGUM turns... 18 again!</p>",
+    "<h1>Goliad</h1>\n<p> Whatya building? Uhm, its just a little stick fort. Oh, rad! Look. Its just my size. Hey, get away from my fort, you big stinky monster! I like it when you get small, Jake. Yeah, me too. Whoa, whoa!</p>\n<p> Whoa, Peppermint butler! Finn, Jake. The Princess wants to see you. As princess of Candy Kingdom, Im in charge of a lot of candy people. They rely on me. I cant imagine what might happen to them if I was gone. And after my brush with death, at the hands of the Lich, I realized something. Im not gonna live forever Finn. I would if I could.</p>\n<ol>\n<li>Yea! Yeah!</li>\n<li>Teachers!</li>\n<li>Yeah, woo-hoo!</li>\n<li>Teach, teaching teachers.</li>\n</ol>\n<h2>But modern science just isnt there yet.</h2>\n<p>So I engineered a replacement who can live forever. I call her Goliad. Aww shes cute. Hi, Goliad. Im Finn. And Im Jake. Hi, Finn. Hi, Jake. Hi, Goliad. Hi, Finn. What did you use to make her? Oh, uhm...</p>\n<h3>Pretty standard candy creature soup.</h3>\n<p>Some acids. Some algebra. And I threw in one of my baby teeth so she had my DNA.</p>\n<h4>Wow, DNA?!</h4>\n<p>Yeah. All it takes is just one little tooth, or, a single hair. Its all it takes. Princess Bubblegum, are you okay? Yeah, Im good. Havent slept for a solid 83 hours, but... yeah, Im good.</p>\n<p>Aw, you should go to bed. I cant go to bed, Goliad has huge, mondo mama brains. I still need to fill them with knowledge... about how to rule a kingdom. What? Let us teach her. Uhh, okay. I guess that will be alright.</p>\n<ul>\n<li>Woow, woow, woow!</li>\n<li>Cmon, Goliad.</li>\n<li>See ya later, Princess!</li>\n<li>Get some sleep!</li>\n<li>Huh? Whu...? Bye guys...</li>\n</ul>"
 ]
-short_slipsum = [
-    'I\'m serious as a heart attack',
-    'I can do that',
-    'Is she dead, yes or no?',
-    'Hold on to your butts',
-    'No, motherfucker',
-    'Are you ready for the truth?',
-    'We happy?',
-    'I gotta piss',
-    'No man, I don\'t eat pork',
-    'Uuummmm, this is a tasty burger!'
+titles = [
+    'Mathematical!',
+    'Whoa! Algebraic!',
+    'Rhombus! Iceclops!',
+    'MY HAT IS AWESOME!',
+    'Do you think I have the goods, Bubblegum? Because I am into this stuff!',
+    'I feel radder, faster... more adequate!',
+    'Youth culture forever!',
+    'Eat my sword, Ice King!',
+    'Don\'t flaunt if if you\'re not gonna give it up.',
+    'Werewolves: much worse than ogres.',
+    'Imagination is for turbo-nerds who can\t handle how kick-butt reality is!',
+    'I\'m looking at my bits, dude. My leg is math!',
+    'Uh, bleach, lighter fluid, ammonia, gasoline, I dunno. Lady stuff... Plutonium...',
+    'So spice! So spice!',
+    'I floop the pig.',
 ]
-database = {
-    'feeds': {},
-    'entries': {},
-}
+urls = [
+    'http://www.cs.sfu.ca/',
+    'http://www.cs.sfu.ca/~ggbaker/',
+    'http://www2.cs.sfu.ca/CourseCentral/470/ggbaker/',
+]
 
 
-def generate_slipsum_paragraph():
-    return '{} {}'.format(random.choice(short_slipsum),
-                          random.choice(long_slipsum))
-
-
-def generate_slipsum_entry():
-    content = stub_entry_template.format(
-        random.choice(short_slipsum),
-        random.randint(200, 800),
-        random.randint(200, 800),
-        generate_slipsum_paragraph(),
-        generate_slipsum_paragraph(),
-        random.choice(short_slipsum),
-        random.choice(short_slipsum),
-        random.choice(short_slipsum)
-    )
+def generate_entry():
     return {
-        'title': random.choice(short_slipsum),
+        'title': random.choice(titles),
         'pub_date': time.time(),
         'status': 'read',
         'feed_id': 1,
-        'url': 'https://mtomwing.com/blog/post/week-5-freeseer',
-        'content': content,
+        'url': random.choice(urls),
+        'content': random.choice(quotes),
     }

@@ -7,7 +7,7 @@ import pbkdf2
 
 from feedreader.api_request_handler import APIRequestHandler
 from feedreader.database.models import Feed, User, Subscription
-from feedreader.stub import generate_slipsum_entry
+from feedreader.stub import generate_entry
 
 
 class MainHandler(APIRequestHandler):
@@ -137,7 +137,6 @@ class EntriesHandler(APIRequestHandler):
     def get(self, dirty_entry_ids):
         with self.get_db_session() as session:
             self.require_auth(session)
-        entries = [generate_slipsum_entry() for _ in
-                   dirty_entry_ids.split(',')]
+        entries = [generate_entry() for _ in dirty_entry_ids.split(',')]
         self.write({'entries': entries})
         self.set_status(200)
