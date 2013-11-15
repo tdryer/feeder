@@ -21,6 +21,14 @@ class MainHandler(APIRequestHandler):
 
 class UsersHandler(APIRequestHandler):
 
+    def get(self):
+        """Returns details of a user based on their auth string."""
+        with self.get_db_session() as session:
+            user = session.query(User).get(self.require_auth(session))
+            username = user.username
+        self.write({'username': username})
+        self.set_status(200)
+
     def post(self):
         """Create a new user."""
         body = self.require_body_schema({
