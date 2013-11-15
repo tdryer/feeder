@@ -5,7 +5,6 @@ import tornado.web
 import sys
 import pbkdf2
 
-from feedreader.auth_provider import DummyAuthProvider
 from feedreader.database import models
 from feedreader import handlers
 
