@@ -181,11 +181,12 @@ class Feed(BASE):
             for entry in entries:
                 entry_ids.append(entry.id)
                 session.delete(entry)
-            reads = session.query(Read).filter(
-                    Read.entry_id.in_(entry_ids
-                    ).all()
-            for read in reads
+            reads = session.query(Read).filter(Read.entry_id.in_(entry_ids))\
+                                       .all()
+
+            for read in reads:
                 session.delete(read)
+
             session.delete(self)
             make_transient(self)
 
