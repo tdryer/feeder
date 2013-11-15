@@ -225,7 +225,7 @@ class Entry(BASE):
 
     def __repr__(self):
         return (
-            "<FeedItem('%s','%s','%s')>" % (
+            "<Entry('%s','%s','%s')>" % (
                     self.title, self.author, self.date)
                     )
 
