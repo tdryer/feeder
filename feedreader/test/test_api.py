@@ -110,7 +110,50 @@ class FeedsTest(AsyncHTTPTestCase):
                     "id": feed1.id,
                     "name": feed1.title,
                     "url": feed1.site_url,
-                    "unreads": 1337, # TODO
+                    "unreads": 1,
+                },
+            ],
+        })
+        s.close()
+
+    def test_get_feeds_only_shows_subscribed_feeds(self):
+        s = self.Session()
+        feed1 = models.Feed("Tombuntu", "http://feeds.feedburner.com/Tombuntu",
+                            "http://tombuntu.com")
+        s.add(feed1)
+        s.commit()
+        s.add(models.Entry(feed1.id, "This is test content.", "Test title",
+                           "Tom", 1384402853))
+        s.commit()
+        response = self.fetch('/feeds/', method='GET', headers=self.headers)
+        self.assertEqual(response.code, 200)
+        self.assertEqual(json.loads(response.body), {
+            "feeds": [],
+        })
+        s.close()
+
+    def test_get_feeds_does_not_count_read_entries(self):
+        s = self.Session()
+        feed1 = models.Feed("Tombuntu", "http://feeds.feedburner.com/Tombuntu",
+                            "http://tombuntu.com")
+        s.add(feed1)
+        s.commit()
+        s.add(models.Subscription("foo", feed1.id))
+        entry1 = models.Entry(feed1.id, "This is test content.", "Test title",
+                              "Tom", 1384402853)
+        s.add(entry1)
+        s.commit()
+        s.add(models.Read("foo", entry1.id))
+        s.commit()
+        response = self.fetch('/feeds/', method='GET', headers=self.headers)
+        self.assertEqual(response.code, 200)
+        self.assertEqual(json.loads(response.body), {
+            "feeds": [
+                {
+                    "id": feed1.id,
+                    "name": feed1.title,
+                    "url": feed1.site_url,
+                    "unreads": 0,
                 },
             ],
         })

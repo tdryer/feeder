@@ -49,13 +49,13 @@ class FeedsHandler(APIRequestHandler):
         """Return a list of the user's subscribed feeds."""
         feeds = []
         with self.get_db_session() as session:
-            self.require_auth(session)
-            for feed in session.query(Feed).all():
+            user = session.query(User).get(self.require_auth(session))
+            for feed in user.get_feeds(session):
                 feeds.append({
                     'id': feed.id,
                     'name': feed.title,
                     'url': feed.site_url,
-                    'unreads': 1337, # TODO
+                    'unreads': user.num_unread_in_feed(session, feed),
                 })
         self.write({'feeds': feeds})
         self.set_status(200)
