@@ -38,7 +38,6 @@ class User(BASE):
 
     def save(self, session):
         session.add(self)
-        session.commit()
 
     def remove(self, session):
         session.delete(self)
@@ -48,13 +47,11 @@ class User(BASE):
             Subscription.username == self.username).all()
         for sub in subs:
             session.delete(sub)
-        session.commit()
         make_transient(self)
 
     def subscribe(self, session, feed_id):
         sub = Subscription(self.username, feed_id)
         session.add(sub)
-        session.commit()
 
     def unsubscribe(self, session, feed_id):
         sub = session.query(
@@ -64,12 +61,19 @@ class User(BASE):
                 Subscription.feed_id == feed_id)).one(
         )
         session.delete(sub)
-        session.commit()
 
     def mark_read(self, session, entry_id):
         read = Read(self.username, entry_id)
         session.add(read)
-        session.commit()
+
+    def num_unread_in_feed(self, session, feed):
+        read_ids = self.get_read_ids(session)
+        if read_ids != []:
+            return session.query(Entry).filter(and_(Entry.feed_id == feed.id,
+                    ~Entry.id.in_(read_ids))).count()
+        else:
+            return session.query(Entry).filter(Entry.feed_id == feed.id
+                                              ).count()
 
     def get_read_ids(self, session):
         id_list = []
@@ -114,14 +118,12 @@ class Feed(BASE):
 
     def save(self, session):
         session.add(self)
-        session.commit()
 
     def remove(self, session):
         # check that no users are subscribed
         if session.query(Subscription).filter(
                 Subscription.feed_id == self.id).count() == 0:
             session.delete(self)
-            session.commit()
             make_transient(self)
 
     def get_entries(self, session):
@@ -171,11 +173,9 @@ class Entry(BASE):
 
     def save(self, session):
         session.add(self)
-        session.commit()
 
     def remove(self, session):
         session.delete(self)
-        session.commit()
         make_transient(self)
 
 
