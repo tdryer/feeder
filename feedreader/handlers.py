@@ -6,7 +6,7 @@ import requests
 import pbkdf2
 
 from feedreader.api_request_handler import APIRequestHandler
-from feedreader.database.models import Feed, User
+from feedreader.database.models import Feed, User, Subscription
 from feedreader.stub import generate_slipsum_entry
 
 
@@ -86,10 +86,13 @@ class FeedsHandler(APIRequestHandler):
             'required': ['url'],
         })
         with self.get_db_session() as session:
-            self.require_auth(session)
+            username = self.require_auth(session)
             dom = html.fromstring(requests.get(body['url']).content)
             title = dom.cssselect('title')[0].text_content()
-            session.add(Feed(title, body['url'], body['url']))
+            feed = Feed(title, body['url'], body['url'])
+            session.add(feed)
+            session.commit()
+            session.add(Subscription(username, feed.id))
             # TODO: If the feed doesn't already exist, retrive it and add new
             # feed and entries.
             # TODO: Subscribe the user to the feed.
