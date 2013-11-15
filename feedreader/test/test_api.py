@@ -205,6 +205,70 @@ class FeedsTest(AsyncHTTPTestCase):
             "entries": [entry1.id],
         })
 
+    def test_get_feed_entries_unread(self):
+        s = self.Session()
+        feed1 = models.Feed("Tombuntu", "http://feeds.feedburner.com/Tombuntu",
+                            "http://tombuntu.com")
+        s.add(feed1)
+        s.commit()
+        s.add(models.Subscription(TEST_USER, feed1.id))
+        entry1 = models.Entry(feed1.id, "This is test content.", "Test title",
+                              "Tom", 1384402853)
+        entry2 = models.Entry(feed1.id, "This is test content.", "Test title",
+                              "Tom", 1384402853)
+        s.add(entry1)
+        s.add(entry2)
+        s.commit()
+        s.add(models.Read(TEST_USER, entry1.id))
+        s.commit()
+        response = self.fetch(
+            '/feeds/{}/entries?filter=unread'.format(feed1.id), method='GET',
+            headers=self.headers
+        )
+        self.assertEqual(response.code, 200)
+        self.assertEqual(json.loads(response.body), {
+            "entries": [entry2.id],
+        })
+
+    def test_get_feed_entries_read(self):
+        s = self.Session()
+        feed1 = models.Feed("Tombuntu", "http://feeds.feedburner.com/Tombuntu",
+                            "http://tombuntu.com")
+        s.add(feed1)
+        s.commit()
+        s.add(models.Subscription(TEST_USER, feed1.id))
+        entry1 = models.Entry(feed1.id, "This is test content.", "Test title",
+                              "Tom", 1384402853)
+        entry2 = models.Entry(feed1.id, "This is test content.", "Test title",
+                              "Tom", 1384402853)
+        s.add(entry1)
+        s.add(entry2)
+        s.commit()
+        s.add(models.Read(TEST_USER, entry1.id))
+        s.commit()
+        response = self.fetch(
+            '/feeds/{}/entries?filter=read'.format(feed1.id), method='GET',
+            headers=self.headers
+        )
+        self.assertEqual(response.code, 200)
+        self.assertEqual(json.loads(response.body), {
+            "entries": [entry1.id],
+        })
+
+    def test_get_feed_entries_invalid_filter(self):
+        s = self.Session()
+        feed1 = models.Feed("Tombuntu", "http://feeds.feedburner.com/Tombuntu",
+                            "http://tombuntu.com")
+        s.add(feed1)
+        s.commit()
+        s.add(models.Subscription(TEST_USER, feed1.id))
+        s.commit()
+        response = self.fetch(
+            '/feeds/{}/entries?filter=foobar'.format(feed1.id), method='GET',
+            headers=self.headers
+        )
+        self.assertEqual(response.code, 400)
+
 
 class EntriesTest(AsyncHTTPTestCase):
 

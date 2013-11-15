@@ -105,25 +105,27 @@ class FeedEntriesHandler(APIRequestHandler):
     def get(self, feed_id):
         """Return a list of entry IDs for a feed."""
         with self.get_db_session() as session:
-            filter = self.request.query
+            entry_filter = self.get_argument("filter", None)
             user = session.query(User).get(self.require_auth(session))
             # check if the feed exists and user is subscribed to it
             if user.is_sub_of_feed(session, int(feed_id)):
                 entries = user.get_feed_entries(session, feed_id)
-                if filter == "read":
+                # filter the entries if necessary
+                if entry_filter == "read":
                     entry_ids = [
-                            entry.id for entry in entries["all_entries"][
-                                    0:entries["num_read"]-1
-                                    ]
-                            ]
-                elif filter == "unread":
+                        entry.id for entry in
+                        entries["all_entries"][:entries["num_read"]]
+                    ]
+                elif entry_filter == "unread":
                     entry_ids = [
-                            entry.id for entry in entries["all_entries"][
-                                    entries["num_read"]:
-                                    ]
-                            ]
-                else:
+                        entry.id for entry in
+                        entries["all_entries"][entries["num_read"]:]
+                    ]
+                elif entry_filter == None:
                     entry_ids = [entry.id for entry in entries["all_entries"]]
+                else:
+                    self.set_status(400)
+                    return
                 self.write({'entries': entry_ids})
                 self.set_status(200)
             else:
