@@ -1,4 +1,4 @@
-.login {
+.login form {
   background: #f7f7f7;
   margin: 2em auto 0;
   width: 16em;
@@ -10,11 +10,11 @@
   -webkit-transition: all 0.4s;
 }
 
-.login.loading {
+.login .loading {
   border: 2px solid #1abc9c;
 }
 
-.login.error {
+.login .error {
   border: 2px solid #e74c3c;
 }
 
@@ -76,4 +76,8 @@
 
 .login .submit:hover {
   background: #16a085;
+}
+
+.login .register {
+  text-align: center;
 }

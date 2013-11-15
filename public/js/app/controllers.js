@@ -68,6 +68,37 @@
   })
 
   /**
+   * Registers a new user.
+   * Routes the user to their home page upon successful registration.
+   *
+   * @controller
+   * @route '/register'
+   */
+  .controller('RegisterCtrl', function($scope, $location, $timeout, UserService) {
+    var timeout;
+
+    $scope.error = false;
+    $scope.loading = false;
+
+    $scope.register = function() {
+      $timeout.cancel(timeout);
+
+      $scope.loading = true;
+      UserService.register($scope.username, $scope.password).then(function() {
+        $location.path('/');
+      }, function() {
+        $scope.error = true;
+
+        timeout = $timeout(function() {
+          $scope.error = false;
+        }, 200);
+      }).then(function() {
+        $scope.loading = false;
+      });
+    }
+  })
+
+  /**
    * Routes the user to their home page upon successful authentication.
    *
    * @controller

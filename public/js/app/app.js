@@ -41,6 +41,11 @@
       templateUrl: 'partials/login.html'
     });
 
+    $routeProvider.when('/register', {
+      controller: 'RegisterCtrl',
+      templateUrl: 'partials/register.html'
+    });
+
     $routeProvider.otherwise({
       redirectTo: '/'
     });
