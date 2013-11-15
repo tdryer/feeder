@@ -211,14 +211,16 @@ class Entry(BASE):
     id = Column(Integer, Sequence('entry_id_seq'), primary_key=True)
     feed_id = Column(Integer, ForeignKey('feeds.id'))
     content = Column(String)
+    url = Column(String)
     title = Column(String)
     author = Column(String)
     date = Column(Integer)
     guid = Column(String)
 
-    def __init__(self, feed_id, content, title, author, date):
+    def __init__(self, feed_id, content, url, title, author, date):
         self.feed_id = feed_id
         self.content = content
+        self.url = url
         self.title = title
         self.author = author
         self.date = date

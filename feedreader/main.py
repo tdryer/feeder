@@ -31,7 +31,7 @@ def get_application(db_setup_f=None):
         (r'^/feeds/?$', handlers.FeedsHandler, default_injections),
         (r'^/feeds/(?P<feed_id>[0-9]+)/entries/?$', handlers.FeedEntriesHandler,
          default_injections),
-        (r'^/entries/((?:[^/]|\d)+)$', handlers.EntriesHandler,
+        (r'^/entries/(?P<entry_ids>(?:\d+,)*\d+)$', handlers.EntriesHandler,
          default_injections),
     ])
 

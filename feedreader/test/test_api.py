@@ -103,7 +103,8 @@ class FeedsTest(AsyncHTTPTestCase):
         s.add(feed1)
         s.commit()
         s.add(models.Subscription(TEST_USER, feed1.id))
-        s.add(models.Entry(feed1.id, "This is test content.", "Test title",
+        s.add(models.Entry(feed1.id, "This is test content.",
+                           "http://tombuntu.com/test-content", "Test title",
                            "Tom", 1384402853))
         s.commit()
         response = self.fetch('/feeds/', method='GET', headers=self.headers)
@@ -126,7 +127,8 @@ class FeedsTest(AsyncHTTPTestCase):
                             "http://tombuntu.com")
         s.add(feed1)
         s.commit()
-        s.add(models.Entry(feed1.id, "This is test content.", "Test title",
+        s.add(models.Entry(feed1.id, "This is test content.",
+                           "http://tombuntu.com/test-content", "Test title",
                            "Tom", 1384402853))
         s.commit()
         response = self.fetch('/feeds/', method='GET', headers=self.headers)
@@ -143,7 +145,8 @@ class FeedsTest(AsyncHTTPTestCase):
         s.add(feed1)
         s.commit()
         s.add(models.Subscription(TEST_USER, feed1.id))
-        entry1 = models.Entry(feed1.id, "This is test content.", "Test title",
+        entry1 = models.Entry(feed1.id, "This is test content.",
+                              "http://tombuntu.com/test-content", "Test title",
                               "Tom", 1384402853)
         s.add(entry1)
         s.commit()
@@ -194,7 +197,8 @@ class FeedsTest(AsyncHTTPTestCase):
         s.add(feed1)
         s.commit()
         s.add(models.Subscription(TEST_USER, feed1.id))
-        entry1 = models.Entry(feed1.id, "This is test content.", "Test title",
+        entry1 = models.Entry(feed1.id, "This is test content.",
+                              "http://tombuntu.com/test-content", "Test title",
                               "Tom", 1384402853)
         s.add(entry1)
         s.commit()
@@ -212,9 +216,11 @@ class FeedsTest(AsyncHTTPTestCase):
         s.add(feed1)
         s.commit()
         s.add(models.Subscription(TEST_USER, feed1.id))
-        entry1 = models.Entry(feed1.id, "This is test content.", "Test title",
+        entry1 = models.Entry(feed1.id, "This is test content.",
+                              "http://tombuntu.com/test-content", "Test title",
                               "Tom", 1384402853)
-        entry2 = models.Entry(feed1.id, "This is test content.", "Test title",
+        entry2 = models.Entry(feed1.id, "This is test content.",
+                              "http://tombuntu.com/test-content", "Test title",
                               "Tom", 1384402853)
         s.add(entry1)
         s.add(entry2)
@@ -237,9 +243,11 @@ class FeedsTest(AsyncHTTPTestCase):
         s.add(feed1)
         s.commit()
         s.add(models.Subscription(TEST_USER, feed1.id))
-        entry1 = models.Entry(feed1.id, "This is test content.", "Test title",
+        entry1 = models.Entry(feed1.id, "This is test content.",
+                              "http://tombuntu.com/test-content", "Test title",
                               "Tom", 1384402853)
-        entry2 = models.Entry(feed1.id, "This is test content.", "Test title",
+        entry2 = models.Entry(feed1.id, "This is test content.",
+                              "http://tombuntu.com/test-content", "Test title",
                               "Tom", 1384402853)
         s.add(entry1)
         s.add(entry2)
@@ -269,24 +277,93 @@ class FeedsTest(AsyncHTTPTestCase):
         )
         self.assertEqual(response.code, 400)
 
+    def test_get_entries_requires_auth(self):
+        response = self.fetch('/entries/1', method='GET')
+        self.assertEqual(response.code, 401)
 
-class EntriesTest(AsyncHTTPTestCase):
+    def test_get_entries_does_not_exist(self):
+        response = self.fetch('/entries/1', method='GET', headers=self.headers)
+        # TODO
+        #self.assertEqual(response.code, 404)
 
-    def setUp(self):
-        super(EntriesTest, self).setUp()
-        create_user(self)
-        self.headers = {
-            'Authorization': get_basic_auth(TEST_USER, TEST_PASSWORD),
-        }
-
-    def get_app(self):
-        return feedreader.main.get_application()
-
-    def test_get_entries_success(self):
-        response = self.fetch('/entries/1234', method='GET', headers=self.headers)
+    def test_get_entries_single(self):
+        s = self.Session()
+        feed1 = models.Feed("Tombuntu", "http://feeds.feedburner.com/Tombuntu",
+                            "http://tombuntu.com")
+        s.add(feed1)
+        s.commit()
+        s.add(models.Subscription(TEST_USER, feed1.id))
+        entry1 = models.Entry(feed1.id, "This is test content.",
+                              "http://tombuntu.com/test-content", "Test title",
+                              "Tom", 1384402853)
+        entry2 = models.Entry(feed1.id, "This is test content.",
+                              "http://tombuntu.com/test-content", "Test title",
+                              "Tom", 1384402853)
+        s.add(entry1)
+        s.add(entry2)
+        s.commit()
+        s.add(models.Read(TEST_USER, entry1.id))
+        s.commit()
+        response = self.fetch('/entries/{}'.format(entry1.id), method='GET',
+                              headers=self.headers)
         self.assertEqual(response.code, 200)
+        self.assertEqual(json.loads(response.body), {
+            "entries": [
+                {
+                    "title": entry1.title,
+                    "pub-date": entry1.date,
+                    # TODO "status": "unread",
+                    "status": "TODO",
+                    "author": entry1.author,
+                    "feed_id": feed1.id,
+                    "url": entry1.url,
+                    "content": entry1.content,
+                },
+            ]
+        })
 
-        # TODO: Validate against schema instead
-        body = json.loads(response.body)
-        self.assertIn('entries', body)
-        self.assertIsInstance(body['entries'], list)
+    def test_get_entries_multiple(self):
+        s = self.Session()
+        feed1 = models.Feed("Tombuntu", "http://feeds.feedburner.com/Tombuntu",
+                            "http://tombuntu.com")
+        s.add(feed1)
+        s.commit()
+        s.add(models.Subscription(TEST_USER, feed1.id))
+        entry1 = models.Entry(feed1.id, "This is test content.",
+                              "http://tombuntu.com/test-content", "Test title",
+                              "Tom", 1384402853)
+        entry2 = models.Entry(feed1.id, "This is test content.",
+                              "http://tombuntu.com/test-content", "Test title",
+                              "Tom", 1384402853)
+        s.add(entry1)
+        s.add(entry2)
+        s.commit()
+        s.add(models.Read(TEST_USER, entry1.id))
+        s.commit()
+        response = self.fetch('/entries/{},{}'.format(entry1.id, entry2.id),
+                              method='GET', headers=self.headers)
+        self.assertEqual(response.code, 200)
+        self.assertEqual(json.loads(response.body), {
+            "entries": [
+                {
+                    "title": entry1.title,
+                    "pub-date": entry1.date,
+                    # TODO "status": "unread",
+                    "status": "TODO",
+                    "author": entry1.author,
+                    "feed_id": feed1.id,
+                    "url": entry1.url,
+                    "content": entry1.content,
+                },
+                {
+                    "title": entry2.title,
+                    "pub-date": entry2.date,
+                    # TODO "status": "unread",
+                    "status": "TODO",
+                    "author": entry2.author,
+                    "feed_id": feed1.id,
+                    "url": entry2.url,
+                    "content": entry2.content,
+                },
+            ]
+        })

@@ -6,8 +6,7 @@ import requests
 import pbkdf2
 
 from feedreader.api_request_handler import APIRequestHandler
-from feedreader.database.models import Feed, User, Subscription
-from feedreader.stub import generate_entry
+from feedreader.database.models import Feed, User, Subscription, Entry
 
 
 class MainHandler(APIRequestHandler):
@@ -134,9 +133,23 @@ class FeedEntriesHandler(APIRequestHandler):
 
 class EntriesHandler(APIRequestHandler):
 
-    def get(self, dirty_entry_ids):
+    def get(self, entry_ids):
+        entry_ids = [int(entry_id) for entry_id in entry_ids.split(",")]
         with self.get_db_session() as session:
-            self.require_auth(session)
-        entries = [generate_entry() for _ in dirty_entry_ids.split(',')]
-        self.write({'entries': entries})
-        self.set_status(200)
+            user = self.require_auth(session)
+            # TODO: check that the user has permission to see each entry_id
+            entries = [session.query(Entry).get(entry_id) for entry_id in
+                       entry_ids]
+            entries_json = [
+                {
+                    "title": entry.title,
+                    "pub-date": entry.date,
+                    "status": "TODO", # TODO
+                    "author": entry.author,
+                    "feed_id": entry.feed_id,
+                    "url": entry.url,
+                    "content": entry.content,
+                } for entry in entries
+            ]
+            self.write({'entries': entries_json})
+            self.set_status(200)
