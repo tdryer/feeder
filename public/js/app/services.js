@@ -45,6 +45,20 @@
       return !!$cookieStore.get(cookieKey);
     }
 
+    User.prototype.getUsername = function() {
+      Restangular = Restangular.withConfig(function(RestangularProvider) {
+        RestangularProvider.setDefaultHeaders({
+          Authorization: 'xBasic ' + $cookieStore.get(cookieKey)
+        });
+      });
+
+      return Restangular.one('users').get().then(function(result) {
+        return result.username;
+      }, function(reason) {
+        return $q.reject(reason);
+      });
+    }
+
     return new User;
   });
 

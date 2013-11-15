@@ -2,11 +2,20 @@
 
   var directives = angular.module('feeder.directives', [])
 
-  .directive('headerBar', function() {
+  /**
+   * Displays the user's username.
+   *
+   * @directive
+   * @route '/home'
+   * @scope {String} username The user's username.
+   */
+  .directive('username', function() {
     return {
-      restrict: 'E',
-      templateUrl: './partials/header.html',
-      replace: true
+      controller: function($scope, UserService) {
+        UserService.getUsername().then(function(username) {
+          $scope.username = username;
+        });
+      }
     }
   })
 
