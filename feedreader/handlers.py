@@ -4,7 +4,6 @@ from lxml import html
 from tornado.web import HTTPError
 import requests
 import pbkdf2
-import re
 
 from feedreader.api_request_handler import APIRequestHandler
 from feedreader.database.models import Feed, User
