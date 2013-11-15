@@ -1,15 +1,2 @@
 <div header></div>
-
-<input ng-model="addFeed.url" placeholder="enter any url">
-<button ng-click="addFeed.add()">add</button>
-
-<p ng-repeat="feed in testApi">
-  <a href="{{ feed.url }}">{{ feed.name }}</a> - {{ feed.unreads }}
-</p>
-
-<div ng-repeat="entry in entries">
-  <p>{{ entry.pub_date | moment }}</p>
-  <p><a href="{{ entry.url }}">{{ entry.title }}</a> is {{ entry.status }}</p>
-  <div ng-bind-html="entry.content"></div>
-  <hr>
-</div>
+<div subscriptions></div>

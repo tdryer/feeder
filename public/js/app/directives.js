@@ -3,6 +3,18 @@
   var directives = angular.module('feeder.directives', [])
 
   /**
+   * Displays the user's list of subscriptions.
+   *
+   * @directive
+   * @route '/home'
+   */
+  .directive('subscriptions', function() {
+    return {
+      templateUrl: 'partials/subscriptions.html'
+    }
+  })
+
+  /**
    * Displays the header bar.
    *
    * @directive

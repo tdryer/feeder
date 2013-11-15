@@ -1,0 +1,21 @@
+<div class="subscriptions">
+  <div class="form-container">
+    <form class="form">
+      <div class="new-subscription">
+        <input
+          id="new-sub"
+          ng-model="addFeed.url"
+          placeholder="Enter a URL"
+          type="text">
+        <label for="new-sub" class="fui fui-new">New subscription</label>
+      </div>
+      <input type="submit" ng-click="addFeed.add()" value="Add" class="submit">
+    </form>
+  </div>
+
+  <ul>
+    <li ng-repeat="feed in testApi">
+      <a href="#/home/{{feed.id}}">{{ feed.name }}</a> - {{ feed.unreads }}
+    </li>
+  </ul>
+</div>

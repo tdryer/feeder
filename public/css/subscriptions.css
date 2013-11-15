@@ -1,0 +1,23 @@
+.subscriptions {
+  padding: 1em;
+}
+
+.subscriptions .form {
+  margin: 0;
+  width: auto;
+  padding: 0;
+  border: 0;
+  max-width: 20em;
+  background: none;
+  text-align: left;
+}
+
+.subscriptions .new-subscription {
+  position: relative;
+  display: inline-block;
+}
+
+.subscriptions .form .submit {
+  display: inline-block;
+  width: auto;
+}
