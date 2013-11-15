@@ -68,7 +68,8 @@ class APIRequestHandler(tornado.web.RequestHandler):
         # use generic error message, or reason if provided
         message = httplib.responses[status_code]
         if "exc_info" in kwargs:
-            reason = kwargs["exc_info"][1].reason
+            e = kwargs["exc_info"][1]
+            reason = e.reason if hasattr(e, "reason") else None
             if reason is not None:
                 message = reason
 
