@@ -16,11 +16,17 @@ def initialize_db():
     This should only be called once when the server starts.
     """
     # hard coded might not be the best approach
-    engine = create_engine('sqlite://', echo=False)
+    engine = create_engine('sqlite:///dbtest', echo=False)
 
     # create tables and prepare to make sessions
     BASE.metadata.create_all(engine)
     return sessionmaker(bind=engine)
+
+# Counts the number of Feeds with id == feed_id, i.e., returns 0 or 1
+
+
+def exists_feed(session, feed_id):
+    return session.query(Feed).filter(Feed.id == feed_id).count()
 
 
 class User(BASE):
@@ -36,22 +42,29 @@ class User(BASE):
     def __repr__(self):
         return "<User('%s')>" % (self.username)
 
-    def save(self, session):
-        session.add(self)
-
     def remove(self, session):
-        session.delete(self)
-        # also remove subscriptions for this user
+        # remove subscriptions for this user
         subs = session.query(
             Subscription).filter(
             Subscription.username == self.username).all()
         for sub in subs:
             session.delete(sub)
+        # also remove read entries
+        reads = sess.query(Read).filter(Read.username == self.username).all()
+        for read in reads:
+            session.delete(read)
+        session.delete(self)
         make_transient(self)
 
     def subscribe(self, session, feed_id):
         sub = Subscription(self.username, feed_id)
         session.add(sub)
+
+    def is_sub_of_feed(self, session, feed_id):
+        return session.query(Subscription).filter(and_(
+            Subscription.username == self.username,
+            Subscription.feed_id == feed_id,
+        )).count()
 
     def unsubscribe(self, session, feed_id):
         sub = session.query(
@@ -66,14 +79,14 @@ class User(BASE):
         read = Read(self.username, entry_id)
         session.add(read)
 
-    def num_unread_in_feed(self, session, feed):
+    def num_unread_in_feed(self, session, feed_id):
         read_ids = self.get_read_ids(session)
         if read_ids != []:
-            return session.query(Entry).filter(and_(Entry.feed_id == feed.id,
-                    ~Entry.id.in_(read_ids))).count()
+            return session.query(Entry).filter(and_(Entry.feed_id == feed_id,
+                                                    ~Entry.id.in_(read_ids))).count()
         else:
-            return session.query(Entry).filter(Entry.feed_id == feed.id
-                                              ).count()
+            return session.query(Entry).filter(Entry.feed_id == feed_id
+                                               ).count()
 
     def get_read_ids(self, session):
         id_list = []
@@ -96,6 +109,46 @@ class User(BASE):
         feeds = session.query(Feed).filter(Feed.id.in_(id_list)).all()
         return feeds
 
+    """
+    Collects all the entries of a feed
+    precondition: is_sub_of_feed should be called prior to
+                  this function call
+    Input: session, Feed.id
+    Ouput: dictionary -- {
+                            "all_entries": list
+                            "num_read": int
+                         }
+           the list is Entry instances,
+           the read entries are in list[0:num_read-1] if any exist
+    """
+
+    def get_feed_entries(self, session, feed_id):
+        # Queries
+        entry_ids = []
+        # Can't make this a single statement because query(Entry.id) produces
+        #  a list [(1,), (2,), . . . ]
+        for row in session.query(Entry).filter(
+                Entry.feed_id == feed_id).all():
+            entry_ids.append(row.id)
+        read_ids = []
+        for row in session.query(Read).filter(and_(
+                Read.username == self.username, Read.entry_id.in_(entry_ids)
+        )).all():
+            read_ids.append(row.entry_id)
+        raw_entries = session.query(Entry).filter(Entry.feed_id == feed_id
+                                                  ).all()
+        # Processing
+        feed_entries = []
+        size_read = 0
+        for entry in raw_entries:
+            if entry.id in read_ids:
+                feed_entries.insert(size_read, entry)
+                size_read += 1
+            else:
+                feed_entries.append(entry)
+
+        return {"all_entries": feed_entries, "num_read": size_read}
+
 
 class Feed(BASE):
     __tablename__ = 'feeds'
@@ -116,25 +169,28 @@ class Feed(BASE):
     def __repr__(self):
         return "<RSSFeed('%s','%s')>" % (self.title, self.site_url)
 
-    def save(self, session):
-        session.add(self)
-
     def remove(self, session):
         # check that no users are subscribed
         if session.query(Subscription).filter(
                 Subscription.feed_id == self.id).count() == 0:
+            # remove all associated entries
+            entries = session.query(Entry).filter(
+                Entry.feed_id == self.id
+            ).all()
+            entry_ids = []
+            for entry in entries:
+                entry_ids.append(entry.id)
+                session.delete(entry)
+            reads = session.query(Read).filter(
+                    Read.entry_id.in_(entry_ids
+                    ).all()
+            for read in reads
+                session.delete(read)
             session.delete(self)
             make_transient(self)
 
     def get_entries(self, session):
-        entries = session.query(Entry).filter(Entry.feed_id == self.id).all()
-        return entries
-
-    def get_unread_entries(self, session, id_list):
-        entries = session.query(
-            Entry).filter(and_(Entry.feed_id == self.id,
-                               ~Entry.id.in_(id_list))).all()
-        return entries
+        return session.query(Entry).filter(Entry.feed_id == self.id).all()
 
     def get_users(self, session):
         name_list = []
@@ -168,11 +224,9 @@ class Entry(BASE):
 
     def __repr__(self):
         return (
-            "<FeedItem('%s','%s','%s')>" % (self.title, self.author, self.date)
-        )
-
-    def save(self, session):
-        session.add(self)
+            "<FeedItem('%s','%s','%s')>" % (
+                    self.title, self.author, self.date)
+                    )
 
     def remove(self, session):
         session.delete(self)
