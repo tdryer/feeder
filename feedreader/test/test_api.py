@@ -8,6 +8,10 @@ import feedreader.main
 from feedreader.database import models
 
 
+TEST_USER = "username1"
+TEST_PASSWORD = "password1"
+
+
 def get_basic_auth(user, passwd):
     """Return basic auth header."""
     return "Basic " + base64.b64encode("{}:{}".format(user, passwd))
@@ -15,7 +19,7 @@ def get_basic_auth(user, passwd):
 
 def create_user(test_case):
     response = test_case.fetch('/users', method="POST", body=json.dumps(
-        {"username": "foo", "password": "bar"})
+        {"username": TEST_USER, "password": TEST_PASSWORD})
     )
     test_case.assertEqual(response.code, 201)
 
@@ -33,35 +37,35 @@ class UsersTest(AsyncHTTPTestCase):
     def test_create_new_user(self):
         create_user(self)
         response = self.fetch('/', headers={
-            "Authorization": get_basic_auth("foo", "bar"),
+            "Authorization": get_basic_auth(TEST_USER, TEST_PASSWORD),
         })
         self.assertEqual(response.code, 200)
 
     def test_create_new_user_invalid_body(self):
         response = self.fetch('/users', method="POST", body=json.dumps(
-            {"username": "foo"})
+            {"username": TEST_USER})
         )
         self.assert_validation_failed(response)
 
     def test_create_new_user_empty_username(self):
         response = self.fetch('/users', method="POST", body=json.dumps(
-            {"username": ""}, {"password": "bar"})
+            {"username": ""}, {"password": TEST_PASSWORD})
         )
         self.assert_validation_failed(response)
 
     def test_create_new_user_empty_password(self):
         response = self.fetch('/users', method="POST", body=json.dumps(
-            {"username": "foo"}, {"password": ""})
+            {"username": TEST_USER}, {"password": ""})
         )
         self.assert_validation_failed(response)
 
     def test_create_duplicate_username(self):
         response = self.fetch('/users', method="POST", body=json.dumps(
-            {"username": "foo", "password": "bar"})
+            {"username": TEST_USER, "password": TEST_PASSWORD})
         )
         self.assertEqual(response.code, 201)
         response = self.fetch('/users', method="POST", body=json.dumps(
-            {"username": "foo", "password": "bar"})
+            {"username": TEST_USER, "password": TEST_PASSWORD})
         )
         self.assertEqual(response.code, 400)
         self.assertIn("Username already registered",
@@ -74,7 +78,7 @@ class FeedsTest(AsyncHTTPTestCase):
         super(FeedsTest, self).setUp()
         create_user(self)
         self.headers = {
-            'Authorization': get_basic_auth('foo', 'bar'),
+            'Authorization': get_basic_auth(TEST_USER, TEST_PASSWORD),
         }
 
     def get_app(self):
@@ -98,7 +102,7 @@ class FeedsTest(AsyncHTTPTestCase):
                             "http://tombuntu.com")
         s.add(feed1)
         s.commit()
-        s.add(models.Subscription("foo", feed1.id))
+        s.add(models.Subscription(TEST_USER, feed1.id))
         s.add(models.Entry(feed1.id, "This is test content.", "Test title",
                            "Tom", 1384402853))
         s.commit()
@@ -138,12 +142,12 @@ class FeedsTest(AsyncHTTPTestCase):
                             "http://tombuntu.com")
         s.add(feed1)
         s.commit()
-        s.add(models.Subscription("foo", feed1.id))
+        s.add(models.Subscription(TEST_USER, feed1.id))
         entry1 = models.Entry(feed1.id, "This is test content.", "Test title",
                               "Tom", 1384402853)
         s.add(entry1)
         s.commit()
-        s.add(models.Read("foo", entry1.id))
+        s.add(models.Read(TEST_USER, entry1.id))
         s.commit()
         response = self.fetch('/feeds/', method='GET', headers=self.headers)
         self.assertEqual(response.code, 200)
@@ -190,7 +194,7 @@ class EntriesTest(AsyncHTTPTestCase):
         super(EntriesTest, self).setUp()
         create_user(self)
         self.headers = {
-            'Authorization': get_basic_auth('foo', 'bar'),
+            'Authorization': get_basic_auth(TEST_USER, TEST_PASSWORD),
         }
 
     def get_app(self):
