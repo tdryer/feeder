@@ -50,7 +50,7 @@ class User(BASE):
         for sub in subs:
             session.delete(sub)
         # also remove read entries
-        reads = sess.query(Read).filter(Read.username == self.username).all()
+        reads = session.query(Read).filter(Read.username == self.username).all()
         for read in reads:
             session.delete(read)
         session.delete(self)
