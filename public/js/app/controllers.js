@@ -131,6 +131,20 @@
         $scope.loading = false;
       });
     }
+  })
+
+  /**
+   * Logs a user out of their account.
+   * Routes the user to the login page.
+   *
+   * @controller
+   */
+  .controller('LogoutCtrl', function($scope, $location, $timeout, UserService) {
+    $scope.logout = function() {
+      UserService.logout();
+
+      $location.path('/login');
+    }
   });
 
 }).call(this, angular);

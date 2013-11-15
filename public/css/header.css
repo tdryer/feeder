@@ -1,0 +1,19 @@
+#header {
+  color: #d4cfcb;
+  font-size: 0.9em;
+  background: #2d2d2d;
+  height: 40px;
+  margin: 0;
+  padding: 0 30px;  
+}
+
+#username {
+  float: right;
+  line-height: 40px;
+  padding: auto 0;
+}
+
+#username a:hover {
+  color: #fff;
+  cursor: pointer;
+}
