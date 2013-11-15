@@ -10,8 +10,9 @@ from feedreader.api_request_handler import APIRequestHandler
 from feedreader.database import models
 
 
-def get_basic_auth(user, passwd):
-    return "Basic " + base64.b64encode("{}:{}".format(user, passwd))
+def get_basic_auth(user, passwd, method="Basic"):
+    return "{} {}".format(method,
+                          base64.b64encode("{}:{}".format(user, passwd)))
 
 
 def get_application(handler):
@@ -54,6 +55,19 @@ class AuthorizationTest(AsyncHTTPTestCase):
             "Authorization": get_basic_auth("demo", "demo"),
         })
         self.assertEqual(response.code, 200)
+
+    def test_successfull_auth_xbasic(self):
+        response = self.fetch('/', headers={
+            "Authorization": get_basic_auth("demo", "demo", method="xBasic"),
+        })
+        self.assertEqual(response.code, 200)
+
+    def test_failed_auth_xbasic(self):
+        response = self.fetch('/', headers={
+            "Authorization": get_basic_auth("demo", "invalid", method="xBasic"),
+        })
+        self.assertEqual(response.code, 401)
+        self.assertNotIn("WWW-Authenticate", response.headers)
 
     def test_invalid_password(self):
         response = self.fetch('/', headers={

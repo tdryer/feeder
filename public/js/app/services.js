@@ -10,7 +10,7 @@
 
       Restangular = Restangular.withConfig(function(RestangularProvider) {
         RestangularProvider.setDefaultHeaders({
-          Authorization: 'Basic ' + auth
+          Authorization: 'xBasic ' + auth
         });
       });
 

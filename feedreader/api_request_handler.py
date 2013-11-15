@@ -14,12 +14,17 @@ class APIRequestHandler(tornado.web.RequestHandler):
 
     def initialize(self, create_session):
         self.create_session = create_session
+        self.use_www_authenticate = True
 
     def require_auth(self, session):
         """Return the authorized user's username.
 
         If authorization fails, raise HTTPError. This doesn't attempt to
         gracefully handle invalid authentication headers.
+
+        HTTP basic auth is used. If the auth method is xBasic, no
+        WWW-Authenticate header will be sent for failed authentication
+        attempts, as a workaround for using the API via JavaScript.
         """
         try:
             auth_header = self.request.headers.get("Authorization")
@@ -27,8 +32,9 @@ class APIRequestHandler(tornado.web.RequestHandler):
                 raise ValueError("No Authorization header provided")
             auth_type, auth_digest = auth_header.split(" ")
             user, passwd = base64.decodestring(auth_digest).split(":")
-            if auth_type != "Basic":
+            if auth_type not in ["Basic", "xBasic"]:
                 raise ValueError("Authorization type is not Basic")
+            self.use_www_authenticate = auth_type == "Basic"
             user_model = session.query(models.User).get(user)
             if user_model is None:
                 raise ValueError("Invalid username or password")
@@ -55,9 +61,9 @@ class APIRequestHandler(tornado.web.RequestHandler):
             raise tornado.web.HTTPError(400, reason=reason)
 
     def write_error(self, status_code, **kwargs):
-        # if unauthorized, tell client that authorization is required
-        # if status_code == 401:
-            # self.set_header('WWW-Authenticate', 'Basic realm=Restricted')
+        #if unauthorized, tell client that authorization is required
+        if status_code == 401 and self.use_www_authenticate:
+            self.set_header('WWW-Authenticate', 'Basic realm=Restricted')
 
         # use generic error message, or reason if provided
         message = httplib.responses[status_code]
