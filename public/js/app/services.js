@@ -30,7 +30,7 @@
         });
       });
 
-      return Restangular.one('').get().then(function(result) {
+      return Restangular.one('users').get().then(function(result) {
         $cookieStore.put(cookieKey, auth);
       }, function(reason) {
         return $q.reject(reason);
