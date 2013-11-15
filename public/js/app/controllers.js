@@ -24,7 +24,7 @@
    * @controller
    * @route '/home'
    */
-  .controller('HomeCtrl', function($scope, $cookies, Restangular, UserService) {
+  .controller('HomeCtrl', function($scope, $cookies, $location, Restangular, UserService) {
     var feeds, entries;
 
     if (!UserService.isLoggedIn()) {

@@ -16,7 +16,6 @@
 
       return Restangular.one('').get().then(function(result) {
         $cookieStore.put('auth', auth);
-        isLoggedIn = true;
       }, function(reason) {
         return $q.reject(reason);
       });
