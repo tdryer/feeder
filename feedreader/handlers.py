@@ -7,7 +7,8 @@ import pbkdf2
 import requests
 
 from feedreader.api_request_handler import APIRequestHandler
-from feedreader.database.models import Entry, Feed, Subscription, User
+from feedreader.database.models import (Entry, Feed, Subscription, User, 
+                                        exists_feed)
 from feedreader.stub import generate_dummy_feed
 
 
@@ -148,6 +149,19 @@ class FeedHandler(APIRequestHandler):
                 'unreads': user.num_unread_in_feed(session, feed.id),
             })
         self.set_status(200)
+
+    def delete(self, feed_id):
+        with self.get_db_session() as session:
+            user = session.query(User).get(self.require_auth(session))
+            if not exists_feed(session, feed_id):
+                raise HTTPError(404, reason='This feed does not exist')
+            feed = session.query(Feed).get(feed_id)
+            if not user.is_sub_of_feed(session, feed_id):
+                raise HTTPError(403, reason=
+                        'You do not have permission to access this feed')
+            user.unsubscribe(session, feed.id)
+            feed.remove(session)
+        self.set_status(204)
 
 
 class FeedEntriesHandler(APIRequestHandler):

@@ -430,3 +430,31 @@ class FeedsTest(AsyncHTTPTestCase):
             'unreads': 0,
             'url': 'http://mtomwing.com',
         })
+
+    def test_delete_feed_requires_auth(self):
+        response = self.fetch('/feeds/1', method='DELETE')
+        self.assertEqual(response.code, 401)
+
+    def test_delete_feed_unsubbed_user(self):
+        s = self.Session()
+        feed1 = models.Feed("Tombuntu", "http://feeds.feedburner.com/Tombuntu",
+                            "http://tombuntu.com")
+        s.add(feed1)
+        s.commit()
+        response = self.fetch('/feeds/1', method='DELETE', headers=self.headers)
+        self.assertEqual(response.code, 403)
+
+    def test_delete_feed_does_not_exist(self):
+        response = self.fetch('/feeds/2', method='DELETE', headers=self.headers)
+        self.assertEqual(response.code, 404)
+
+    def test_delete_feed_deleted(self):
+        s = self.Session()
+        feed = models.Feed("Tombuntu", "http://feeds.feedburner.com/Tombuntu",
+                            "http://tombuntu.com")
+        s.add(feed)
+        s.commit()
+        s.add(models.Subscription(TEST_USER, feed.id))
+        s.commit()
+        response = self.fetch('/feeds/1', method='DELETE', headers=self.headers)
+        self.assertEqual(response.code, 204)
