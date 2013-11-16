@@ -2,11 +2,12 @@
 
 from lxml import html
 from tornado.web import HTTPError
-import requests
 import pbkdf2
+import requests
 
 from feedreader.api_request_handler import APIRequestHandler
-from feedreader.database.models import Feed, User, Subscription, Entry
+from feedreader.database.models import Entry, Feed, Subscription, User
+from feedreader.stub import generate_dummy_feed
 
 
 class MainHandler(APIRequestHandler):
@@ -53,6 +54,12 @@ class UsersHandler(APIRequestHandler):
             password_hash = pbkdf2.crypt(body["password"])
             new_user = User(body["username"], password_hash)
             session.add(new_user)
+            session.commit()
+
+            # XXX: Create some dummy feeds for the new user
+            if self.enable_dummy_data:
+                for _ in xrange(10):
+                    generate_dummy_feed(session, new_user.username)
         self.set_status(201)
 
 
@@ -84,15 +91,18 @@ class FeedsHandler(APIRequestHandler):
         })
         with self.get_db_session() as session:
             username = self.require_auth(session)
-            dom = html.fromstring(requests.get(body['url']).content)
-            title = dom.cssselect('title')[0].text_content()
-            feed = Feed(title, body['url'], body['url'])
-            session.add(feed)
-            session.commit()
-            session.add(Subscription(username, feed.id))
             # TODO: If the feed doesn't already exist, retrive it and add new
             # feed and entries.
-            # TODO: Subscribe the user to the feed.
+            dom = html.fromstring(requests.get(body['url']).content)
+            title = dom.cssselect('title')[0].text_content().strip()
+            if self.enable_dummy_data:
+                # XXX: Generate a dummy feed
+                generate_dummy_feed(session, username, title, body['url'])
+            else:
+                feed = Feed(title, body['url'], body['url'])
+                session.add(feed)
+                session.commit()
+                session.add(Subscription(username, feed.id))
         # TODO: we should indicate the ID of the new feed (location header?)
         self.set_status(201)
 

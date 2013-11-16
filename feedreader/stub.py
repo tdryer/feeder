@@ -1,6 +1,8 @@
 import random
 import time
 
+from feedreader.database.models import Entry, Feed, Subscription
+
 quotes = [
     "<h1>Marceline's Closet</h1>\n<p>Do you think it's right for Marceline to invite us to jam without Princess and BMO? It's just a jam sesh. Is that what you're gonna jam with? Yeah, man. Balloon music is the future. Listen. Pretty good. I don't think you mastered it yet. Well, duh. I just started.</p>\n<p>Oh, dude. There's a note. What's it say? Hey, guys, I had to run out, but I'll be back, blee-bloo-blop, Don't go in my house. That's it? Yeah. Just Don't go in my house in all caps... written in blood. </p>\n<h2>Hmm. What are you doing?</h2>\n<p>Eliminating desire from my heart. It helps pass the time. Come on! I can't do that! Let's play Cloud Hunt 'til she gets here. No, man, I got a mental block with Cloud Hunt! Yeah, that's what makes it awesome, 'cause I know I'll win. Oh, what?! Bring it on, brother! Now explain the rules 'cause I forget. Okay. I count to ten and you go hide somewhere. Then, I gotta try to find you. You can hide... anywhere in here. Anywhere in here, ...but Marcy's house is off limits because she said so. Okay? Got it. Okay. I'm gonna start counting. Ready? Yes. Go! </p>\n<ol>\n<li>One... </li>\n<li>Two... </li>\n<li>Three... </li>\n<li>Four... </li>\n<li>Five... </li>\n<li>Four...</li>\n</ol>\n<h3>Cloud Hunt...</h3>\n<p>GOTCHA! Huh. Hmm. AH-HA! JAKE! Get out of there! Marcelines gonna kill you! Jake! I know this isnt a mirror. What the--?! Youre doing it wrong, even! Get out! Get out!! (Finn goes inside. Jake spots him and continues mirroring him.) Dude, get out of there! Shes gonna kill us! Shell be home any minute! Did you read the note?! I mean, you read the note! You told it to me!!</p>\n<ul>\n<li>This is Jake! And this is Finn!</li>\n<li>Were not home right now, so...</li>\n<li>...leave a message! Leave a message!</li>\n</ul>\n<h4>Smells like sourdough in here.</h4>\n<p>Shes gonna kill us. Once she finds out shes gonna tie us up and eat us like a spider. You dont think I know that?! Hmmmmmmm... Well wait for the right moment and sneak out... right under her big, fat caboose. Okay, man. I can do this. Egh! Egh! Egh!! Shh, here she comes! Here she comes... Shh, shh!!</p>\n<h5>Huh. Lets get outta here.</h5>\n<p>Hello? She didnt wash hands! Is someone here? Shh!! Thats what stinks! Where are those dweebs? Uh... Yeah, hey, you guys. Are you still coming over? S jam time, so, like, call me, kay?</p>",
     "<h1>Throw it, Cake! </h1>\n<p>Eyahh! These jelly kinders arent... alive, are they? What? No, they cant even talk. Kick it! Thanks for helping me out guys. What are these buggers for, anyway? Oh, theyre decorations for my Biennial Gumball Ball. Tonight!</p>\n<p>Sounds like it gonna be large. Yes! So very large. Id like you to be there as my special guest. You want me to go with you to the ball? Heck yes. As my pal! Oh. Right. It starts at seven, so dont be late! Fionna, we got trouble! My tail is totally frizzin out! Ill check it out.</p>\n<h2>Its Ice Queen!</h2>\n<ol>\n<li>No! No retreat, girl.</li>\n<li>Hello, Fionna.</li>\n<li>And I see you brought Cake.</li>\n<li>Thats cool, right?</li>\n<li>Only if its cool that I brought... Lord Monochromicorn!</li>\n</ol>\n<p>The Prince shall be mine! Back inside! Outta my way, tomboy! Ice Queen, why are you always predatoring on dudes? Ha! You should to talk! Keeping all the babes to yourself, totally ice-blocking my game! What? Not this time! Gah! Slush Beast!</p>\n<h3>Cake! Morning-star mode!</h3>\n<p>You saved me from the Ice Queen! Oh, uh, yeah I guess. Is she gone? She must have fled. Fionna, youre so strong. And you look so beautiful in the snow. What are you doing later? I was just going to go home, I... Come with me. Lets go out. Go... out? Yeah. Lets go somewhere. What? Wed love to! Great! Meet me in the castle gardens in an hour! Yes, well be there!</p>\n<ul>\n<li>Hiya, gorgeous.</li>\n<li>H-E-Y.</li>\n<li>Accept these tokens of our esteem.</li>\n<li>Hey you didnt have to, guy...</li>\n<li>Nonsense. For you, Cake, a satchel of nepetalactone. Mo-Chro picked it himself.</li>\n</ul>\n<h4>Oh, its a date!</h4>\n<p>No, its not. Im sure when he said go out, he meant go out, not go out! Shut up, hes into you! Come on, you heard what he said. Im like his guy-friend. Well, that could change tonight. If its a date, why are you coming? Im coming to help you! Hold on, Im bringing my dulcimer. Man.</p>\n<h5>Its a conversation starter.</h5>\n<p>Fine, Ill do this if only to prove you wrong. Mm... Lets just bail, I changed my mind.</p>",
@@ -34,12 +36,21 @@ urls = [
 ]
 
 
-def generate_entry():
-    return {
-        'title': random.choice(titles),
-        'pub_date': time.time(),
-        'status': 'read',
-        'feed_id': 1,
-        'url': random.choice(urls),
-        'content': random.choice(quotes),
-    }
+def generate_entry(feed_id):
+    return Entry(feed_id, random.choice(quotes), random.choice(urls),
+                 random.choice(titles), 'David Yan', int(time.time()))
+
+
+def generate_dummy_feed(session, username, title=None, url=None):
+    if not title:
+        title = random.choice(titles)
+    if not url:
+        url = random.choice(urls)
+
+    feed = Feed(title, url, url)
+    session.add(feed)
+    session.commit()
+    for _ in xrange(10):
+        entry = generate_entry(feed.id)
+        session.add(entry)
+    session.add(Subscription(username, feed.id))

@@ -6,10 +6,11 @@ import sys
 import pbkdf2
 
 from feedreader.database import models
+from feedreader.stub import generate_dummy_feed
 from feedreader import handlers
 
 
-def get_application(db_setup_f=None):
+def get_application(db_setup_f=None, enable_dummy_data=False):
     """Return Tornado application instance."""
     # initialize the DB so sessions can be created
     create_session = models.initialize_db()
@@ -21,10 +22,17 @@ def get_application(db_setup_f=None):
     session = create_session()
     session.add(models.User("username", pbkdf2.crypt("password")))
     session.commit()
+
+    # XXX: Generate dummy data for the default user as per David's request
+    for _ in xrange(10):
+        generate_dummy_feed(session, 'username')
     session.close()
 
     # create tornado application and listen on the provided port
-    default_injections = dict(create_session=create_session)
+    default_injections = dict(
+        create_session=create_session,
+        enable_dummy_data=enable_dummy_data,
+    )
     return tornado.web.Application([
         (r"^/?$", handlers.MainHandler, default_injections),
         (r"^/users/?$", handlers.UsersHandler, default_injections),

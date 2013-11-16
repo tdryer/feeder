@@ -30,7 +30,7 @@ class SingleFileHandler(tornado.web.StaticFileHandler):
 
 
 def main():
-    feedreader_app = feedreader.main.get_application()
+    feedreader_app = feedreader.main.get_application(enable_dummy_data=True)
     application = tornado.web.Application([
         (r"/api/(.*)", PrefixedFallbackHandler, dict(fallback=feedreader_app)),
         (r"/(.*\..*)", tornado.web.StaticFileHandler, {"path": "public"}),
