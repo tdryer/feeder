@@ -7,7 +7,7 @@ import pbkdf2
 import requests
 
 from feedreader.api_request_handler import APIRequestHandler
-from feedreader.database.models import (Entry, Feed, Subscription, User, 
+from feedreader.database.models import (Entry, Feed, Subscription, User,
                                         exists_feed)
 from feedreader.stub import generate_dummy_feed
 
@@ -95,7 +95,7 @@ class FeedsHandler(APIRequestHandler):
             username = self.require_auth(session)
             dom = html.fromstring(requests.get(body['url']).content)
             title = dom.cssselect('title')[0].text_content().strip()
-            
+
             if self.enable_dummy_data:
                 # XXX: Generate a dummy feed
                 generate_dummy_feed(session, username, title, body['url'])
@@ -202,7 +202,7 @@ class EntriesHandler(APIRequestHandler):
                     "id": entry.id,
                     "title": entry.title,
                     "pub-date": entry.date,
-                    "status": entry.been_read(session, user)
+                    "status": entry.been_read(session, user),
                     "author": entry.author,
                     "feed_id": entry.feed_id,
                     "url": entry.url,
