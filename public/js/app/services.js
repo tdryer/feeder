@@ -144,16 +144,16 @@
   })
 
   .factory('Articles', function($q, User, Article, Restangular) {
-    Restangular = Restangular.withConfig(function(RestangularProvider) {
-      RestangularProvider.setDefaultHeaders({
-        Authorization: 'xBasic ' + User.getAuth()
-      });
-    });
-
     function get(id) {
       if (!id) {
         return $q.reject();
       }
+
+      Restangular = Restangular.withConfig(function(RestangularProvider) {
+        RestangularProvider.setDefaultHeaders({
+          Authorization: 'xBasic ' + User.getAuth()
+        });
+      });
 
       return Restangular.one('feeds', id).getList('entries').then(function(result) {
         return Article.get(result.entries).then(function(result) {
@@ -168,16 +168,18 @@
   })
 
   .factory('Article', function($q, User, Restangular) {
-    Restangular = Restangular.withConfig(function(RestangularProvider) {
-      RestangularProvider.setDefaultHeaders({
-        Authorization: 'xBasic ' + User.getAuth()
-      });
-    });
+
 
     function get(id) {
       if (!id) {
         return $q.reject();
       }
+
+      Restangular = Restangular.withConfig(function(RestangularProvider) {
+        RestangularProvider.setDefaultHeaders({
+          Authorization: 'xBasic ' + User.getAuth()
+        });
+      });
 
       return Restangular.one('entries').getList(id);
     }
@@ -196,19 +198,26 @@
    * @var {Function} genAuth Creates a base64 encoding of the username/password.
    */
   .factory('Feeds', function($q, User, Restangular) {
-    Restangular = Restangular.withConfig(function(RestangularProvider) {
-      RestangularProvider.setDefaultHeaders({
-        Authorization: 'xBasic ' + User.getAuth()
-      });
-    });
 
     function add(URL) {
+      Restangular = Restangular.withConfig(function(RestangularProvider) {
+        RestangularProvider.setDefaultHeaders({
+          Authorization: 'xBasic ' + User.getAuth()
+        });
+      });
+
       return Restangular.all('feeds').post({
         url: URL
       });
     }
 
     function get() {
+      Restangular = Restangular.withConfig(function(RestangularProvider) {
+        RestangularProvider.setDefaultHeaders({
+          Authorization: 'xBasic ' + User.getAuth()
+        });
+      });
+
       return Restangular.all('feeds').getList().then(function(result) {
         return result.feeds;
       }, $q.reject);

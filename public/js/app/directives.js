@@ -36,7 +36,12 @@
    */
   .directive('header', function() {
     return {
-      templateUrl: 'partials/header.html'
+      templateUrl: 'partials/header.html',
+      controller: function($scope, User) {
+        User.getUsername().then(function(username) {
+          $scope.username = username;
+        });
+      }
     }
   })
 
