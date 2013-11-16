@@ -12,7 +12,7 @@
       controller: function($rootScope, $scope) {
         $rootScope.$watch('breadcrumbs', function(breadcrumbs) {
           $scope.anchor = _.last(breadcrumbs);
-        })
+        });
       }
     }
   })
@@ -37,9 +37,15 @@
   .directive('header', function() {
     return {
       templateUrl: 'partials/header.html',
-      controller: function($scope, User) {
-        User.getUsername().then(function(username) {
-          $scope.username = username;
+      controller: function($scope, $rootScope, User) {
+        $rootScope.$watch('showHeader', function(showHeader) {
+          if (!showHeader) {
+            return;
+          }
+
+          User.getUsername().then(function(username) {
+            $scope.username = username;
+          });
         });
       }
     }
