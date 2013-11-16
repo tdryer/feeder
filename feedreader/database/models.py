@@ -256,6 +256,15 @@ class Entry(BASE):
         session.delete(self)
         make_transient(self)
 
+    def been_read(self, session, username):
+        if session.query(Read).filter(and_(
+                Read.username == username,
+                Read.entry_id == self.id
+                )).count():
+            return "read"
+        else:
+            return "unread"
+
 
 class Subscription(BASE):
     __tablename__ = 'subscriptions'

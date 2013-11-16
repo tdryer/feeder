@@ -202,7 +202,7 @@ class EntriesHandler(APIRequestHandler):
                     "id": entry.id,
                     "title": entry.title,
                     "pub-date": entry.date,
-                    "status": "TODO", # TODO
+                    "status": entry.been_read(session, user)
                     "author": entry.author,
                     "feed_id": entry.feed_id,
                     "url": entry.url,
