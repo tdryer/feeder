@@ -153,8 +153,8 @@ class User(BASE):
                     Read.entry_id.in_(entry_ids)
             )).all():
                 read_ids.append(row.entry_id)
-        raw_entries = session.query(Entry).filter(Entry.feed_id == feed_id
-                                                  ).all()
+        raw_entries = session.query(Entry).filter(Entry.feed_id == feed_id)\
+                                          .order_by(Entry.date.desc()).all()
         if not do_filter:
             return raw_entries
         else:
