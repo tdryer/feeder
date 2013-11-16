@@ -54,18 +54,12 @@
    * @scope {Number} feedId The id of the current subscription.
    * @scope {Object} feed The data of the current subscription.
    */
-  .controller('FeedCtrl', function($scope, $location, $routeParams, User, Feeds) {
+  .controller('FeedCtrl', function($scope, $location, Feed, User, Articles) {
     if (!User.isLoggedIn()) {
       $location.path('/login');
     }
 
-    $scope.feedId = +$routeParams.feed;
-
-    Feeds.get().then(function(feeds) {
-      $scope.feed = _.find(feeds, {
-        id: $scope.feedId
-      });
-    });
+    $scope.feed = Feed;
   })
 
   /**

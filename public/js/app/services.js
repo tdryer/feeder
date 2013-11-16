@@ -102,6 +102,18 @@
     return new User;
   })
 
+  .factory('Articles', function($q, User, Restangular) {
+    var Articles = angular.noop;
+
+    Restangular = Restangular.withConfig(function(RestangularProvider) {
+      RestangularProvider.setDefaultHeaders({
+        Authorization: 'xBasic ' + User.getAuth()
+      });
+    });
+
+    return new Articles;
+  })
+
   /**
    * Creates a `User` model.
    *
@@ -113,25 +125,19 @@
   .factory('Feeds', function($q, User, Restangular) {
     var Feeds = angular.noop;
 
-    Feeds.prototype.add = function(URL) {
-      Restangular = Restangular.withConfig(function(RestangularProvider) {
-        RestangularProvider.setDefaultHeaders({
-          Authorization: 'xBasic ' + User.getAuth()
-        });
+    Restangular = Restangular.withConfig(function(RestangularProvider) {
+      RestangularProvider.setDefaultHeaders({
+        Authorization: 'xBasic ' + User.getAuth()
       });
+    });
 
+    Feeds.prototype.add = function(URL) {
       return Restangular.all('feeds').post({
         url: URL
       });
     }
 
     Feeds.prototype.get = function() {
-      Restangular = Restangular.withConfig(function(RestangularProvider) {
-        RestangularProvider.setDefaultHeaders({
-          Authorization: 'xBasic ' + User.getAuth()
-        });
-      });
-
       return Restangular.all('feeds').getList().then(function(result) {
         return result.feeds;
       }, function(reason) {

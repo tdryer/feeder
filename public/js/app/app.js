@@ -1,4 +1,4 @@
-(function(angular) {
+(function(angular, _) {
 
   var app = angular.module('feeder', [
     'ngCookies',
@@ -30,7 +30,16 @@
 
     .when('/home/:feed', {
       controller: 'FeedCtrl',
-      templateUrl: 'partials/feed.html'
+      templateUrl: 'partials/feed.html',
+      resolve: {
+        Feed: function($route, Feeds) {
+          return Feeds.get().then(function(feeds) {
+            return _.find(feeds, {
+              id: +$route.current.params.feed
+            });
+          });
+        }
+      }
     })
 
     .when('/home/:feed/:article', {
@@ -62,4 +71,4 @@
     RestangularProvider.setBaseUrl('api');
   });
 
-}).call(this, angular);
+}).call(this, angular, _);
