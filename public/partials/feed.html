@@ -1,10 +1,12 @@
-<p ng-show="feed">You are looking at feed #{{feed.id}} <b>{{feed.name}}</b></p>
-<ul>
-  <li ng-repeat="article in articles">
-    <article>
-      <a href="#/home/{{feed.id}}/{{article.id}}">{{article.title}}</a>
-      <b>by {{article.author}}</b>
-      <i>on {{article["pub-date"] | moment}}</i>
-    </article>
-  </li>
-</ul>
+<div class="feed">
+  <p ng-show="feed">You are looking at feed #{{feed.id}} <b>{{feed.name}}</b></p>
+  <ul>
+    <li ng-repeat="article in articles">
+      <article>
+        <a href="#/home/{{feed.id}}/{{article.id}}">{{article.title}}</a>
+        <b>by {{article.author}}</b>
+        <i>on {{article["pub-date"] | moment}}</i>
+      </article>
+    </li>
+  </ul>
+</div>
