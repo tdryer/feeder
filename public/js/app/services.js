@@ -117,9 +117,13 @@
      * @returns {Promise} Returns the promise of the API hit.
      */
     function getUsername() {
+      if (!isLoggedIn()) {
+        return $q.reject();
+      }
+
       Restangular = Restangular.withConfig(function(RestangularProvider) {
         RestangularProvider.setDefaultHeaders({
-          Authorization: 'xBasic ' + $cookieStore.get(cookieKey)
+          Authorization: 'xBasic ' + getAuth()
         });
       });
 
