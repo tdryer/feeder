@@ -3,6 +3,21 @@
   angular.module('feeder.directives', [])
 
   /**
+   * Navigates a user back one level.
+   *
+   * @directive
+   */
+  .directive('back', function() {
+    return {
+      controller: function($rootScope, $scope) {
+        $rootScope.$watch('breadcrumbs', function(breadcrumbs) {
+          $scope.anchor = _.last(breadcrumbs);
+        })
+      }
+    }
+  })
+
+  /**
    * Displays the user's list of subscriptions.
    *
    * @directive
@@ -18,7 +33,6 @@
    * Displays the header bar.
    *
    * @directive
-   * @route '/home'
    */
   .directive('header', function() {
     return {

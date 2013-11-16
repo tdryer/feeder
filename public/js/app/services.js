@@ -1,6 +1,46 @@
-(function(angular) {
+(function(angular, _) {
 
   angular.module('feeder.services', [])
+
+  .factory('Breadcrumbs', function($q, $rootScope, Feeds) {
+    var breadcrumbs = []
+      , home;
+
+    home = {
+      url: '#/home',
+      text: 'Home'
+    };
+
+    function update(params) {
+      if (!_.size(params)) {
+        $rootScope.breadcrumbs = [];
+        return;
+      }
+
+      if (angular.isDefined(params.feed) && angular.isUndefined(params.article)) {
+        $rootScope.breadcrumbs = [home];
+        return;
+      }
+
+      if (angular.isDefined(params.feed) && angular.isDefined(params.article)) {
+        Feeds.get().then(function(feeds) {
+          var feed = _.find(feeds, {
+            id: +params.feed
+          });
+
+          feed.text = feed.name;
+          feed.url = '#/home/' + feed.id;
+
+          $rootScope.breadcrumbs = [home, feed];
+        });
+        return;
+      }
+    }
+
+    return {
+      update: update
+    }
+  })
 
   /**
    * Creates a `User` model.
@@ -11,8 +51,7 @@
    * @var {Function} genAuth Creates a base64 encoding of the username/password.
    */
   .factory('User', function($q, $cookieStore, Restangular) {
-    var User = angular.noop
-      , cookieKey = 'auth';
+    var cookieKey = 'auth';
 
     function genAuth(username, password) {
       return btoa(username + ':' + password);
@@ -105,8 +144,6 @@
   })
 
   .factory('Articles', function($q, User, Article, Restangular) {
-    var Articles = angular.noop;
-
     Restangular = Restangular.withConfig(function(RestangularProvider) {
       RestangularProvider.setDefaultHeaders({
         Authorization: 'xBasic ' + User.getAuth()
@@ -131,8 +168,6 @@
   })
 
   .factory('Article', function($q, User, Restangular) {
-    var Articles = angular.noop;
-
     Restangular = Restangular.withConfig(function(RestangularProvider) {
       RestangularProvider.setDefaultHeaders({
         Authorization: 'xBasic ' + User.getAuth()
@@ -161,8 +196,6 @@
    * @var {Function} genAuth Creates a base64 encoding of the username/password.
    */
   .factory('Feeds', function($q, User, Restangular) {
-    var Feeds = angular.noop;
-
     Restangular = Restangular.withConfig(function(RestangularProvider) {
       RestangularProvider.setDefaultHeaders({
         Authorization: 'xBasic ' + User.getAuth()
@@ -187,4 +220,4 @@
     };
   });
 
-}).call(this, angular);
+}).call(this, angular, _);

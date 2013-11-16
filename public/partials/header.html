@@ -1,4 +1,15 @@
 <header ng-show="username">
+  <div class="breadcrumbs" breadcrumbs>
+    <a
+      back
+      class="back btn fui fui-arrow-left"
+      href="{{anchor.url}}"
+      ng-show="anchor"></a>
+    <a
+      class="btn breadcrumb"
+      href="{{link.url}}"
+      ng-repeat="link in breadcrumbs">{{link.text}}</a>
+  </div>
   <span username>Hello, {{username}}!</span>
   <a class="btn logout" href="#/logout">Logout</a>
 </header>

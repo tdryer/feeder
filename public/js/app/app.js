@@ -78,4 +78,10 @@
     RestangularProvider.setBaseUrl('api');
   });
 
+  app.run(function($rootScope, Breadcrumbs) {
+    $rootScope.$on('$routeChangeSuccess', function(angularEvent, current) {
+      Breadcrumbs.update(current.params);
+    });
+  })
+
 }).call(this, angular, _);
