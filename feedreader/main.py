@@ -47,7 +47,7 @@ def get_application(db_setup_f=None, enable_dummy_data=False):
 def main():
     """Main entry point for the server."""
     port = int(sys.argv[1])
-    get_application().listen(port)
+    get_application(enable_dummy_data=True).listen(port)
     tornado.ioloop.IOLoop.instance().start()
 
 
