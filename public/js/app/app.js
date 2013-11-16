@@ -29,8 +29,8 @@
     })
 
     .when('/home/:feed', {
-      controller: 'HomeCtrl',
-      templateUrl: 'partials/home.html'
+      controller: 'FeedCtrl',
+      templateUrl: 'partials/feed.html'
     })
 
     .when('/home/:feed/:article', {

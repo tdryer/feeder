@@ -1,4 +1,4 @@
-(function(angular) {
+(function(angular, _) {
 
   angular.module('feeder.controllers', [])
 
@@ -44,6 +44,28 @@
     }
 
     updateFeeds();
+  })
+
+  /**
+   * Displays a list of articles for a subscription.
+   *
+   * @controller
+   * @route '/home/:feed'
+   * @scope {Number} feedId The id of the current subscription.
+   * @scope {Object} feed The data of the current subscription.
+   */
+  .controller('FeedCtrl', function($scope, $location, $routeParams, User, Feeds) {
+    if (!User.isLoggedIn()) {
+      $location.path('/login');
+    }
+
+    $scope.feedId = +$routeParams.feed;
+
+    Feeds.get().then(function(feeds) {
+      $scope.feed = _.find(feeds, {
+        id: $scope.feedId
+      });
+    });
   })
 
   /**
@@ -117,4 +139,4 @@
     $location.path('/login');
   });
 
-}).call(this, angular);
+}).call(this, angular, _);
