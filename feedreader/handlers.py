@@ -116,23 +116,15 @@ class FeedEntriesHandler(APIRequestHandler):
             user = session.query(User).get(self.require_auth(session))
             # check if the feed exists and user is subscribed to it
             if user.is_sub_of_feed(session, int(feed_id)):
-                entries = user.get_feed_entries(session, feed_id)
-                # filter the entries if necessary
-                if entry_filter == "read":
-                    entry_ids = [
-                        entry.id for entry in
-                        entries["all_entries"][:entries["num_read"]]
-                    ]
-                elif entry_filter == "unread":
-                    entry_ids = [
-                        entry.id for entry in
-                        entries["all_entries"][entries["num_read"]:]
-                    ]
+                if entry_filter == "read" or entry_filter == "unread":
+                    entries = user.get_feed_entries(
+                            session, feed_id, filter=entry_filter)
                 elif entry_filter == None:
-                    entry_ids = [entry.id for entry in entries["all_entries"]]
+                    entries = user.get_feed_entries(session, feed_id)
                 else:
                     self.set_status(400)
                     return
+                entry_ids = [entry.id for entry in entries]
                 self.write({'entries': entry_ids})
                 self.set_status(200)
             else:

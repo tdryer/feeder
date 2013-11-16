@@ -113,16 +113,14 @@ class User(BASE):
     Collects all the entries of a feed
     precondition: is_sub_of_feed should be called prior to
                   this function call
-    Input: session, Feed.id
-    Ouput: dictionary -- {
-                            "all_entries": list
-                            "num_read": int
-                         }
-           the list is Entry instances,
-           the read entries are in list[0:num_read-1] if any exist
+    Input: session, Feed.id, optional: filter="read"|"unread"
+    Ouput: a list of entries
     """
-
-    def get_feed_entries(self, session, feed_id):
+    def get_feed_entries(self, session, feed_id, **kwargs):
+        do_filter = False        
+        if 'filter' in kwargs:
+            entry_filter = kwargs.get('filter')
+            do_filter = True
         # Queries
         entry_ids = []
         # Can't make this a single statement because query(Entry.id) produces
@@ -131,23 +129,28 @@ class User(BASE):
                 Entry.feed_id == feed_id).all():
             entry_ids.append(row.id)
         read_ids = []
-        for row in session.query(Read).filter(and_(
-                Read.username == self.username, Read.entry_id.in_(entry_ids)
-        )).all():
-            read_ids.append(row.entry_id)
+        if entry_ids != []:
+            for row in session.query(Read).filter(and_(
+                    Read.username == self.username,
+                    Read.entry_id.in_(entry_ids)
+                    )).all():
+                read_ids.append(row.entry_id)
         raw_entries = session.query(Entry).filter(Entry.feed_id == feed_id
                                                   ).all()
-        # Processing
-        feed_entries = []
-        size_read = 0
-        for entry in raw_entries:
-            if entry.id in read_ids:
-                feed_entries.insert(size_read, entry)
-                size_read += 1
-            else:
-                feed_entries.append(entry)
+        if not do_filter:
+            return raw_entries
+        else:
+            feed_entries = []
+            if entry_filter == "read":
+                for entry in raw_entries:
+                    if entry.id in read_ids:
+                        feed_entries.append(entry)
+            elif entry_filter == "unread":
+                for entry in raw_entries:
+                    if entry.id not in read_ids:
+                        feed_entries.append(entry)
 
-        return {"all_entries": feed_entries, "num_read": size_read}
+            return feed_entries
 
 
 class Feed(BASE):
