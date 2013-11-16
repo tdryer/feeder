@@ -2,6 +2,7 @@
 
 from lxml import html
 from tornado.web import HTTPError
+from sqlalchemy import and_
 import pbkdf2
 import requests
 
@@ -91,18 +92,33 @@ class FeedsHandler(APIRequestHandler):
         })
         with self.get_db_session() as session:
             username = self.require_auth(session)
-            # TODO: If the feed doesn't already exist, retrive it and add new
-            # feed and entries.
             dom = html.fromstring(requests.get(body['url']).content)
             title = dom.cssselect('title')[0].text_content().strip()
+            
             if self.enable_dummy_data:
                 # XXX: Generate a dummy feed
                 generate_dummy_feed(session, username, title, body['url'])
             else:
-                feed = Feed(title, body['url'], body['url'])
-                session.add(feed)
-                session.commit()
-                session.add(Subscription(username, feed.id))
+                # Check to see if the feed already exists
+                feed = session.query(Feed).filter(and_(
+                    Feed.title == title,
+                    Feed.feed_url == body['url'],
+                    Feed.site_url == body['url'])).first()
+
+                # If the feed doesn't already exist, create one
+                if feed is None:
+                    feed = Feed(title, body['url'], body['url'])
+                    session.add(feed)
+                    session.commit()
+
+                # Check to see if the user already has a subscription to to
+                # this feed
+                if session.query(Subscription).filter(and_(
+                    Subscription.username == username,
+                    Subscription.feed_id == feed.id)).first() is None:
+                        session.add(Subscription(username, feed.id))
+                else:
+                    raise HTTPError(400, reason="Already to subscribed to feed")
         # TODO: we should indicate the ID of the new feed (location header?)
         self.set_status(201)
 

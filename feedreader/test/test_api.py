@@ -192,6 +192,21 @@ class FeedsTest(AsyncHTTPTestCase):
         )
         self.assertEqual(response.code, 201)
 
+    def test_duplicate_subscription(self):
+        # Create a feed which we will attempt to subscribe to twice
+        self.fetch('/feeds/', method='POST', headers=self.headers,
+                              body=json.dumps({
+                                    'url': 'http://awesome-blog.github.io'
+                                }),
+        )
+        # Try subscribing to the feed a second time
+        response = self.fetch('/feeds/', method='POST', headers=self.headers,
+                              body=json.dumps({
+                                    'url': 'http://awesome-blog.github.io'
+                                }),
+        )
+        self.assertEqual(response.code, 400)
+
     def test_get_feed_entries_feed_does_not_exist(self):
         response = self.fetch('/feeds/1/entries', method='GET',
                               headers=self.headers)
