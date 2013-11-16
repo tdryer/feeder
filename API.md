@@ -1,5 +1,45 @@
 # Unnamed Feed Reader API Specification
 
+Every API endpoint requires HTTP Basic Authentication unless stated otherwise.
+
+## Register a new user
+POST /users/
+
+### Description
+Registers a new using with the given username and password. Authentication is
+not required.
+
+### Request
+    {
+      "username": "username",
+      "password": "password",
+    }
+
+### Response
+
+  - 201 Created
+  - 400 Bad Request: Invalid request body, those credentials are already taken,
+    or unsuitable credentials
+
+---
+
+## Get user information
+GET /users/
+
+### Description
+Returns information about the current user.
+
+### Request
+None
+
+### Response
+
+  - 200 Success
+  - 401 Unauthorized: if user credentials are bad
+  - 403 Forbidden: if the user does not have permission to access this feed
+
+---
+
 ## List all feeds
 GET /feeds/
 
@@ -24,6 +64,8 @@ None
   - 200 Success
   - 401 Unauthorized: if user credentials are bad
 
+---
+
 ## Add feed
 POST /feeds/
 
@@ -41,6 +83,8 @@ Used to add a new feed for the user.
   - 201 Created
   - 400 Bad Request: if any of the feed parameters were invalid
   - 401 Unauthorized: if user credentials are bad
+
+---
 
 ## Get feed items and details
 GET /feeds/:feed\_id/entries[?filter="all|read|unread"]
@@ -60,7 +104,7 @@ Get the entries (articles) of a feed that the user has access to.
   - 403 Forbidden: if the user does not have permission to access this feed
   - 404 Not Found: if the feed does not exist
 
-
+---
 
 ## Delete feed
 DELETE /feeds/:feed\_id
@@ -78,7 +122,7 @@ None
   - 403 Forbidden: if the user does not have permission to access this feed
   - 404 Not Found: if the feed does not exist
 
-
+---
 
 ## Get feed item
 GET /entries/:entry\_id(,entry\_id,...)
@@ -106,6 +150,8 @@ None
   - 401 Unauthorized: if user credentials are bad
   - 403 Forbidden: if the user does not have permission to access this feed
   - 404 Not Found: if the feed/item does not exist
+
+---
 
 ## Update item details
 PATCH /entries/:entry\_id(,entry\_id,...)
