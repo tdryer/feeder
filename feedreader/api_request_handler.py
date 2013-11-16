@@ -31,8 +31,8 @@ class APIRequestHandler(tornado.web.RequestHandler):
             auth_header = self.request.headers.get("Authorization")
             if auth_header is None:
                 raise ValueError("No Authorization header provided")
-            auth_type, auth_digest = auth_header.split(" ")
-            user, passwd = base64.decodestring(auth_digest).split(":")
+            auth_type, auth_digest = auth_header.split(" ", 1)
+            user, passwd = base64.decodestring(auth_digest).split(":", 1)
             if auth_type not in ["Basic", "xBasic"]:
                 raise ValueError("Authorization type is not Basic")
             self.use_www_authenticate = auth_type == "Basic"
