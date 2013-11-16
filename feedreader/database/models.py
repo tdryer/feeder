@@ -50,7 +50,9 @@ class User(BASE):
         for sub in subs:
             session.delete(sub)
         # also remove read entries
-        reads = session.query(Read).filter(Read.username == self.username).all()
+        reads = session.query(Read).filter(
+            Read.username == self.username
+        ).all()
         for read in reads:
             session.delete(read)
         session.delete(self)
@@ -60,6 +62,7 @@ class User(BASE):
         sub = Subscription(self.username, feed_id)
         session.add(sub)
 
+    # checks if the user is subscribed to the feed with id == feed_id
     def is_sub_of_feed(self, session, feed_id):
         return session.query(Subscription).filter(and_(
             Subscription.username == self.username,
@@ -75,15 +78,29 @@ class User(BASE):
         )
         session.delete(sub)
 
+    # checks if the user is allowed to view the entry with id == entry_id
+    def can_read(self, session, entry_id):
+        entry = session.query(Entry).filter(Entry.id == entry_id).one()
+        return self.is_sub_of_feed(session, entry.feed_id)
+
     def mark_read(self, session, entry_id):
         read = Read(self.username, entry_id)
         session.add(read)
 
+    # checks if the user has read the entry with id == entry_id
+    def is_read(self, session, entry_id):
+        return session.query(Read).filter(and_(
+                Read.username == self.username,
+                Read.entry_id == entry_id
+                ).count()
+
     def num_unread_in_feed(self, session, feed_id):
         read_ids = self.get_read_ids(session)
         if read_ids != []:
-            return session.query(Entry).filter(and_(Entry.feed_id == feed_id,
-                                                    ~Entry.id.in_(read_ids))).count()
+            return session.query(Entry).filter(and_(
+                Entry.feed_id == feed_id,
+                ~Entry.id.in_(read_ids)
+            )).count()
         else:
             return session.query(Entry).filter(Entry.feed_id == feed_id
                                                ).count()
@@ -116,8 +133,9 @@ class User(BASE):
     Input: session, Feed.id, optional: filter="read"|"unread"
     Ouput: a list of entries
     """
+
     def get_feed_entries(self, session, feed_id, **kwargs):
-        do_filter = False        
+        do_filter = False
         if 'filter' in kwargs:
             entry_filter = kwargs.get('filter')
             do_filter = True
@@ -133,7 +151,7 @@ class User(BASE):
             for row in session.query(Read).filter(and_(
                     Read.username == self.username,
                     Read.entry_id.in_(entry_ids)
-                    )).all():
+            )).all():
                 read_ids.append(row.entry_id)
         raw_entries = session.query(Entry).filter(Entry.feed_id == feed_id
                                                   ).all()
@@ -231,8 +249,8 @@ class Entry(BASE):
     def __repr__(self):
         return (
             "<Entry('%s','%s','%s')>" % (
-                    self.title, self.author, self.date)
-                    )
+                self.title, self.author, self.date)
+        )
 
     def remove(self, session):
         session.delete(self)
