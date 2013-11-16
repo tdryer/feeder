@@ -85,6 +85,17 @@ class FeedsTest(AsyncHTTPTestCase):
         def hook(Session): self.Session = Session
         return feedreader.main.get_application(db_setup_f=hook)
 
+    def test_get_user_requires_auth(self):
+        response = self.fetch('/users/', method='GET')
+        self.assertEqual(response.code, 401)
+
+    def test_get_user(self):
+        response = self.fetch('/users/', method='GET', headers=self.headers)
+        self.assertEqual(response.code, 200)
+        self.assertEqual(json.loads(response.body), {
+            "username": TEST_USER,
+        })
+
     def test_get_feeds_requires_auth(self):
         response = self.fetch('/feeds/', method='GET')
         self.assertEqual(response.code, 401)

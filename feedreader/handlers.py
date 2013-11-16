@@ -22,7 +22,7 @@ class MainHandler(APIRequestHandler):
 class UsersHandler(APIRequestHandler):
 
     def get(self):
-        """Returns details of a user based on their auth string."""
+        """Return information about the current user."""
         with self.get_db_session() as session:
             user = session.query(User).get(self.require_auth(session))
             username = user.username
