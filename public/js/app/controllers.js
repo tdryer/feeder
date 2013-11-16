@@ -60,6 +60,10 @@
     }
 
     $scope.feed = Feed;
+
+    Articles.get(Feed.id).then(function(articles) {
+      $scope.articles = articles;
+    });
   })
 
   /**

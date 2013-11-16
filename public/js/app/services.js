@@ -25,15 +25,13 @@
      * @param {String} password The new user's password.
      * @returns {Promise} Returns the promise of the registration API hit.
      */
-    User.prototype.register = function(username, password) {
+    function register(username, password) {
       return Restangular.all('users').post({
         username: username,
         password: password
       }).then(function(result) {
         $cookieStore.put(cookieKey, genAuth(username, password));
-      }, function(reason) {
-        return $q.reject(reason);
-      });
+      }, $q.reject);
     }
 
     /**
@@ -44,7 +42,7 @@
      * @param {String} password The user's password.
      * @returns {Promise} Returns the promise of the login API hit.
      */
-    User.prototype.login = function(username, password) {
+    function login(username, password) {
       var auth = genAuth(username, password);
 
       Restangular = Restangular.withConfig(function(RestangularProvider) {
@@ -55,15 +53,13 @@
 
       return Restangular.one('users').get().then(function(result) {
         $cookieStore.put(cookieKey, auth);
-      }, function(reason) {
-        return $q.reject(reason);
-      });
+      }, $q.reject);
     };
 
     /**
      * Logs out a user by deleting the session cookie.
      */
-    User.prototype.logout = function() {
+    function logout() {
       $cookieStore.remove(cookieKey);
     }
 
@@ -72,7 +68,7 @@
      *
      * @returns {Boolean} Returns whether or not a user is currently logged in.
      */
-    User.prototype.isLoggedIn = function() {
+    function isLoggedIn() {
       return !!$cookieStore.get(cookieKey);
     }
 
@@ -81,7 +77,7 @@
      *
      * @returns {Promise} Returns the promise of the API hit.
      */
-    User.prototype.getUsername = function() {
+    function getUsername() {
       Restangular = Restangular.withConfig(function(RestangularProvider) {
         RestangularProvider.setDefaultHeaders({
           Authorization: 'xBasic ' + $cookieStore.get(cookieKey)
@@ -90,19 +86,25 @@
 
       return Restangular.one('users').get().then(function(result) {
         return result.username;
-      }, function(reason) {
-        return $q.reject(reason);
-      });
+      }, $q.reject);
     }
 
-    User.prototype.getAuth = function() {
+    function getAuth() {
       return $cookieStore.get(cookieKey);
     }
 
-    return new User;
+    return {
+      getAuth: getAuth,
+      genAuth: genAuth,
+      getUsername: getUsername,
+      isLoggedIn: isLoggedIn,
+      login: login,
+      logout: logout,
+      register: register
+    };
   })
 
-  .factory('Articles', function($q, User, Restangular) {
+  .factory('Articles', function($q, User, Article, Restangular) {
     var Articles = angular.noop;
 
     Restangular = Restangular.withConfig(function(RestangularProvider) {
@@ -111,7 +113,43 @@
       });
     });
 
-    return new Articles;
+    function get(id) {
+      if (!id) {
+        return $q.reject();
+      }
+
+      return Restangular.one('feeds', id).getList('entries').then(function(result) {
+        return Article.get(result.entries).then(function(result) {
+          return result.entries;
+        }, $q.reject);
+      }, $q.reject);
+    }
+
+    return {
+      get: get
+    };
+  })
+
+  .factory('Article', function($q, User, Restangular) {
+    var Articles = angular.noop;
+
+    Restangular = Restangular.withConfig(function(RestangularProvider) {
+      RestangularProvider.setDefaultHeaders({
+        Authorization: 'xBasic ' + User.getAuth()
+      });
+    });
+
+    function get(id) {
+      if (!id) {
+        return $q.reject();
+      }
+
+      return Restangular.one('entries').getList(id);
+    }
+
+    return {
+      get: get
+    };
   })
 
   /**
@@ -131,21 +169,22 @@
       });
     });
 
-    Feeds.prototype.add = function(URL) {
+    function add(URL) {
       return Restangular.all('feeds').post({
         url: URL
       });
     }
 
-    Feeds.prototype.get = function() {
+    function get() {
       return Restangular.all('feeds').getList().then(function(result) {
         return result.feeds;
-      }, function(reason) {
-        $q.reject(reason);
-      });
+      }, $q.reject);
     }
 
-    return new Feeds;
+    return {
+      add: add,
+      get: get
+    };
   });
 
 }).call(this, angular);
