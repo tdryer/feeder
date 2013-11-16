@@ -133,7 +133,7 @@
 
       $scope.loading = true;
       User.login($scope.username, $scope.password).then(function() {
-        $location.path('/');
+        $location.path('/home');
       }, function() {
         $scope.error = true;
 

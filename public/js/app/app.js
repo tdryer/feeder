@@ -78,8 +78,9 @@
     RestangularProvider.setBaseUrl('api');
   });
 
-  app.run(function($rootScope, Breadcrumbs) {
+  app.run(function($rootScope, Breadcrumbs, User) {
     $rootScope.$on('$routeChangeSuccess', function(angularEvent, current) {
+      $rootScope.showHeader = User.isLoggedIn();
       Breadcrumbs.update(current.params);
     });
   })
