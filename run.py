@@ -1,3 +1,4 @@
+#!/usr/bin/env python2
 """Hacked-together development server for feedreader.
 
 Runs the feedreader server under the /api prefix, serves URI not containing a
