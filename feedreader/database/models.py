@@ -88,7 +88,7 @@ class User(BASE):
         session.add(read)
 
     # checks if the user has read the entry with id == entry_id
-    def is_read(self, session, entry_id):
+    def has_read(self, session, entry_id):
         return session.query(Read).filter(and_(
                 Read.username == self.username,
                 Read.entry_id == entry_id
