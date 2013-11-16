@@ -1,8 +1,10 @@
 import os
 
-from fabric.api import env, local, prefix, put, run 
+from fabric.api import env, local, prefix, put, run
 
-CSIL_USERNAME = raw_input('CSIL USERNAME: ')
+CSIL_USERNAME = os.getenv('CSIL_USERNAME', '')
+if not CSIL_USERNAME:
+    CSIL_USERNAME = raw_input('CSIL USERNAME: ')
 
 base_path = os.path.dirname(__file__)
 env.gateway = '{}@cmpt470.csil.sfu.ca'.format(CSIL_USERNAME)
