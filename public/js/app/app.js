@@ -32,19 +32,26 @@
       controller: 'FeedCtrl',
       templateUrl: 'partials/feed.html',
       resolve: {
-        Feed: function($route, Feeds) {
+        Feed: function($route, $q, Feeds) {
           return Feeds.get().then(function(feeds) {
             return _.find(feeds, {
               id: +$route.current.params.feed
             });
-          });
+          }, $q.reject);
         }
       }
     })
 
     .when('/home/:feed/:article', {
-      controller: 'HomeCtrl',
-      templateUrl: 'partials/home.html'
+      controller: 'ArticleCtrl',
+      templateUrl: 'partials/article.html',
+      resolve: {
+        data: function($route, $q, Article) {
+          return Article.get($route.current.params.article).then(function(result) {
+            return result.entries[0];
+          }, $q.reject);
+        }
+      }
     })
 
     .when('/login', {

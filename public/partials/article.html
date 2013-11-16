@@ -1,0 +1,11 @@
+<div header></div>
+<article class="article">
+  <div class="metadata">
+    <time class="pub-date">{{article['pub-date'] | moment}}</time>
+    <span class="title">
+      <a href="{{article.url}}">{{article.title}}</a>
+    </span>
+    <span class="source">{{article.author}}</span>
+  </div>
+  <div class="content" ng-bind-html="article.content"></div>
+</article>

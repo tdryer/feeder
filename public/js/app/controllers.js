@@ -67,6 +67,20 @@
   })
 
   /**
+   * Displays an article.
+   *
+   * @controller
+   * @route '/home/:feed/:article'
+   */
+  .controller('ArticleCtrl', function($scope, $location, User, data) {
+    if (!User.isLoggedIn()) {
+      $location.path('/login');
+    }
+
+    $scope.article = data;
+  })
+
+  /**
    * Registers a new user.
    * Routes the user to their home page upon successful registration.
    *
