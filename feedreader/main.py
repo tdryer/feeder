@@ -24,8 +24,9 @@ def get_application(db_setup_f=None, enable_dummy_data=False):
     session.commit()
 
     # XXX: Generate dummy data for the default user as per David's request
-    for _ in xrange(10):
-        generate_dummy_feed(session, 'username')
+    if enable_dummy_data:
+        for _ in xrange(10):
+            generate_dummy_feed(session, 'username')
     session.close()
 
     # create tornado application and listen on the provided port
