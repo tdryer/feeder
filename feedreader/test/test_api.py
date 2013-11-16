@@ -410,7 +410,7 @@ class FeedsTest(AsyncHTTPTestCase):
 
         response = self.fetch('/feeds/{}'.format(feed.id), method='GET',
                               headers=self.headers)
-        self.assertEqual(response.code, 403)
+        self.assertEqual(response.code, 404)
 
     def test_get_feed_subscribed(self):
         s = self.Session()

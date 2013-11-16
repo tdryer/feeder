@@ -139,8 +139,7 @@ class FeedHandler(APIRequestHandler):
                                                             feed.id))
             # Make sure the user is subscribed to this feed
             if subscription is None:
-                raise HTTPError(403, reason=feed.title)
-                                #reason='You are not subscribed to this feed')
+                raise HTTPError(404, reason='This feed does not exist')
 
             self.write({
                 'id': feed.id,
