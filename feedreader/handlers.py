@@ -123,6 +123,34 @@ class FeedsHandler(APIRequestHandler):
         self.set_status(201)
 
 
+class FeedHandler(APIRequestHandler):
+
+    def get(self, feed_id):
+        """Return metadata for a subscribed feed."""
+        with self.get_db_session() as session:
+            user = session.query(User).get(self.require_auth(session))
+            feed = session.query(Feed).get(int(feed_id))
+
+            # Make sure the feed exists
+            if feed is None:
+                raise HTTPError(404, reason='This feed does not exist')
+
+            subscription = session.query(Subscription).get((user.username,
+                                                            feed.id))
+            # Make sure the user is subscribed to this feed
+            if subscription is None:
+                raise HTTPError(403, reason=feed.title)
+                                #reason='You are not subscribed to this feed')
+
+            self.write({
+                'id': feed.id,
+                'name': feed.title,
+                'url': feed.site_url,
+                'unreads': user.num_unread_in_feed(session, feed.id),
+            })
+        self.set_status(200)
+
+
 class FeedEntriesHandler(APIRequestHandler):
 
     def get(self, feed_id):

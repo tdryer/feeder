@@ -396,3 +396,37 @@ class FeedsTest(AsyncHTTPTestCase):
                 },
             ]
         })
+
+    def test_get_feed_not_found(self):
+        response = self.fetch('/feeds/1', method='GET', headers=self.headers)
+        self.assertEqual(response.code, 404)
+
+    def test_get_feed_unsubscribed(self):
+        s = self.Session()
+        feed = models.Feed('Michael Tom-Wing', 'http://mtomwing.com',
+                           'http://mtomwing.com')
+        s.add(feed)
+        s.commit()
+
+        response = self.fetch('/feeds/{}'.format(feed.id), method='GET',
+                              headers=self.headers)
+        self.assertEqual(response.code, 403)
+
+    def test_get_feed_subscribed(self):
+        s = self.Session()
+        feed = models.Feed('Michael Tom-Wing', 'http://mtomwing.com',
+                           'http://mtomwing.com')
+        s.add(feed)
+        s.commit()
+        s.add(models.Subscription(TEST_USER, feed.id))
+        s.commit()
+
+        response = self.fetch('/feeds/{}'.format(feed.id), method='GET',
+                              headers=self.headers)
+        self.assertEqual(response.code, 200)
+        self.assertEqual(json.loads(response.body), {
+            'id': 1,
+            'name': 'Michael Tom-Wing',
+            'unreads': 0,
+            'url': 'http://mtomwing.com',
+        })
