@@ -92,7 +92,7 @@ class User(BASE):
         return session.query(Read).filter(and_(
                 Read.username == self.username,
                 Read.entry_id == entry_id
-                ).count()
+                )).count()
 
     def num_unread_in_feed(self, session, feed_id):
         read_ids = self.get_read_ids(session)
