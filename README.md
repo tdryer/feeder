@@ -13,9 +13,7 @@ Start by installing the dependencies for the server using pip:
 
 The tests can be run using `py.test` in the `feedreader` directory.
 
-The `run.sh` script is the easiest way to run the feed reader. It will serve
-the public directory to `localhost:8080/` and reverse-proxy the API server to
-`localhost:8080/api/`. It requires installing the `tape` utility:
-
-`pip install git+https://github.com/wspringer/tape.git#egg=tape`
+The `run.py` script is the easiest way to run the feed reader. It will serve
+the public directory to `localhost:8080/` and pseudo-reverse-proxy the API
+server to `localhost:8080/api/`.
 
