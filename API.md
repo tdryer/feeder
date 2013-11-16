@@ -136,13 +136,14 @@ None
 ### Response
     {
       "entries": [{
-          "title": item_title,
-          "pub-date": item_date,
+          "id": entry_id,
+          "title": entry_title,
+          "pub-date": entry_date,
           "status": "read"|"unread",
-          "author": author_name,
+          "author": entry_author_name,
           "feed_id": feed_id,
-          "url": permalink
-          "content": item_content
+          "url": entry_permalink
+          "content": entry_content
       }, { ... }]
     }
 

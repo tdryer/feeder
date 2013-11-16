@@ -336,6 +336,7 @@ class FeedsTest(AsyncHTTPTestCase):
         self.assertEqual(json.loads(response.body), {
             "entries": [
                 {
+                    "id": entry1.id,
                     "title": entry1.title,
                     "pub-date": entry1.date,
                     # TODO "status": "unread",
@@ -372,6 +373,7 @@ class FeedsTest(AsyncHTTPTestCase):
         self.assertEqual(json.loads(response.body), {
             "entries": [
                 {
+                    "id": entry1.id,
                     "title": entry1.title,
                     "pub-date": entry1.date,
                     # TODO "status": "unread",
@@ -382,6 +384,7 @@ class FeedsTest(AsyncHTTPTestCase):
                     "content": entry1.content,
                 },
                 {
+                    "id": entry2.id,
                     "title": entry2.title,
                     "pub-date": entry2.date,
                     # TODO "status": "unread",

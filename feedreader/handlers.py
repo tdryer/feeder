@@ -158,6 +158,7 @@ class EntriesHandler(APIRequestHandler):
                        entry_ids]
             entries_json = [
                 {
+                    "id": entry.id,
                     "title": entry.title,
                     "pub-date": entry.date,
                     "status": "TODO", # TODO
