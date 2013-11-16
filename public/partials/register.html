@@ -1,26 +1,48 @@
 <div class="form-container">
-  <form class="form" ng-class="{error:error,loading:loading}">
-    <img src="img/avatar_2x.png" class="avatar">
-    <div class="usr">
-      <input
-        autofocus
-        id="usr"
-        ng-model="username"
-        ng-trim="false"
-        placeholder="Username"
-        type="text">
-      <label for="usr" class="fui fui-user">Username</label>
-    </div>
-    <div class="pwd">
-      <input
-        id="pwd"
-        ng-model="password"
-        ng-trim="false"
-        placeholder="Password"
-        type="password">
-      <label for="pwd" class="fui fui-lock">Password</label>
-    </div>
-    <input type="submit" ng-click="register()" value="Register" class="submit">
+  <form 
+    name="registration"
+    class="form"
+    ng-class="{error:error,loading:loading}">
+      <img src="img/avatar_2x.png" class="avatar">
+      <div 
+        class="error" 
+        ng-show="registration.usr.$dirty && registration.usr.$invalid">
+          <small ng-show="registration.usr.$error.maxlength">
+            Username must not be longer than 32 characters
+          </small>
+          <small ng-show="registration.usr.$error.pattern">
+            Username cannot contain spaces or colons(:)
+          </small>
+      </div>
+      <div class="usr">
+        <input
+          autofocus
+          required
+          id="usr"
+          name="usr"
+          ng-model="username"
+          ng-trim="false"
+          ng-maxlength="32"
+          ng-pattern="/^[^:\s]+$/"
+          placeholder="Username"
+          type="text">
+        <label for="usr" class="fui fui-user">Username</label>
+      </div>
+      <div class="pwd">
+        <input
+          required
+          id="pwd"
+          ng-model="password"
+          ng-trim="false"
+          placeholder="Password"
+          type="password">
+        <label for="pwd" class="fui fui-lock">Password</label>
+      </div>
+      <input 
+        type="submit"
+        ng-click="register()"
+        value="Register"
+        class="submit">
   </form>
   <p class="center-text">
     <a href="#/login">Already have an account?</a>
