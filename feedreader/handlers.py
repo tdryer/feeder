@@ -39,10 +39,12 @@ class UsersHandler(APIRequestHandler):
                 "username": {
                     "type": "string",
                     "pattern": "^[^:\s]*$",
-                    "maxLength": 32
+                    "maxLength": 32,
+                    "minLength": 1
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1
                 },
             },
             "required": ["username", "password"],
@@ -157,8 +159,7 @@ class FeedHandler(APIRequestHandler):
                 raise HTTPError(404, reason='This feed does not exist')
             feed = session.query(Feed).get(feed_id)
             if not user.is_sub_of_feed(session, feed_id):
-                raise HTTPError(403, reason=
-                        'You do not have permission to access this feed')
+                raise HTTPError(404, reason='This feed does not exist')
             user.unsubscribe(session, feed.id)
             feed.remove(session)
         self.set_status(204)
@@ -197,6 +198,9 @@ class EntriesHandler(APIRequestHandler):
             # TODO: check that the user has permission to see each entry_id
             entries = [session.query(Entry).get(entry_id) for entry_id in
                        entry_ids]
+            # if any of the entries do not exist, return 404
+            if None in entries:
+                raise HTTPError(404, "Entry does not exist.")
             entries_json = [
                 {
                     "id": entry.id,
