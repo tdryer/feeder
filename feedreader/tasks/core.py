@@ -26,5 +26,20 @@ class Tasks(object):
 
     # celery tasks
 
-    def fetch_feed(self, url):
-        return 'hola bro'
+    def fetch_feed(self, feed_url, last_modified=None, etag=None):
+        """Fetch and parse the feed at the given URL.
+
+        If the given URL is not a feed, this will attempt to find one.
+
+        Raises SomeException if an error occurs.
+
+        Returns dict containing:
+            - feed_url: canonical url of the feed resource
+            - feed: new instance of the Feed model, or None if the feed was
+              unmodified
+            - entries: list of new instances of the Entry model, or empty list
+              if the feed was unmodified
+            - last_modified: last modified date, if server provides one
+            - etag: etag, if server provides one
+        """
+        return # TODO
