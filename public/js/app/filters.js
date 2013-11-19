@@ -12,7 +12,7 @@
    */
   filters.filter('moment', function() {
     return function(date, format) {
-      format || (format = 'LLL');
+      //format || (format = 'LLL');
 
       if (angular.isNumber(date)) {
         date = moment.unix(date);
