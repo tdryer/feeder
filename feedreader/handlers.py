@@ -95,6 +95,7 @@ class FeedsHandler(APIRequestHandler):
         })
         with self.get_db_session() as session:
             username = self.require_auth(session)
+            user = session.query(User).get(username)
             dom = html.fromstring(requests.get(body['url']).content)
             title = dom.cssselect('title')[0].text_content().strip()
 
@@ -116,10 +117,8 @@ class FeedsHandler(APIRequestHandler):
 
                 # Check to see if the user already has a subscription to to
                 # this feed
-                if session.query(Subscription).filter(and_(
-                    Subscription.username == username,
-                    Subscription.feed_id == feed.id)).first() is None:
-                        session.add(Subscription(username, feed.id))
+                if not user.is_sub_of_feed(session, int(feed.id)):
+                    session.add(Subscription(username, feed.id))
                 else:
                     raise HTTPError(400, reason="Already to subscribed to feed")
         # TODO: we should indicate the ID of the new feed (location header?)
