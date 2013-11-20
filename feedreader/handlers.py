@@ -103,7 +103,7 @@ class FeedsHandler(APIRequestHandler):
 
             # verify this feed has not already been added
             feed = session.query(Feed)\
-                .filter(Feed.feed_url == body['url']).first()
+                    .filter(Feed.feed_url == body['url']).first()
 
             # if the feed has not been added, add it
             if feed is None:
@@ -175,7 +175,7 @@ class FeedEntriesHandler(APIRequestHandler):
             if user.is_sub_of_feed(session, int(feed_id)):
                 if entry_filter == "read" or entry_filter == "unread":
                     entries = user.get_feed_entries(
-                        session, feed_id, filter=entry_filter)
+                            session, feed_id, filter=entry_filter)
                 elif entry_filter is None:
                     entries = user.get_feed_entries(session, feed_id)
                 else:

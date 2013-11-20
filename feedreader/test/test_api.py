@@ -57,8 +57,7 @@ class ApiTest(AsyncHTTPTestCase):
 
     def get_app(self):
         # hack to get access to the session class
-        def hook(Session):
-            self.Session = Session
+        def hook(Session): self.Session = Session
         return feedreader.main.get_application(db_setup_f=hook)
 
     def assert_api_call(self, api_call, headers=None, json_body=None,
@@ -157,16 +156,16 @@ class ApiTest(AsyncHTTPTestCase):
         self.add_commit(self.sub1, {"feed_id": self.feed1.id})
         self.assert_api_call('GET /feeds/', headers=self.headers,
                              expect_code=200, expect_json={
-                                 "feeds": [
-                                     {
-                                         "id": self.feed1.id,
-                                         "name": self.feed1.title,
-                                         "url": self.feed1.site_url,
-                                         "unreads": 1,
-                                     },
-                                 ],
+            "feeds": [
+                {
+                    "id": self.feed1.id,
+                    "name": self.feed1.title,
+                    "url": self.feed1.site_url,
+                    "unreads": 1,
+                },
+            ],
 
-                             })
+        })
 
     def test_get_feeds_only_shows_subscribed_feeds(self):
         # add a feed with an entry
@@ -184,16 +183,16 @@ class ApiTest(AsyncHTTPTestCase):
         self.add_commit(self.read1, {"entry_id": self.feed1_entry1.id})
         self.assert_api_call('GET /feeds/', headers=self.headers,
                              expect_code=200, expect_json={
-                                 "feeds": [
-                                     {
-                                         "id": self.feed1.id,
-                                         "name": self.feed1.title,
-                                         "url": self.feed1.site_url,
-                                         "unreads": 0,
-                                     },
-                                 ],
+            "feeds": [
+                {
+                    "id": self.feed1.id,
+                    "name": self.feed1.title,
+                    "url": self.feed1.site_url,
+                    "unreads": 0,
+                },
+            ],
 
-                             })
+        })
 
     ######################################################################
     # POST /feeds/
@@ -308,7 +307,7 @@ class ApiTest(AsyncHTTPTestCase):
                         "content": self.feed1_entry1.content,
                     },
                 ]
-            })
+        })
 
     def test_get_entries_multiple(self):
         # add feed with 2 entries, subscribe to the feed, read the first entry
@@ -345,7 +344,7 @@ class ApiTest(AsyncHTTPTestCase):
                         "content": self.feed1_entry2.content,
                     },
                 ]
-            })
+        })
 
     ######################################################################
     # PATCH /entries/ID
@@ -431,7 +430,7 @@ class ApiTest(AsyncHTTPTestCase):
                 'name': self.feed1.title,
                 'unreads': 0,
                 'url': self.feed1.site_url,
-            })
+        })
 
     ######################################################################
     # DELETE /feeds/ID
