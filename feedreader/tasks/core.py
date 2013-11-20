@@ -1,4 +1,5 @@
 from celery import Celery
+import logging
 
 from feedreader import stub
 
@@ -16,7 +17,10 @@ class Tasks(object):
             CELERY_TIMEZONE='America/Vancouver',
         )
 
-        if not debug:
+        if debug:
+            # silence warning from pika
+            logging.getLogger("pika").setLevel(logging.ERROR)
+        else:
             self.app.conf.update(
                 BROKER_URL='amqp://guest:guest@novus.mtomwing.com:5673//',
                 CELERY_ALWAYS_EAGER=False,
