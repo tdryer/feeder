@@ -18,7 +18,8 @@ def get_basic_auth(user, passwd, method="Basic"):
 def get_application(handler):
     """Return Tornado application with demo user."""
     create_session = models.initialize_db()
-    app = Application([("/", handler, dict(create_session=create_session))])
+    app = Application([("/", handler, dict(create_session=create_session,
+                                           tasks=None))])
     session = create_session()
     # TODO: better way of creating the demo user
     session.add(models.User("demo", pbkdf2.crypt("demo")))

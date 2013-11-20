@@ -12,9 +12,11 @@ from feedreader.database import models
 class APIRequestHandler(tornado.web.RequestHandler):
     """Base RequestHandler for use by API endpoints."""
 
-    def initialize(self, create_session, enable_dummy_data=False):
+    def initialize(self, create_session, tasks, enable_dummy_data=False):
         self.create_session = create_session
+        self.tasks = tasks
         self.enable_dummy_data = enable_dummy_data
+
         self.use_www_authenticate = True
 
     def require_auth(self, session):

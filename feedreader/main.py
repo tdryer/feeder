@@ -6,8 +6,9 @@ import sys
 import pbkdf2
 
 from feedreader.database import models
-from feedreader.stub import generate_dummy_feed
+from feedreader import stub
 from feedreader import handlers
+from feedreader.tasks.core import Tasks
 
 
 def get_application(db_setup_f=None, enable_dummy_data=False):
@@ -25,14 +26,26 @@ def get_application(db_setup_f=None, enable_dummy_data=False):
 
     # XXX: Generate dummy data for the default user as per David's request
     if enable_dummy_data:
-        for _ in xrange(10):
-            generate_dummy_feed(session, 'username')
+        for _ in range(10):
+            feed = stub.generate_dummy_feed()
+            session.add(feed)
+            session.commit()
+            session.add(models.Subscription('username', feed.id))
+            for _ in range(10):
+                entry = stub.generate_dummy_entry(feed.id)
+                session.add(entry)
+
+    session.commit()
     session.close()
+
+    # TODO: make this configurable
+    tasks = Tasks(debug=True)
 
     # create tornado application and listen on the provided port
     default_injections = dict(
         create_session=create_session,
         enable_dummy_data=enable_dummy_data,
+        tasks=tasks,
     )
     return tornado.web.Application([
         (r"^/?$", handlers.MainHandler, default_injections),

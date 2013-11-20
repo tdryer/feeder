@@ -1,15 +1,19 @@
 """APIRequestHandler subclasses for API endpoints."""
 
-from lxml import html
-from tornado.web import HTTPError
-from sqlalchemy import and_
+from tornado.web import HTTPError, asynchronous
+from tornado import gen
 import pbkdf2
-import requests
+import tcelery
 
 from feedreader.api_request_handler import APIRequestHandler
 from feedreader.database.models import (Entry, Feed, Subscription, User,
                                         exists_feed)
 from feedreader.stub import generate_dummy_feed
+
+
+
+# tornado-celery magic, not sure what this does
+tcelery.setup_nonblocking_producer()
 
 
 class MainHandler(APIRequestHandler):
@@ -84,6 +88,8 @@ class FeedsHandler(APIRequestHandler):
         self.write({'feeds': feeds})
         self.set_status(200)
 
+    @asynchronous
+    @gen.coroutine
     def post(self):
         """Subscribe the user to a new feed."""
         body = self.require_body_schema({
@@ -94,33 +100,28 @@ class FeedsHandler(APIRequestHandler):
             'required': ['url'],
         })
         with self.get_db_session() as session:
-            username = self.require_auth(session)
-            user = session.query(User).get(username)
-            dom = html.fromstring(requests.get(body['url']).content)
-            title = dom.cssselect('title')[0].text_content().strip()
+            user = session.query(User).get(self.require_auth(session))
 
-            if self.enable_dummy_data:
-                # XXX: Generate a dummy feed
-                generate_dummy_feed(session, username, title, body['url'])
+            # verify this feed has not already been added
+            feed = session.query(Feed)\
+                   .filter(Feed.feed_url == body['url']).first()
+
+            # if the feed has not been added, add it
+            if feed is None:
+                # TODO: we're just assuming this succeeds
+                res = yield gen.Task(self.tasks.fetch_feed, body["url"])
+                session.add(res["feed"])
+                session.commit() # needed to get the feed's ID
+                for entry in res["entries"]:
+                    entry.feed_id = res["feed"].id
+                session.add_all(res["entries"])
+                feed = res["feed"]
+
+            # Check to see if the user already has a subscription to this feed
+            if not user.is_sub_of_feed(session, int(feed.id)):
+                session.add(Subscription(user.username, feed.id))
             else:
-                # Check to see if the feed already exists
-                feed = session.query(Feed).filter(and_(
-                    Feed.title == title,
-                    Feed.feed_url == body['url'],
-                    Feed.site_url == body['url'])).first()
-
-                # If the feed doesn't already exist, create one
-                if feed is None:
-                    feed = Feed(title, body['url'], body['url'])
-                    session.add(feed)
-                    session.commit()
-
-                # Check to see if the user already has a subscription to to
-                # this feed
-                if not user.is_sub_of_feed(session, int(feed.id)):
-                    session.add(Subscription(username, feed.id))
-                else:
-                    raise HTTPError(400, reason="Already to subscribed to feed")
+                raise HTTPError(400, reason="Already to subscribed to feed")
         # TODO: we should indicate the ID of the new feed (location header?)
         self.set_status(201)
 

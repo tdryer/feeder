@@ -1,5 +1,7 @@
 from celery import Celery
 
+from feedreader import stub
+
 
 class Tasks(object):
 
@@ -26,10 +28,14 @@ class Tasks(object):
 
     # celery tasks
 
-    def fetch_feed(self, feed_url, last_modified=None, etag=None):
+    def fetch_feed(self, feed_url, last_modified=None, etag=None,
+                   callback=None):
         """Fetch and parse the feed at the given URL.
 
         If the given URL is not a feed, this will attempt to find one.
+
+        Any returned models will be missing foreign keys that don't exist yet
+        (like Entry.feed_id if the feed is new).
 
         Raises SomeException if an error occurs.
 
@@ -42,4 +48,17 @@ class Tasks(object):
             - last_modified: last modified date, if server provides one
             - etag: etag, if server provides one
         """
-        return # TODO
+        # TODO: last_modified and etag return values not needed since we have
+        # to add them to Feed model anyways?
+
+        # TODO: implement this for real
+        feed = stub.generate_dummy_feed(url=feed_url)
+        entries = [stub.generate_dummy_entry(None) for _ in range(10)]
+
+        callback({
+            "feed_url": feed_url,
+            "feed": feed,
+            "entries": entries,
+            "last_modified": None,
+            "etag": None,
+        })

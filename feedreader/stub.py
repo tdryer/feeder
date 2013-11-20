@@ -25,7 +25,7 @@ titles = [
     'Eat my sword, Ice King!',
     'Don\'t flaunt if if you\'re not gonna give it up.',
     'Werewolves: much worse than ogres.',
-    'Imagination is for turbo-nerds who can\t handle how kick-butt reality is!',
+    'Imagination is for turbo-nerds who can\'t handle how kick-butt reality is!',
     'I\'m looking at my bits, dude. My leg is math!',
     'Uh, bleach, lighter fluid, ammonia, gasoline, I dunno. Lady stuff... Plutonium...',
     'So spice! So spice!',
@@ -43,22 +43,16 @@ urls = [
 ]
 
 
-def generate_entry(feed_id):
+def generate_dummy_entry(feed_id):
     return Entry(feed_id, random.choice(quotes), random.choice(urls),
                  random.choice(titles), 'David Yan',
                  random.randint(1, int(time.time())))
 
 
-def generate_dummy_feed(session, username, title=None, url=None):
+def generate_dummy_feed(title=None, url=None):
     if not title:
         title = random.choice(titles)
     if not url:
         url = random.choice(urls)
-
     feed = Feed(title, url, url)
-    session.add(feed)
-    session.commit()
-    for _ in xrange(10):
-        entry = generate_entry(feed.id)
-        session.add(entry)
-    session.add(Subscription(username, feed.id))
+    return feed
