@@ -7,9 +7,8 @@ import tcelery
 
 from feedreader.api_request_handler import APIRequestHandler
 from feedreader.database.models import (Entry, Feed, Subscription, User,
-                                        exists_feed)
+                                        Read, and_, exists_feed)
 from feedreader.stub import generate_dummy_feed
-
 
 
 # tornado-celery magic, not sure what this does
@@ -104,14 +103,14 @@ class FeedsHandler(APIRequestHandler):
 
             # verify this feed has not already been added
             feed = session.query(Feed)\
-                   .filter(Feed.feed_url == body['url']).first()
+                .filter(Feed.feed_url == body['url']).first()
 
             # if the feed has not been added, add it
             if feed is None:
                 # TODO: we're just assuming this succeeds
                 res = yield gen.Task(self.tasks.fetch_feed, body["url"])
                 session.add(res["feed"])
-                session.commit() # needed to get the feed's ID
+                session.commit()  # needed to get the feed's ID
                 for entry in res["entries"]:
                     entry.feed_id = res["feed"].id
                 session.add_all(res["entries"])
@@ -176,8 +175,8 @@ class FeedEntriesHandler(APIRequestHandler):
             if user.is_sub_of_feed(session, int(feed_id)):
                 if entry_filter == "read" or entry_filter == "unread":
                     entries = user.get_feed_entries(
-                            session, feed_id, filter=entry_filter)
-                elif entry_filter == None:
+                        session, feed_id, filter=entry_filter)
+                elif entry_filter is None:
                     entries = user.get_feed_entries(session, feed_id)
                 else:
                     self.set_status(400)
@@ -214,4 +213,43 @@ class EntriesHandler(APIRequestHandler):
                 } for entry in entries
             ]
             self.write({'entries': entries_json})
+            self.set_status(200)
+
+    def patch(self, entry_ids):
+        body = self.require_body_schema({
+            "type": "object",
+            "properties": {
+                "status": {"type": "string"},
+            },
+            "required": ["status"],
+        })
+        if body["status"] not in ["read", "unread"]:
+            raise HTTPError(400, "That is not a valid status")
+        entry_ids = [int(entry_id) for entry_id in entry_ids.split(",")]
+        with self.get_db_session() as session:
+            user = session.query(User).get(self.require_auth(session))
+            entries = session.query(Entry).filter(
+                Entry.id.in_(entry_ids)
+            ).all()
+            if entries == []:
+                raise HTTPError(404, "Those entry ids do not exist")
+            for entry in entries:
+                if not user.is_sub_of_feed(session, entry.feed_id):
+                    raise HTTPError(403,
+                            "You do not have access to one of these entries"
+                                    )
+            read_ids = user.get_read_ids(session)
+            if body["status"] == "read":
+                for entry in entries:
+                    if not entry.id in read_ids:
+                        update = Read(user.username, entry.id)
+                        session.add(update)
+            if body["status"] == "unread":
+                for entry in entries:
+                    if entry.id in read_ids:
+                        update = session.query(Read).filter(and_(
+                            Read.username == user.username,
+                            Read.entry_id == entry.id
+                        )).one()
+                        session.delete(update)
             self.set_status(200)
