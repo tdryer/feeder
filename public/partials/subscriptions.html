@@ -1,4 +1,13 @@
 <div class="subscriptions">
+  <ul>
+    <li
+      ng-repeat="feed in subscriptions"
+      ng-click="goToFeed(feed.id)">
+        <div class="name">{{feed.name}}</div>
+        <div class="unread">{{feed.unreads}}</div>
+    </li>
+  </ul>
+
   <div class="form-container">
     <form class="form">
       <div class="new-subscription">
@@ -18,10 +27,4 @@
         value="Add">
     </form>
   </div>
-
-  <ul>
-    <li ng-repeat="feed in subscriptions">
-      <a href="#/home/{{feed.id}}">{{feed.name}}</a> - {{feed.unreads}}
-    </li>
-  </ul>
 </div>

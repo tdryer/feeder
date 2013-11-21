@@ -43,6 +43,10 @@
       });
     }
 
+    $scope.goToFeed = function(id) {
+      $location.path('/home/' + id);
+    }
+
     updateFeeds();
   })
 
