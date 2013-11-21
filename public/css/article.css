@@ -2,33 +2,34 @@
   padding: 1em;
 }
 
-.pub-date, .source {
-    font-size: 0.9em;
+.article .pub-date,
+.article .source {
+  font-size: 0.9em;
 }
 
-.title {
-    display: block;
-    margin: 0.3 0;
-    font-size: 2em;
-    font-weight: bold;
+.article .title {
+  display: block;
+  margin: 0.3 0;
+  font-size: 2em;
+  font-weight: bold;
 }
 
-.title a:link,
-.title a:visited {
-    color: #000;
-    text-decoration: none;
+.article .title a:link,
+.article .title a:visited {
+  color: #000;
+  text-decoration: none;
 }
 
-.title a:hover {
-    color: #1abc9c;
+.article .title a:hover {
+  color: #1abc9c;
 }
 
-.content a:link,
-.content a:visited {
-    color: #1abc9c;
-    text-decoration: none;
+.article .content a:link,
+.article .content a:visited {
+  color: #1abc9c;
+  text-decoration: none;
 }
 
-.content a:hover {
-    text-decoration: underline;
+.article .content a:hover {
+  text-decoration: underline;
 }
