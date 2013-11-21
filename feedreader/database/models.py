@@ -32,8 +32,8 @@ def exists_feed(session, feed_id):
 class User(BASE):
     __tablename__ = 'users'
 
-    username = Column(String, primary_key=True)
-    password_hash = Column(String)
+    username = Column(String, primary_key=True, nullable=False)
+    password_hash = Column(String, nullable=False)
 
     def __init__(self, name, pwhash):
         self.username = name
@@ -174,11 +174,13 @@ class User(BASE):
 class Feed(BASE):
     __tablename__ = 'feeds'
 
-    id = Column(Integer, Sequence('feed_id_seq'),
-                primary_key=True)
-    title = Column(String)
-    feed_url = Column(String)  # feed resource
-    site_url = Column(String)  # main site
+    id = Column(Integer,
+        Sequence('feed_id_seq'),
+        primary_key=True,
+        nullable=False)
+    title = Column(String, nullable=False)
+    feed_url = Column(String, nullable=False)  # feed resource
+    site_url = Column(String, nullable=False)  # main site
     last_refresh_date = Column(Integer)
 
     def __init__(self, title, feed_url, site_url):
@@ -229,13 +231,18 @@ class Feed(BASE):
 class Entry(BASE):
     __tablename__ = 'entries'
 
-    id = Column(Integer, Sequence('entry_id_seq'), primary_key=True)
-    feed_id = Column(Integer, ForeignKey('feeds.id'))
-    content = Column(String)
-    url = Column(String)
-    title = Column(String)
-    author = Column(String)
-    date = Column(Integer)
+    id = Column(Integer,
+        Sequence('entry_id_seq'),
+        primary_key=True,
+        nullable=False)
+    feed_id = Column(Integer,
+        ForeignKey('feeds.id'),
+        nullable=False)
+    content = Column(String, nullable=False)
+    url = Column(String, nullable=False)
+    title = Column(String, nullable=False)
+    author = Column(String, nullable=False)
+    date = Column(Integer, nullable=False)
     guid = Column(String)
 
     def __init__(self, feed_id, content, url, title, author, date):
@@ -272,8 +279,12 @@ class Subscription(BASE):
     username = Column(
         String(50),
         ForeignKey('users.username'),
-        primary_key=True)
-    feed_id = Column(Integer, ForeignKey('feeds.id'), primary_key=True)
+        primary_key=True,
+        nullable=False)
+    feed_id = Column(Integer,
+        ForeignKey('feeds.id'),
+        primary_key=True,
+        nullable=False)
 
     def __init__(self, user, feed):
         self.username = user
@@ -289,8 +300,12 @@ class Read(BASE):
     username = Column(
         String(50),
         ForeignKey('users.username'),
-        primary_key=True)
-    entry_id = Column(Integer, ForeignKey('entries.id'), primary_key=True)
+        primary_key=True,
+        nullable=False)
+    entry_id = Column(Integer,
+        ForeignKey('entries.id'),
+        primary_key=True,
+        nullable=False)
 
     def __init__(self, user, entry_id):
         self.username = user
