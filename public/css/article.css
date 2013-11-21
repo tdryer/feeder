@@ -23,6 +23,15 @@
   color: #1abc9c;
 }
 
+.article .content {
+  position: relative;
+}
+
+.article .content:empty {
+  height: 4em;
+  background: url(../img/spinner.gif) center no-repeat;
+}
+
 .article .content a:link,
 .article .content a:visited {
   color: #1abc9c;
@@ -31,4 +40,8 @@
 
 .article .content a:hover {
   text-decoration: underline;
+}
+
+.article .content img {
+  max-width: 100%;
 }
