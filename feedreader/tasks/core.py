@@ -82,7 +82,12 @@ class Tasks(object):
         # parse the feed
         feed_title = parsed_feed.feed.get("title", "Untitled")
         feed_link = parsed_feed.feed.get("link", None)
-        feed = models.Feed(feed_title, feed_url, feed_link)
+        etag = parsed_feed.get("etag", None)
+        last_modified = parsed_feed.get("modified", None)
+        last_refresh_date = int(time.time())
+        feed = models.Feed(feed_title, feed_url, feed_link, etag=etag,
+                           last_modified=last_modified,
+                           last_refresh_date=last_refresh_date)
 
         # parse the entries
         entries = []

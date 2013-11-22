@@ -31,11 +31,18 @@ def test_awesome_blog(tasks):
     feed_url = "http://example.com/feed.xml"
     feed = open(path.join(TEST_DATA_DIR, "awesome-blog.xml")).read()
     httpretty.register_uri(httpretty.GET, feed_url,
-                           body=feed, content_type="application/atom+xml")
+                           body=feed, content_type="application/atom+xml",
+                           adding_headers={
+                                "ETag": "1337",
+                                "Last-Modified": "Tue, 15 Nov 1994 12:45:26 +0000",
+                           })
     res = tasks.fetch_feed.delay(feed_url).get()
     assert res["feed"].title == "David Yan's CMPT 376W Blog"
     assert res["feed"].site_url == "http://awesome-blog.github.io/"
     assert res["feed"].feed_url == feed_url
+    assert res["feed"].etag == "1337"
+    assert res["feed"].last_modified == "Tue, 15 Nov 1994 12:45:26 +0000"
+    assert res["feed"].last_refresh_date is not None
 
     assert res["entries"][0].title == "Return of the OPPO Find 5"
     assert res["entries"][0].url == "http://awesome-blog.github.io/2013/11/20/return-of-the-oppo-find-5.html"

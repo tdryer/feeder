@@ -177,20 +177,26 @@ class User(BASE):
 class Feed(BASE):
     __tablename__ = 'feeds'
 
-    id = Column(Integer,
-        Sequence('feed_id_seq'),
-        primary_key=True,
-        nullable=False)
+    id = Column(Integer, Sequence('feed_id_seq'), primary_key=True,
+                nullable=False)
     title = Column(String, nullable=False)
     feed_url = Column(String, nullable=False)  # feed resource
     site_url = Column(String, nullable=False)  # main site
-    last_refresh_date = Column(Integer)
+    # date of last attempted refresh
+    last_refresh_date = Column(Integer, nullable=True)
+    # last-modifed date used for caching
+    last_modified = Column(String, nullable=True)
+    # etag used for caching
+    etag = Column(String, nullable=True)
 
-    def __init__(self, title, feed_url, site_url):
+    def __init__(self, title, feed_url, site_url, last_modified=None,
+                 etag=None, last_refresh_date=None):
         self.title = title
         self.feed_url = feed_url
         self.site_url = site_url
-        #self.last_refresh_date = now()
+        self.last_modified = last_modified
+        self.etag = etag
+        self.last_refresh_date = last_refresh_date
 
     def __repr__(self):
         return "<RSSFeed('%s','%s')>" % (self.title, self.site_url)
