@@ -12,9 +12,11 @@ from feedreader.database import models
 class APIRequestHandler(tornado.web.RequestHandler):
     """Base RequestHandler for use by API endpoints."""
 
-    def initialize(self, create_session, tasks, enable_dummy_data=False):
+    def initialize(self, create_session, tasks, celery_poller,
+                   enable_dummy_data=False):
         self.create_session = create_session
         self.tasks = tasks
+        self.celery_poller = celery_poller
         self.enable_dummy_data = enable_dummy_data
 
         self.use_www_authenticate = True

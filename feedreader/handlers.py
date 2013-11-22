@@ -3,16 +3,11 @@
 from tornado.web import HTTPError, asynchronous
 from tornado import gen
 import pbkdf2
-import tcelery
 
 from feedreader.api_request_handler import APIRequestHandler
 from feedreader.database.models import (Entry, Feed, Subscription, User,
                                         Read, and_, exists_feed)
 from feedreader.stub import generate_dummy_feed
-
-
-# tornado-celery magic, not sure what this does
-tcelery.setup_nonblocking_producer()
 
 
 class MainHandler(APIRequestHandler):
@@ -108,7 +103,8 @@ class FeedsHandler(APIRequestHandler):
             # if the feed has not been added, add it
             if feed is None:
                 # TODO: we're just assuming this succeeds
-                res = yield gen.Task(self.tasks.fetch_feed, body["url"])
+                res = yield self.celery_poller.run_task(self.tasks.fetch_feed,
+                                                   body["url"])
                 session.add(res["feed"])
                 session.commit()  # needed to get the feed's ID
                 for entry in res["entries"]:

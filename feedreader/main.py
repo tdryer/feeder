@@ -4,7 +4,9 @@ import tornado.ioloop
 import tornado.web
 import sys
 import pbkdf2
+from datetime import timedelta
 
+from feedreader.celery_poller import CeleryPoller
 from feedreader.database import models
 from feedreader import stub
 from feedreader import handlers
@@ -41,11 +43,14 @@ def get_application(db_setup_f=None, enable_dummy_data=False):
     # TODO: make this configurable
     tasks = Tasks(debug=True)
 
+    celery_poller = CeleryPoller(timedelta(milliseconds=5))
+
     # create tornado application and listen on the provided port
     default_injections = dict(
         create_session=create_session,
         enable_dummy_data=enable_dummy_data,
         tasks=tasks,
+        celery_poller=celery_poller,
     )
     return tornado.web.Application([
         (r"^/?$", handlers.MainHandler, default_injections),

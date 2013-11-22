@@ -22,7 +22,7 @@ class Tasks(object):
             logging.getLogger("pika").setLevel(logging.ERROR)
         else:
             self.app.conf.update(
-                BROKER_URL='amqp://guest:guest@novus.mtomwing.com:5673//',
+                BROKER_URL='amqp://guest:guest@localhost:5672//',
                 CELERY_ALWAYS_EAGER=False,
                 CELERY_RESULT_BACKEND='amqp',
             )
@@ -32,8 +32,7 @@ class Tasks(object):
 
     # celery tasks
 
-    def fetch_feed(self, feed_url, last_modified=None, etag=None,
-                   callback=None):
+    def fetch_feed(self, feed_url, last_modified=None, etag=None):
         """Fetch and parse the feed at the given URL.
 
         If the given URL is not a feed, this will attempt to find one.
@@ -55,14 +54,20 @@ class Tasks(object):
         # TODO: last_modified and etag return values not needed since we have
         # to add them to Feed model anyways?
 
+        #print "Fetching feed {}...".format(feed_url)
+        #parsed_feed = feedparser.parse(feed_url)
+        #if parsed_feed.bozo:
+        #    #raise ValueError("Feed URL could not be loaded.")
+        #    pass
+
         # TODO: implement this for real
         feed = stub.generate_dummy_feed(url=feed_url)
         entries = [stub.generate_dummy_entry(None) for _ in range(10)]
 
-        callback({
+        return {
             "feed_url": feed_url,
             "feed": feed,
             "entries": entries,
             "last_modified": None,
             "etag": None,
-        })
+        }
