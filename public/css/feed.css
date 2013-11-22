@@ -1,3 +1,71 @@
 .feed {
-  padding: 1em;
+  width: 20%;
+  background: #dadada;
+  border-right: 2px solid #bababa;
+}
+
+.feed .feed-title {
+  background: #cacaca ;
+  padding: 0.7em 0.8em;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  border-bottom: 1px solid #bababa;
+}
+
+.feed ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none; 
+}
+
+.feed li {
+  position: relative;
+  padding: 0.7em 0em 0.5em;
+  font-size: 0.95em;
+  border-bottom: 1px solid #bababa;
+  max-height: 10em;
+}
+
+.feed li:hover,
+.feed li:hover .preview:after {
+  background: #eaeaea;
+  cursor: pointer;
+}
+
+.feed article {
+  padding: 0em 2em;
+}
+
+.feed .unread {
+  border-left: 0.3em solid #1abc9c;
+}
+
+.feed time {
+  display: block;
+  color: #9a9a9a;
+  font-size: 0.8em;
+  font-style: italic;
+}
+
+.feed .title {
+  margin: 0.3em 0;
+  font-size: 1em;
+}
+
+.feed .preview {
+  color: #9a9a9a;
+  font-size: 0.8em;
+  max-height: 3em;
+  overflow: hidden;
+}
+
+.feed .preview:after {
+  background: #dadada;
+  content: ' ';
+  display: block;
+  position: absolute;  
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: 1em;
 }

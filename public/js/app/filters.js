@@ -1,4 +1,4 @@
-(function(angular, moment) {
+(function(angular, _) {
 
   var filters = angular.module('feeder.filters', []);
 
@@ -24,4 +24,10 @@
     }
   });
 
-}).call(this, angular, moment);
+  filters.filter('htmlToPlainText', function() {
+    return function(text) {
+      return String(text).replace(/<(?:.|\n)*?>/gm, '');
+    }
+  });
+
+}).call(this, angular, _);

@@ -1,12 +1,14 @@
 <div class="feed">
-  <p ng-show="feed">You are looking at feed #{{feed.id}} <b>{{feed.name}}</b></p>
+  <div class="feed-title">{{feed.name}}</div>
   <ul>
-    <li ng-repeat="article in articles">
-      <article>
-        <a href="#/home/{{feed.id}}/{{article.id}}">{{article.title}}</a>
-        <b>by {{article.author}}</b>
-        <i>on {{article["pub-date"] | moment}}</i>
-      </article>
+    <li 
+      ng-repeat="article in articles"
+      ng-click="goToArticle(feed.id, article.id)">
+        <article class="{{article.status}}">
+          <time class="pub-date">{{article["pub-date"] | moment}}</time>
+          <div class="title">{{article.title}}</div>
+          <div class="preview">{{article.content | htmlToPlainText}}</div>
+        </article>
     </li>
   </ul>
 </div>

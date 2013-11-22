@@ -68,6 +68,10 @@
     Articles.get(Feed.id).then(function(articles) {
       $scope.articles = articles;
     });
+
+    $scope.goToArticle = function(feed_id, article_id) {
+      $location.path('/home/' + feed_id + '/' + article_id);
+    }
   })
 
   /**
