@@ -121,9 +121,12 @@ class User(BASE):
             Subscription).filter(
             Subscription.username == self.username).all(
         )
+
         for sub in subs:
             id_list.append(sub.feed_id)
-        feeds = session.query(Feed).filter(Feed.id.in_(id_list)).all()
+
+        feeds = session.query(Feed).filter(Feed.id.in_(id_list))\
+                                   .order_by(Feed.title.asc()).all()
         return feeds
 
     """
