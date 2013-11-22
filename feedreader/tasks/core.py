@@ -1,7 +1,9 @@
 from celery import Celery
 import logging
+import feedparser
 
 from feedreader import stub
+from feedreader.database import models
 
 
 class Tasks(object):
@@ -54,20 +56,17 @@ class Tasks(object):
         # TODO: last_modified and etag return values not needed since we have
         # to add them to Feed model anyways?
 
-        #print "Fetching feed {}...".format(feed_url)
-        #parsed_feed = feedparser.parse(feed_url)
-        #if parsed_feed.bozo:
-        #    #raise ValueError("Feed URL could not be loaded.")
-        #    pass
+        parsed_feed = feedparser.parse(feed_url)
+        if parsed_feed.bozo:
+            raise ValueError("Feed URL could not be loaded.")
 
-        # TODO: implement this for real
-        feed = stub.generate_dummy_feed(url=feed_url)
-        entries = [stub.generate_dummy_entry(None) for _ in range(10)]
+        feed = models.Feed(parsed_feed.feed.title, feed_url,
+                           parsed_feed.feed.link)
 
         return {
             "feed_url": feed_url,
             "feed": feed,
-            "entries": entries,
+            "entries": [],
             "last_modified": None,
             "etag": None,
         }
