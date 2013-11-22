@@ -80,12 +80,14 @@
    * @controller
    * @route '/home/:feed/:article'
    */
-  .controller('ArticleCtrl', function($scope, $location, User, data) {
+  .controller('ArticleCtrl', function($scope, $location, User, Article, data) {
     if (!User.isLoggedIn()) {
       $location.path('/login');
     }
 
     $scope.article = data;
+
+    Article.read($scope.article.id);
   })
 
   /**

@@ -188,8 +188,25 @@
       return Restangular.one('entries').getList(id);
     }
 
+    function read(id) {
+      if (!id) {
+        return $q.reject();
+      }
+
+      Restangular = Restangular.withConfig(function(RestangularProvider) {
+        RestangularProvider.setDefaultHeaders({
+          Authorization: 'xBasic ' + User.getAuth()
+        });
+      });
+
+      return Restangular.one('entries', id).patch({
+        status: 'read'
+      });
+    }
+
     return {
-      get: get
+      get: get,
+      read: read
     };
   })
 
