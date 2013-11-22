@@ -35,7 +35,13 @@ def test_awesome_blog(tasks):
     res = tasks.fetch_feed.delay(feed_url).get()
     assert res["feed"].title == "David Yan's CMPT 376W Blog"
     assert res["feed"].site_url == "http://awesome-blog.github.io/"
-    # TODO: everything else
+    assert res["feed"].feed_url == feed_url
+
+    assert res["entries"][0].title == "Return of the OPPO Find 5"
+    assert res["entries"][0].url == "http://awesome-blog.github.io/2013/11/20/return-of-the-oppo-find-5.html"
+    assert res["entries"][0].author == "David Yan"
+    assert res["entries"][0].date == 1384934400
+    assert res["entries"][0].content.startswith("<p>Yesterday, ")
 
     httpretty.disable()
     httpretty.reset()
