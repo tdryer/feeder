@@ -70,18 +70,17 @@ None
 POST /feeds/
 
 ### Description
-Used to add a new feed for the user.
+Subscribe the user to a new feed by URL.
 
 ### Request
     {
-      "name": feed_name,
       "url": any_url
     }
 
 ### Response
 
   - 201 Created
-  - 400 Bad Request: if any of the feed parameters were invalid
+  - 400 Bad Request: if any of the feed parameters were invalid, or feed could not be added, or user is already subscribed to feed
   - 401 Unauthorized: if user credentials are bad
 
 ---

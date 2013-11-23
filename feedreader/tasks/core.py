@@ -49,7 +49,8 @@ class Tasks(object):
         Any returned models will be missing foreign keys that don't exist yet
         (like Entry.feed_id if the feed is new).
 
-        Raises SomeException if an error occurs.
+        Raises ValueError if feed_url can't be fetch, with a description of
+        the error.
 
         Returns dict containing:
             - feed: new instance of the Feed model, or None if the feed was
@@ -58,8 +59,9 @@ class Tasks(object):
               if the feed was unmodified
 
         TODO:
-            add etag and last-modified to the feed model
-            save and use etag and last-modified
+            feed discovery
+            disallow local URLs
+            use etag and last-modified if provided
             save guid and use it for updating feeds
             check content types and escape html if necessary
             check the http status code

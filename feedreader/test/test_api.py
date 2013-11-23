@@ -3,9 +3,18 @@
 from tornado.testing import AsyncHTTPTestCase
 import base64
 import json
+import os
+import multiprocessing
+from contextlib import contextmanager
+import SimpleHTTPServer
+import SocketServer
 
 import feedreader.main
 from feedreader.database import models
+
+
+TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+TEST_SERVER_PORT = 8081
 
 
 # TODO: these should probably be attributes of ApiTest
@@ -13,6 +22,25 @@ TEST_USER = "username1"
 TEST_PASSWORD = "password1"
 TEST_NEW_USER = "username2"
 TEST_NEW_PASSWORD = "password2"
+
+@contextmanager
+def serve_dir(dir_path, port):
+    """Context manager that runs a web server to serve the given directory.
+
+    I never said this was a good idea.
+    """
+    def target():
+        handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+        SocketServer.TCPServer.allow_reuse_address = True
+        httpd = SocketServer.TCPServer(("", port), handler)
+        os.chdir(dir_path)
+        httpd.serve_forever()
+    httpd_process = multiprocessing.Process(target=target)
+    httpd_process.start()
+    try:
+        yield "http://localhost:{}/".format(port)
+    finally:
+        httpd_process.terminate()
 
 
 def get_basic_auth(user, passwd):
@@ -199,25 +227,31 @@ class ApiTest(AsyncHTTPTestCase):
     ######################################################################
 
     def test_add_feed_requires_auth(self):
-        self.assert_api_call("POST /feeds", json_body={
-            'url': 'http://awesome-blog.github.io'
-        }, expect_code=401)
+        with serve_dir(TEST_DATA_DIR, TEST_SERVER_PORT) as url:
+            self.assert_api_call("POST /feeds",
+                                 json_body={'url': url + "awesome-blog.xml"},
+                                 expect_code=401)
 
     def test_add_feed_success(self):
-        return # TODO: disabled test until we can mock the feed
-        self.assert_api_call("POST /feeds", headers=self.headers, json_body={
-            'url': 'http://awesome-blog.github.io'
-        }, expect_code=201)
+        with serve_dir(TEST_DATA_DIR, TEST_SERVER_PORT) as url:
+            self.assert_api_call("POST /feeds", headers=self.headers,
+                                 json_body={'url': url + "awesome-blog.xml"},
+                                 expect_code=201)
+
+    def test_add_feed_404(self):
+        with serve_dir(TEST_DATA_DIR, TEST_SERVER_PORT) as url:
+            self.assert_api_call("POST /feeds", headers=self.headers,
+                                 json_body={'url': url + "null.xml"},
+                                 expect_code=400)
 
     def test_duplicate_subscription(self):
-        return # TODO: disabled test until we can mock the feed
-        self.assert_api_call("POST /feeds", headers=self.headers, json_body={
-            'url': 'http://awesome-blog.github.io'
-        }, expect_code=201)
-        # try subscribing to the feed a second time
-        self.assert_api_call("POST /feeds", headers=self.headers, json_body={
-            'url': 'http://awesome-blog.github.io'
-        }, expect_code=400)
+        with serve_dir(TEST_DATA_DIR, TEST_SERVER_PORT) as url:
+            self.assert_api_call("POST /feeds", headers=self.headers,
+                                 json_body={'url': url + "awesome-blog.xml"},
+                                 expect_code=201)
+            self.assert_api_call("POST /feeds", headers=self.headers,
+                                 json_body={'url': url + "awesome-blog.xml"},
+                                 expect_code=400)
 
     ######################################################################
     # GET /feeds/ID/entries

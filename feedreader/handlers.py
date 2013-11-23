@@ -102,9 +102,12 @@ class FeedsHandler(APIRequestHandler):
 
             # if the feed has not been added, add it
             if feed is None:
-                # TODO: we're just assuming this succeeds
-                res = yield self.celery_poller.run_task(self.tasks.fetch_feed,
-                                                   body["url"])
+                try:
+                    res = yield self.celery_poller.run_task(
+                        self.tasks.fetch_feed, body["url"]
+                    )
+                except ValueError as e:
+                    raise HTTPError(400, reason=str(e))
                 session.add(res["feed"])
                 session.commit()  # needed to get the feed's ID
                 for entry in res["entries"]:
