@@ -82,6 +82,35 @@ class FeedsHandler(APIRequestHandler):
         self.write({'feeds': feeds})
         self.set_status(200)
 
+    @classmethod
+    @gen.coroutine
+    def subscribe_feed(cls, session, user, celery_poller, tasks, url):
+        """Subscribe the user to a feed.
+
+        Raises ValueError if the feed at the given url can't be subscribed to.
+        """
+        # add a new feed if it doesn't exist already
+        feed = session.query(Feed).filter(Feed.feed_url == url).first()
+        if feed is None:
+            try:
+                res = yield celery_poller.run_task(tasks.fetch_feed, url)
+            except ValueError as e:
+                raise HTTPError(400, reason=str(e))
+            session.add(res["feed"])
+            session.commit()  # needed to get the feed's ID
+            for entry in res["entries"]:
+                entry.feed_id = res["feed"].id
+            session.add_all(res["entries"])
+            feed = res["feed"]
+        elif user.is_sub_of_feed(session, int(feed.id)):
+            # refuse to subscribe to feed if user is already subscribed
+            raise HTTPError(400, reason="Already to subscribed to feed")
+        # subscribe the user to the feed
+        print "SUBSCRIBING {} to {}".format(user, feed)
+        session.add(Subscription(user.username, feed.id))
+        session.commit()
+
+
     @asynchronous
     @gen.coroutine
     def post(self):
@@ -95,31 +124,8 @@ class FeedsHandler(APIRequestHandler):
         })
         with self.get_db_session() as session:
             user = session.query(User).get(self.require_auth(session))
-
-            # verify this feed has not already been added
-            feed = session.query(Feed)\
-                    .filter(Feed.feed_url == body['url']).first()
-
-            # if the feed has not been added, add it
-            if feed is None:
-                try:
-                    res = yield self.celery_poller.run_task(
-                        self.tasks.fetch_feed, body["url"]
-                    )
-                except ValueError as e:
-                    raise HTTPError(400, reason=str(e))
-                session.add(res["feed"])
-                session.commit()  # needed to get the feed's ID
-                for entry in res["entries"]:
-                    entry.feed_id = res["feed"].id
-                session.add_all(res["entries"])
-                feed = res["feed"]
-
-            # Check to see if the user already has a subscription to this feed
-            if not user.is_sub_of_feed(session, int(feed.id)):
-                session.add(Subscription(user.username, feed.id))
-            else:
-                raise HTTPError(400, reason="Already to subscribed to feed")
+            yield self.subscribe_feed(session, user, self.celery_poller,
+                                      self.tasks, body['url'])
         # TODO: we should indicate the ID of the new feed (location header?)
         self.set_status(201)
 
