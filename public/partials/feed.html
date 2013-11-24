@@ -5,7 +5,12 @@
       ng-repeat="article in articles"
       ng-click="goToArticle(feed.id, article.id)">
         <article class="{{article.status}}">
-          <time class="pub-date">{{article["pub-date"] | moment}}</time>
+          <time
+            class="pub-date"
+            title="{{article['pub-date'] |
+              moment:'dddd, MMMM Do YYYY, h:mm:ss a'}}">
+                {{article['pub-date'] | moment:'relative'}}
+          </time>
           <div class="title">{{article.title}}</div>
           <div class="preview">{{article.content | htmlToPlainText}}</div>
         </article>

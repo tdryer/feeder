@@ -1,7 +1,10 @@
 <article class="article">
   <div class="metadata">
-    <time class="pub-date">
-      {{article['pub-date'] | moment:'dddd, MMMM Do YYYY, h:mm:ss a'}}
+    <time
+      class="pub-date"
+      title="{{article['pub-date'] |
+        moment:'dddd, MMMM Do YYYY, h:mm:ss A'}}">
+          {{article['pub-date'] | moment:'relative'}}
     </time>
     <span class="title">
       <a href="{{article.url}}">{{article.title}}</a>

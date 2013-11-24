@@ -20,7 +20,12 @@
         date = moment(date);
       }
 
-      return date.format(format);
+      if (format.toUpperCase() == 'RELATIVE')
+      {
+          return date.fromNow();
+      } else {
+        return date.format(format);
+      }
     }
   });
 
