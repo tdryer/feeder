@@ -87,7 +87,12 @@
 
     $scope.article = data;
 
-    Article.read($scope.article.id);
+    $scope.unread = function() {
+      Article.status($scope.article.id, 'unread');
+      $location.path('/home/' + $scope.article.feed_id);
+    }
+
+    Article.status($scope.article.id, 'read');
   })
 
   /**

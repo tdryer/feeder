@@ -188,8 +188,8 @@
       return Restangular.one('entries').getList(id);
     }
 
-    function read(id) {
-      if (!id) {
+    function status(id, read_status) {
+      if (!id || (read_status != 'read' && read_status != 'unread')) {
         return $q.reject();
       }
 
@@ -200,13 +200,13 @@
       });
 
       return Restangular.one('entries', id).patch({
-        status: 'read'
+        status: read_status
       });
     }
-
+    
     return {
       get: get,
-      read: read
+      status: status
     };
   })
 

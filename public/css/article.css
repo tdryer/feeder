@@ -1,4 +1,5 @@
 .article {
+  position: relative;
   padding: 1em;
 }
 
@@ -21,6 +22,12 @@
 
 .article .title a:hover {
   color: #1abc9c;
+}
+
+.article .unread {
+  float: right;
+  top: 1em;
+  right: 2em;
 }
 
 .article .content {
