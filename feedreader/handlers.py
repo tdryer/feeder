@@ -7,7 +7,6 @@ import pbkdf2
 from feedreader.api_request_handler import APIRequestHandler
 from feedreader.database.models import (Entry, Feed, Subscription, User,
                                         Read, and_, exists_feed)
-from feedreader.stub import generate_dummy_feed
 
 
 class MainHandler(APIRequestHandler):
@@ -57,11 +56,6 @@ class UsersHandler(APIRequestHandler):
             new_user = User(body["username"], password_hash)
             session.add(new_user)
             session.commit()
-
-            # XXX: Create some dummy feeds for the new user
-            if self.enable_dummy_data:
-                for _ in xrange(10):
-                    generate_dummy_feed(session, new_user.username)
         self.set_status(201)
 
 

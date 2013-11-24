@@ -2,13 +2,13 @@
 
 import tornado.ioloop
 import tornado.web
+from tornado import gen
 import sys
 import pbkdf2
 from datetime import timedelta
 
 from feedreader.celery_poller import CeleryPoller
 from feedreader.database import models
-from feedreader import stub
 from feedreader import handlers
 from feedreader.tasks.core import Tasks
 
@@ -23,27 +23,34 @@ def get_application(db_setup_f=None, enable_dummy_data=False):
 
     # XXX create test user
     session = create_session()
-    session.add(models.User("username", pbkdf2.crypt("password")))
+    user = models.User("username", pbkdf2.crypt("password"))
+    session.add(user)
     session.commit()
 
-    # XXX: Generate dummy data for the default user as per David's request
-    if enable_dummy_data:
-        for _ in range(10):
-            feed = stub.generate_dummy_feed()
-            session.add(feed)
-            session.commit()
-            session.add(models.Subscription('username', feed.id))
-            for _ in range(10):
-                entry = stub.generate_dummy_entry(feed.id)
-                session.add(entry)
-
-    session.commit()
-    session.close()
 
     # TODO: make this configurable
     tasks = Tasks(debug=True)
 
     celery_poller = CeleryPoller(timedelta(milliseconds=5))
+
+    if enable_dummy_data:
+        # add some test feeds
+        # don't any anything that we aren't ok with hammering with requests
+        TEST_FEEDS = [
+            "http://feeds.feedburner.com/Tombuntu",
+            "https://mtomwing.com/blog/feed",
+            "http://awesome-blog.github.io/atom.xml",
+        ]
+        for url in TEST_FEEDS:
+            @gen.coroutine
+            def add_feed():
+                yield handlers.FeedsHandler.subscribe_feed(
+                    session, user, celery_poller, tasks, url
+                )
+            tornado.ioloop.IOLoop.instance().run_sync(add_feed)
+
+    session.commit()
+    session.close()
 
     # create tornado application and listen on the provided port
     default_injections = dict(
