@@ -69,12 +69,13 @@ class ApiTest(AsyncHTTPTestCase):
                                  "http://tombuntu.com")
         self.feed1_entry1 = models.Entry(
             None, "This is test content.", "http://tombuntu.com/test-content",
-            "Test title", "Tom", 1384402853
+            "Test title", "Tom", 1384402853, "veryrandomguid1"
         )
         # TODO: make this entry different
         self.feed1_entry2 = models.Entry(
             None, "This is test content.",
-            "http://tombuntu.com/test-content", "Test title", "Tom", 1384402853
+            "http://tombuntu.com/test-content", "Test title", "Tom", 1384402853,
+            "veryrandomguid2"
         )
         self.sub1 = models.Subscription(TEST_USER, None)
         self.read1 = models.Read(TEST_USER, None)

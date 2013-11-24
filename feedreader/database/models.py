@@ -240,27 +240,24 @@ class Feed(BASE):
 class Entry(BASE):
     __tablename__ = 'entries'
 
-    id = Column(Integer,
-        Sequence('entry_id_seq'),
-        primary_key=True,
-        nullable=False)
-    feed_id = Column(Integer,
-        ForeignKey('feeds.id'),
-        nullable=False)
+    id = Column(Integer, Sequence('entry_id_seq'), primary_key=True,
+                nullable=False)
+    feed_id = Column(Integer, ForeignKey('feeds.id'), nullable=False)
     content = Column(String, nullable=False)
     url = Column(String, nullable=False)
     title = Column(String, nullable=False)
     author = Column(String, nullable=False)
     date = Column(Integer, nullable=False)
-    guid = Column(String)
+    guid = Column(String, nullable=False)
 
-    def __init__(self, feed_id, content, url, title, author, date):
+    def __init__(self, feed_id, content, url, title, author, date, guid):
         self.feed_id = feed_id
         self.content = content
         self.url = url
         self.title = title
         self.author = author
         self.date = date
+        self.guid = guid
 
     def __repr__(self):
         return (

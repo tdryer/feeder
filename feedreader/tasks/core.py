@@ -5,6 +5,7 @@ import logging
 import feedparser
 import time
 import calendar
+import hashlib
 
 from feedreader.database import models
 
@@ -114,7 +115,8 @@ class Tasks(object):
                 date = int(calendar.timegm(entry.published_parsed))
             else:
                 date = int(time.time())
-            entry = models.Entry(None, content, link, title, author, date)
+            guid = hashlib.sha1(entry.get("id", title)).hexdigest()
+            entry = models.Entry(None, content, link, title, author, date, guid)
             entries.append(entry)
 
         return {

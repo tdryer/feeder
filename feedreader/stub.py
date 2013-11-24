@@ -46,7 +46,7 @@ urls = [
 def generate_dummy_entry(feed_id):
     return Entry(feed_id, random.choice(quotes), random.choice(urls),
                  random.choice(titles), 'David Yan',
-                 random.randint(1, int(time.time())))
+                 random.randint(1, int(time.time())), "veryrandomguid")
 
 
 def generate_dummy_feed(title=None, url=None):

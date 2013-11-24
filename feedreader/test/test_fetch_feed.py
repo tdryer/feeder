@@ -49,6 +49,7 @@ def test_awesome_blog(tasks):
     assert res["entries"][0].author == "David Yan"
     assert res["entries"][0].date == 1384934400
     assert res["entries"][0].content.startswith("<p>Yesterday, ")
+    assert res["entries"][0].guid == "57785a2b321c948508451096cb98f23a2a697c01"
 
     httpretty.disable()
     httpretty.reset()
