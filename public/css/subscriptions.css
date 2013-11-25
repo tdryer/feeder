@@ -1,7 +1,10 @@
 .subscriptions {
-  width: 20%;
-  background: #dadada;
-  border-right: 2px solid #bababa;
+  position: relative;
+}
+
+.subscriptions.loading {
+  min-height: 4em;
+  background: url(../img/spinner.gif) center no-repeat;
 }
 
 .subscriptions .form-container {
@@ -14,8 +17,7 @@
   padding: 0;
   border: 0;
   max-width: 20em;
-  background: #dadada;
-  text-align: left;
+  background: inherit;
 }
 
 .subscriptions .new-subscription {
@@ -37,7 +39,6 @@
 .subscriptions li {
   position: relative;
   padding: 1em 3em 1em 1em;
-  font-size: 0.95em;
   border-bottom: 1px solid #bababa;
 }
 

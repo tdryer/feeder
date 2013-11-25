@@ -9,7 +9,9 @@
    * @controller
    * @route '/'
    */
-  .controller('IndexCtrl', function($location, User) {
+  .controller('IndexCtrl', function($scope, $location, User) {
+    $scope.User = User;
+
     if (User.isLoggedIn()) {
       $location.path('/home');
     }
@@ -30,8 +32,10 @@
     }
 
     function updateFeeds() {
+      $scope.loadingFeeds = true;
       Feeds.get().then(function(feeds) {
         $scope.subscriptions = feeds;
+        $scope.loadingFeeds = false;
       });
     }
 

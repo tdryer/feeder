@@ -36,7 +36,7 @@
    */
   .directive('header', function() {
     return {
-      templateUrl: 'partials/header.html',
+      templateUrl: '/partials/header.html',
       controller: function($scope, $rootScope, User) {
         $rootScope.$watch('showHeader', function(showHeader) {
           if (!showHeader) {

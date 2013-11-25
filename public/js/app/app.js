@@ -20,17 +20,17 @@
 
     .when('/', {
       controller: 'IndexCtrl',
-      templateUrl: 'partials/index.html'
+      templateUrl: '/partials/index.html'
     })
 
     .when('/home', {
       controller: 'HomeCtrl',
-      templateUrl: 'partials/home.html'
+      templateUrl: '/partials/home.html'
     })
 
     .when('/home/:feed', {
       controller: 'FeedCtrl',
-      templateUrl: 'partials/feed.html',
+      templateUrl: '/partials/feed.html',
       resolve: {
         Feed: function($route, $q, Feeds) {
           return Feeds.get().then(function(feeds) {
@@ -44,7 +44,7 @@
 
     .when('/home/:feed/:article', {
       controller: 'ArticleCtrl',
-      templateUrl: 'partials/article.html',
+      templateUrl: '/partials/article.html',
       resolve: {
         data: function($route, $q, Article) {
           return Article.get($route.current.params.article).then(function(result) {
@@ -56,7 +56,7 @@
 
     .when('/login', {
       controller: 'LoginCtrl',
-      templateUrl: 'partials/login.html'
+      templateUrl: '/partials/login.html'
     })
 
     .when('/logout', {
@@ -66,7 +66,7 @@
 
     .when('/register', {
       controller: 'RegisterCtrl',
-      templateUrl: 'partials/register.html'
+      templateUrl: '/partials/register.html'
     })
 
     .otherwise({
@@ -75,7 +75,7 @@
   });
 
   app.config(function(RestangularProvider) {
-    RestangularProvider.setBaseUrl('api');
+    RestangularProvider.setBaseUrl('/api');
   });
 
   app.run(function($rootScope, Breadcrumbs, User) {
