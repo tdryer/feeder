@@ -100,7 +100,6 @@ class FeedsHandler(APIRequestHandler):
             # refuse to subscribe to feed if user is already subscribed
             raise HTTPError(400, reason="Already to subscribed to feed")
         # subscribe the user to the feed
-        print "SUBSCRIBING {} to {}".format(user, feed)
         session.add(Subscription(user.username, feed.id))
         session.commit()
 
