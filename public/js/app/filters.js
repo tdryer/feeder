@@ -35,4 +35,16 @@
     }
   });
 
+  filters.filter('setAnchorTarget', function() {
+    return function(text, value) {
+      // Remove new-lines
+      var dom = angular.element(String(text).replace(/(\r\n|\r|\n)/gm, ''));
+      value || (value = '_blank');
+      
+      dom.find('a').attr('target', '_blank');
+
+      return (angular.element('<div>').append(dom)).html();
+    }
+  });
+
 }).call(this, angular, _);

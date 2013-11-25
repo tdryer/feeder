@@ -8,9 +8,9 @@
           {{article['pub-date'] | moment:'relative'}}
     </time>
     <span class="title">
-      <a href="{{article.url}}">{{article.title}}</a>
+      <a href="{{article.url}}" target="_blank">{{article.title}}</a>
     </span>
     <span class="source">By: {{article.author}}</span>
   </div>
-  <div class="content" ng-bind-html="article.content"></div>
+  <div class="content" ng-bind-html="article.content | setAnchorTarget"></div>
 </article>
