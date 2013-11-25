@@ -12,8 +12,6 @@
   .controller('IndexCtrl', function($location, User) {
     if (User.isLoggedIn()) {
       $location.path('/home');
-    } else {
-      $location.path('/login');
     }
   })
 

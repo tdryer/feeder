@@ -1,12 +1,12 @@
 <div class="form-container">
-  <form 
+  <form
     name="registration"
     class="form"
     ng-class="{error:error,loading:loading}">
       <img src="img/avatar_2x.png" class="avatar">
-      <div 
-        class="error" 
-        ng-show="registration.usr.$dirty && registration.usr.$invalid">
+      <div
+        class="error"
+        ng-show="registration.usr.$dirty &amp;&amp; registration.usr.$invalid">
           <small ng-show="registration.usr.$error.maxlength">
             Username must not be longer than 32 characters
           </small>
@@ -38,13 +38,13 @@
           type="password">
         <label for="pwd" class="fui fui-lock">Password</label>
       </div>
-      <input 
+      <input
         type="submit"
         ng-click="register()"
         value="Register"
         class="submit">
   </form>
   <p class="center-text">
-    <a href="#/login">Already have an account?</a>
+    <a href="/login">Already have an account?</a>
   </p>
 </div>

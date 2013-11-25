@@ -12,7 +12,7 @@
   ]);
 
   app.config(function($locationProvider) {
-    $locationProvider.html5Mode(false);
+    $locationProvider.html5Mode(true);
   });
 
   app.config(function($routeProvider) {
@@ -20,7 +20,7 @@
 
     .when('/', {
       controller: 'IndexCtrl',
-      template: ' '
+      templateUrl: 'partials/index.html'
     })
 
     .when('/home', {
