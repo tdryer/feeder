@@ -45,6 +45,10 @@ body {
   background: #eaeaea;
 }
 
+img {
+  max-width: 100%;
+}
+
 /* @src 'http://designmodo.github.com/Flat-UI/' */
 .fui-arrow-right,
 .fui-arrow-left,

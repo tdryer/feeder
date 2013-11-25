@@ -31,7 +31,7 @@
       $location.path('/login');
     }
 
-    function updateFeeds() {
+    $scope.updateFeeds = function() {
       $scope.loadingFeeds = true;
       Feeds.get().then(function(feeds) {
         $scope.subscriptions = feeds;
@@ -48,8 +48,6 @@
     $scope.goToFeed = function(id) {
       $location.path('/home/' + id);
     }
-
-    updateFeeds();
   })
 
   /**

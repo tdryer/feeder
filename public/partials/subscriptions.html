@@ -1,13 +1,6 @@
-<div class="subscriptions" ng-class="{loading:loadingFeeds}">
-  <ul>
-    <li
-      ng-repeat="feed in subscriptions"
-      ng-click="goToFeed(feed.id)">
-        <div class="name">{{feed.name}}</div>
-        <div class="unread">{{feed.unreads}}</div>
-    </li>
-  </ul>
-
+<div
+  class="subscriptions"
+  ng-init="updateFeeds()">
   <div class="form-container">
     <form class="form">
       <div class="new-subscription">
@@ -27,4 +20,15 @@
         value="Add">
     </form>
   </div>
+
+  <ul ng-class="{loading:loadingFeeds}">
+    <li
+      class="subscription"
+      ng-repeat="feed in subscriptions"
+      ng-click="goToFeed(feed.id)">
+        <h5 class="name">{{feed.name}}</h5>
+        <img class="icon" src="http://robohash.org/{{feed.name}}"></i>
+        <h5 class="unread">Unread: {{feed.unreads}}</h5>
+    </li>
+  </ul>
 </div>

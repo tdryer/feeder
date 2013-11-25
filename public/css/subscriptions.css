@@ -2,8 +2,8 @@
   position: relative;
 }
 
-.subscriptions.loading {
-  min-height: 4em;
+.subscriptions .loading {
+  height: 4em;
   background: url(../img/spinner.gif) center no-repeat;
 }
 
@@ -32,30 +32,70 @@
 
 .subscriptions ul {
   margin: 0;
-  padding: 0;
+  padding: 1em;
   list-style-type: none;
 }
 
-.subscriptions li {
+.subscriptions .subscription {
   position: relative;
-  padding: 1em 3em 1em 1em;
-  border-bottom: 1px solid #bababa;
+  width: 12em;
+  display: inline-block;
+  margin: 0 1em;
+  cursor: pointer;
+  background: #f7f7f7;
+  border-radius: 0.5em;
 }
 
-.subscriptions li:hover {
-  background: #eaeaea;
-}
-
-.subscriptions .name {
+.subscriptions .subscription .name {
+  border-radius: 0.5em;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  margin: 0;
   white-space: nowrap;
-  width: 90%;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding: 0.5em;
+  background: #1abc9c;
+  color: #fff;
+  text-align: center;
 }
 
-.subscriptions .unread {
-  position: absolute;
-  top: 1em;
-  right: 1em;
-  color: #9a9a9a;
+.subscriptions .subscription .unread {
+  margin: 0;
+  padding: 0.5em;
+  border-top: 1px solid #1abc9c;
+  text-align: right;
+}
+
+.subscriptions .subscription .icon {
+  width: 100%;
+  vertical-align: bottom;
+}
+
+@media (max-width: 60em) {
+  .subscriptions ul {
+    padding: 0;
+  }
+
+  .subscriptions .subscription {
+    width: auto;
+    height: auto;
+    display: block;
+    border-radius: 0;
+    background: 0;
+    border-top: 1px solid #666;
+    padding: 1em;
+  }
+
+  .subscriptions .subscription:last-child {
+
+    border-bottom: 1px solid #666;
+  }
+
+  .subscriptions .subscription .name {
+    background: 0;
+    color: #333;
+    text-align: left;
+    padding: 0;
+  }
 }
