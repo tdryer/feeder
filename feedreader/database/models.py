@@ -35,9 +35,8 @@ def initialize_db(database_uri):
     BASE.metadata.create_all(engine)
     return sessionmaker(bind=engine)
 
+
 # Counts the number of Feeds with id == feed_id, i.e., returns 0 or 1
-
-
 def exists_feed(session, feed_id):
     return session.query(Feed).filter(Feed.id == feed_id).count()
 
@@ -55,6 +54,7 @@ class User(BASE):
     def __repr__(self):
         return "<User('%s')>" % (self.username)
 
+    # deletes user from database and associated rows in Subcription and Read
     def remove(self, session):
         # remove subscriptions for this user
         subs = session.query(
@@ -71,17 +71,23 @@ class User(BASE):
         session.delete(self)
         make_transient(self)
 
+    # subscribes user to a feed
+    # not useful since session.add(Subscription( ... )) is just
+    # as easy
     def subscribe(self, session, feed_id):
         sub = Subscription(self.username, feed_id)
         session.add(sub)
 
     # checks if the user is subscribed to the feed with id == feed_id
+    # since the query is filtering on a primary key, returns 0 or 1
     def is_sub_of_feed(self, session, feed_id):
         return session.query(Subscription).filter(and_(
             Subscription.username == self.username,
             Subscription.feed_id == feed_id,
         )).count()
 
+    # unsubscribes a user from a feed
+    # if the subscription does not exists one() will throw an exception
     def unsubscribe(self, session, feed_id):
         sub = session.query(
             Subscription).filter(
@@ -96,17 +102,21 @@ class User(BASE):
         entry = session.query(Entry).filter(Entry.id == entry_id).one()
         return self.is_sub_of_feed(session, entry.feed_id)
 
+    # records that the user has read the entry
+    # not useful since session.add(Read( ... )) is just as easy
     def mark_read(self, session, entry_id):
         read = Read(self.username, entry_id)
         session.add(read)
 
     # checks if the user has read the entry with id == entry_id
+    # since the query is filtering on a primary key, returns 0 or 1
     def has_read(self, session, entry_id):
         return session.query(Read).filter(and_(
                 Read.username == self.username,
                 Read.entry_id == entry_id
                 )).count()
 
+    # returns the number of unread entries in a feed the user is subbed to
     def num_unread_in_feed(self, session, feed_id):
         read_ids = self.get_read_ids(session)
         if read_ids != []:
@@ -118,6 +128,7 @@ class User(BASE):
             return session.query(Entry).filter(Entry.feed_id == feed_id
                                                ).count()
 
+    # returns a list of ids of all entries for all feeds the user has read
     def get_read_ids(self, session):
         id_list = []
         reads = session.query(
@@ -128,6 +139,7 @@ class User(BASE):
             id_list.append(read.entry_id)
         return id_list
 
+    # returns a list of feeds that the user is subbed to
     def get_feeds(self, session):
         id_list = []
         subs = session.query(
@@ -150,7 +162,6 @@ class User(BASE):
     Input: session, Feed.id, optional: filter="read"|"unread"
     Ouput: a list of entries
     """
-
     def get_feed_entries(self, session, feed_id, **kwargs):
         do_filter = False
         if 'filter' in kwargs:
@@ -220,6 +231,8 @@ class Feed(BASE):
         """Return all feeds with last_modified earlier than unix_date."""
         return session.query(Feed).filter(Feed.last_refresh_date < unix_date).all()
 
+    # deletes a feed and associated entries from database unless any user is
+    # still subbed
     def remove(self, session):
         # check that no users are subscribed
         if session.query(Subscription).filter(
@@ -241,9 +254,11 @@ class Feed(BASE):
             session.delete(self)
             make_transient(self)
 
+    # fetches entries associated with the feed
     def get_entries(self, session):
         return session.query(Entry).filter(Entry.feed_id == self.id).all()
 
+    # returns a list of users that are subbed to this feed
     def get_users(self, session):
         name_list = []
         subs = session.query(
@@ -281,10 +296,13 @@ class Entry(BASE):
     def __repr__(self):
         return '<Entry({!r})>'.format(self.id)
 
+    # a safer way to delete an entry from the database (in case it's to be
+    # added again for some reason)
     def remove(self, session):
         session.delete(self)
         make_transient(self)
 
+    # returns a string representing the state of this entry for a user
     def been_read(self, session, username):
         if session.query(Read).filter(and_(
                 Read.username == username,
