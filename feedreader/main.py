@@ -11,9 +11,11 @@ from feedreader.celery_poller import CeleryPoller
 from feedreader.database import models
 from feedreader import handlers
 from feedreader.tasks.core import Tasks
+from feedreader.updater import Updater
 
 
-def get_application(db_setup_f=None, enable_dummy_data=False):
+def get_application(db_setup_f=None, enable_dummy_data=False,
+                    periodic_updates=False):
     """Return Tornado application instance."""
     # initialize the DB so sessions can be created
     create_session = models.initialize_db()
@@ -51,6 +53,16 @@ def get_application(db_setup_f=None, enable_dummy_data=False):
 
     session.commit()
     session.close()
+
+    CHECK_UPDATE_PERIOD = timedelta(seconds=1)
+    UPDATE_PERIOD = timedelta(seconds=5)
+    if periodic_updates:
+        # create updater and attach to IOLoop
+        updater = Updater(UPDATE_PERIOD)
+        periodic_callback = tornado.ioloop.PeriodicCallback(
+            updater.do_updates, CHECK_UPDATE_PERIOD.total_seconds() * 1000
+        )
+        periodic_callback.start()
 
     # create tornado application and listen on the provided port
     default_injections = dict(
