@@ -41,7 +41,7 @@
 
     $scope.addFeed = function() {
       Feeds.add($scope.newFeed).then(function(feeds) {
-        updateFeeds();
+        $scope.updateFeeds();
       });
     }
 
