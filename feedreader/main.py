@@ -62,11 +62,12 @@ def get_application(db_setup_f=None, enable_dummy_data=False,
     session.commit()
     session.close()
 
-    CHECK_UPDATE_PERIOD = timedelta(seconds=1)
-    UPDATE_PERIOD = timedelta(seconds=5)
+    CHECK_UPDATE_PERIOD = timedelta(minutes=1)
+    UPDATE_PERIOD = timedelta(minutes=5)
+
     if periodic_updates:
         # create updater and attach to IOLoop
-        updater = Updater(UPDATE_PERIOD)
+        updater = Updater(UPDATE_PERIOD, create_session)
         periodic_callback = tornado.ioloop.PeriodicCallback(
             updater.do_updates, CHECK_UPDATE_PERIOD.total_seconds() * 1000
         )
@@ -95,7 +96,7 @@ def get_application(db_setup_f=None, enable_dummy_data=False,
 def main():
     """Main entry point for the server."""
     port = int(sys.argv[1])
-    get_application(enable_dummy_data=True).listen(port)
+    get_application(enable_dummy_data=True, periodic_updates=True).listen(port)
     tornado.ioloop.IOLoop.instance().start()
 
 

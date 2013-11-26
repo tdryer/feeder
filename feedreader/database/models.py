@@ -215,6 +215,11 @@ class Feed(BASE):
     def __repr__(self):
         return "<RSSFeed('%s','%s')>" % (self.title, self.site_url)
 
+    @classmethod
+    def find_last_updated_before(cls, session, unix_date):
+        """Return all feeds with last_modified earlier than unix_date."""
+        return session.query(Feed).filter(Feed.last_refresh_date < unix_date).all()
+
     def remove(self, session):
         # check that no users are subscribed
         if session.query(Subscription).filter(
