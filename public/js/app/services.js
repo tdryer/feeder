@@ -7,7 +7,7 @@
       , home;
 
     home = {
-      url: '#/home',
+      url: '/home',
       text: 'Home'
     };
 
@@ -29,7 +29,7 @@
           });
 
           feed.text = feed.name;
-          feed.url = '#/home/' + feed.id;
+          feed.url = '/home/' + feed.id;
 
           $rootScope.breadcrumbs = [home, feed];
         });
@@ -203,7 +203,7 @@
         status: read_status
       });
     }
-    
+
     return {
       get: get,
       status: status
