@@ -1,6 +1,14 @@
 <section class="hero">
-  <h1>feeder</h1>
-  <p class="pbl">Enjoy reading your news on all your devices with feeder, a modern feed reader built with speed and simplicity in mind.</p>
-  <a class="btn btn-hg btn-success mrs" href="/login">Login</a>
-  <a class="btn btn-hg btn-danger mls" href="/register">Register</a>
+  <h1 class="mts mbs">feeder</h1>
+  <p class="mbl">a modern feed reader, built to be fast, simple, and
+    device-agnostic.</p>
+  <div ng-show="!User.authenticated" class="mtl">
+    <a class="btn btn-hg btn-success mrs" href="/login">Login</a>
+    <a class="btn btn-hg btn-danger mls" href="/register">Register</a>
+  </div>
+  <div ng-show="User.authenticated" class="mtl">
+    <a
+      class="btn btn-hg btn-success"
+      href="/home">Begin</a>
+  </div>
 </section>
