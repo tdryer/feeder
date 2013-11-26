@@ -1,15 +1,24 @@
-<header ng-show="showHeader &amp;&amp; username">
-  <div class="breadcrumbs" breadcrumbs>
+<nav>
+  <breadcrumbs>
     <a
-      back
-      class="back btn fui fui-arrow-left"
-      href="{{anchor.url}}"
-      ng-show="anchor"></a>
+      href="/home"
+      class="btn btn-primary mrs"
+      ng-show="User.authenticated">Home</a>
+  </breadcrumbs>
+  <div class="header-user">
+    <greeting
+      ng-show="User.authenticated">Hello, {{User.username}}!</greeting>
     <a
-      class="btn breadcrumb"
-      href="{{link.url}}"
-      ng-repeat="link in breadcrumbs">{{link.text}}</a>
+      href="/login"
+      class="btn btn-success mls"
+      ng-show="!User.authenticated">Login</a>
+    <a
+      href="/register"
+      class="btn btn-danger mls"
+      ng-show="!User.authenticated">Register</a>
+    <a
+      href="/logout"
+      class="btn btn-default mls"
+      ng-show="User.authenticated">Logout</a>
   </div>
-  <span username>Hello, {{username}}!</span>
-  <a class="btn logout" href="/logout">Logout</a>
-</header>
+</nav>

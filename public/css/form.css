@@ -1,11 +1,12 @@
+.form-container .btn {
+  width: 100%;
+}
+
 .form-container .error {
   color: #ff0000;
   margin-bottom: 0.5em;
 }
 
-/**
- * @tag form
- */
 .form-container .form {
   background: #f7f7f7;
   margin: 2em auto 0;
@@ -52,47 +53,4 @@
 .form-container .form .pwd {
   position: relative;
   margin: 0 0 1em;
-}
-
-
-/**
- * @tag input
- */
-.form-container .form input {
-  -webkit-appearance: none;
-  -webkit-transition: all 0.4s;
-  transition: all 0.4s;
-  border: 2px solid #eaeaea;
-  padding: 0.5em;
-  padding-right: 1.6em;
-  border-radius: 0.2em;
-  width: 100%;
-  color: #7f8c8d;
-}
-
-.form-container .form input:focus {
-  outline: 0;
-  border-color: #1abc9c;
-}
-
-/**
- * @tag label
- */
-.form-container .form input:focus + .fui {
-  color: #1abc9c;
-}
-
-/**
- * @tag input[type=submit]
- */
-.form-container .form .submit {
-  border: 0;
-  background: #1abc9c;
-  padding: 0.5em;
-  color: #fff;
-}
-
-.form-container .form .submit:hover,
-.form-container .form .submit:focus {
-  background: #16a085;
 }

@@ -3,6 +3,66 @@
   angular.module('feeder.directives', [])
 
   /**
+   * Overlays the entire screen if the application is loading.
+   *
+   * @directive
+   * @restrict element
+   */
+  .directive('loading', function() {
+    return {
+      restrict: 'E',
+      controller: function($scope, State) {
+        $scope.State = State;
+      }
+    }
+  })
+
+  /**
+   * The header houses the breadcrumbs, a greeting to the user if he or she is
+   * authenticated, and various buttons.
+   *
+   * @directive
+   * @restrict element
+   */
+  .directive('header', function() {
+    return {
+      restrict: 'E',
+      templateUrl: '/partials/header.html'
+    }
+  })
+
+  /**
+   * Displays breadcrumbs. The items in the breadcrumbs depends on the current
+   * route.
+   *
+   * @directive
+   * @restrict element
+   */
+  .directive('breadcrumbs', function() {
+    return {
+      restrict: 'E',
+      controller: function($scope, User) {
+        $scope.User = User;
+      }
+    }
+  })
+
+  /**
+   * Displays a greeting to the user.
+   *
+   * @directive
+   * @restrict element
+   */
+  .directive('greeting', function() {
+    return {
+      restrict: 'E',
+      controller: function($scope, User) {
+        $scope.User = User;
+      }
+    }
+  })
+
+  /**
    * Displays the content of an article.
    *
    * @directive
@@ -43,45 +103,6 @@
   .directive('subscriptions', function() {
     return {
       templateUrl: 'partials/subscriptions.html'
-    }
-  })
-
-  /**
-   * Displays the header bar.
-   *
-   * @directive
-   */
-  .directive('header', function() {
-    return {
-      templateUrl: '/partials/header.html',
-      controller: function($scope, $rootScope, User) {
-        $rootScope.$watch('showHeader', function(showHeader) {
-          if (!showHeader) {
-            return;
-          }
-
-          User.getUsername().then(function(username) {
-            $scope.username = username;
-          });
-        });
-      }
-    }
-  })
-
-  /**
-   * Displays the user's username.
-   *
-   * @directive
-   * @route '/home'
-   * @scope {String} username The user's username.
-   */
-  .directive('username', function() {
-    return {
-      controller: function($scope, User) {
-        User.getUsername().then(function(username) {
-          $scope.username = username;
-        });
-      }
     }
   });
 

@@ -1,149 +1,110 @@
-(function(angular, _) {
-
-  angular.module('feeder.services', [])
-
-  .factory('Breadcrumbs', function($q, $rootScope, Feeds) {
-    var breadcrumbs = []
-      , home;
-
-    home = {
-      url: '/home',
-      text: 'Home'
-    };
-
-    function update(params) {
-      if (!_.size(params)) {
-        $rootScope.breadcrumbs = [];
-        return;
-      }
-
-      if (angular.isDefined(params.feed) && angular.isUndefined(params.article)) {
-        $rootScope.breadcrumbs = [home];
-        return;
-      }
-
-      if (angular.isDefined(params.feed) && angular.isDefined(params.article)) {
-        Feeds.get().then(function(feeds) {
-          var feed = _.find(feeds, {
-            id: +params.feed
-          });
-
-          feed.text = feed.name;
-          feed.url = '/home/' + feed.id;
-
-          $rootScope.breadcrumbs = [home, feed];
-        });
-        return;
-      }
-    }
-
-    return {
-      update: update
-    }
-  })
+(function() {
 
   /**
-   * Creates a `User` model.
+   * The `State` model represents the overall state and status of the entire
+   * application.
    *
    * @factory
-   * @var {Function} User `User` constructor.
-   * @var {String} cookieKey The identifier for the user cookie.
-   * @var {Function} genAuth Creates a base64 encoding of the username/password.
+   * @var {Boolean} [error=false] Has the application encountered an error?
+   * @var {Boolean} [loading=false] Is the application is loading something?
+   * @var {String} [message=''] A message to display to the user.
    */
-  .factory('User', function($q, $cookieStore, Restangular) {
-    var cookieKey = 'auth';
-
-    function genAuth(username, password) {
-      return btoa(username + ':' + password);
+  this.factory('State', function() {
+    return {
+      error: false,
+      loading: false,
+      message: ''
     }
+  });
+
+  /**
+   * The `User` model represents the current visitor.
+   *
+   * @factory
+   * @var {Boolean} authenticated Is the visitor authenticated?
+   * @var {String} authorization The authorization token of the current user.
+   * @var {Function} getAuthHeader Creates the header needed to make API calls.
+   * @var {Function} login Logs the current visitor in.
+   * @var {Function} logout Logs the current visitor out.
+   * @var {Function} register Creates a user for the current visitor.
+   * @var {String} username The username of the user.
+   */
+  this.factory('User', function($q, $cookieStore, Restangular) {
+    var authKey = 'auth'
+      , usernameKey = 'username';
+
+    /**
+     * Generates a header object that needs to be used by every other service to
+     * make their API calls.
+     *
+     * @param {String} [auth=this.authorization] The authorization token.
+     * @returns {Object} Returns the header object.
+     */
+    function getAuthHeader(auth) {
+      auth || (auth = this.authorization);
+
+      return {
+        Authorization: 'xBasic ' + auth
+      };
+    }
+
+    /**
+     * Logs in a visitor by checking the server to see if the he or she exists
+     * and if the username and password pair matches.
+     *
+     * @param {String} username The username of the visitor.
+     * @param {String} password The password of the visitor.
+     * @returns {Promise} Returns the promise of the login API hit.
+     */
+    function login(username, password) {
+      var auth = btoa(username + ':' + password)
+        , header = getAuthHeader(auth);
+
+      return Restangular.one('users').get({}, header).then(_.bind(function() {
+        this.authenticated = true;
+        this.username = username;
+        $cookieStore.put(authKey, auth);
+        $cookieStore.put(usernameKey, username);
+      }, this), $q.reject);
+    };
 
     /**
      * Registers a new user.
      *
-     * @param {String} username The new user's username.
-     * @param {String} password The new user's password.
+     * @param {String} username The username of the new user.
+     * @param {String} password The password of the new user.
      * @returns {Promise} Returns the promise of the registration API hit.
      */
     function register(username, password) {
       return Restangular.all('users').post({
         username: username,
         password: password
-      }).then(function(result) {
-        $cookieStore.put(cookieKey, genAuth(username, password));
-      }, $q.reject);
+      }).then(_.bind(function(result) {
+        this.authenticated = true;
+        this.username = username;
+        $cookieStore.put(authKey, btoa(username + ':' + password));
+        $cookieStore.put(usernameKey, username);
+      }, this), $q.reject);
     }
-
-    /**
-     * Logs in a user by checking the server to see if the user exists and the
-     * password matches.
-     *
-     * @param {String} username The user's username.
-     * @param {String} password The user's password.
-     * @returns {Promise} Returns the promise of the login API hit.
-     */
-    function login(username, password) {
-      var auth = genAuth(username, password);
-
-      Restangular = Restangular.withConfig(function(RestangularProvider) {
-        RestangularProvider.setDefaultHeaders({
-          Authorization: 'xBasic ' + auth
-        });
-      });
-
-      return Restangular.one('users').get().then(function(result) {
-        $cookieStore.put(cookieKey, auth);
-      }, $q.reject);
-    };
 
     /**
      * Logs out a user by deleting the session cookie.
      */
     function logout() {
-      $cookieStore.remove(cookieKey);
-    }
-
-    /**
-     * Checks to see if an user is logged in.
-     *
-     * @returns {Boolean} Returns whether or not a user is currently logged in.
-     */
-    function isLoggedIn() {
-      return !!$cookieStore.get(cookieKey);
-    }
-
-    /**
-     * Returns the current user's username by checking the server.
-     *
-     * @returns {Promise} Returns the promise of the API hit.
-     */
-    function getUsername() {
-      if (!isLoggedIn()) {
-        return $q.reject();
-      }
-
-      Restangular = Restangular.withConfig(function(RestangularProvider) {
-        RestangularProvider.setDefaultHeaders({
-          Authorization: 'xBasic ' + getAuth()
-        });
-      });
-
-      return Restangular.one('users').get().then(function(result) {
-        return result.username;
-      }, $q.reject);
-    }
-
-    function getAuth() {
-      return $cookieStore.get(cookieKey);
+      this.authenticated = false;
+      this.username = '';
+      $cookieStore.remove(authKey);
+      $cookieStore.remove(usernameKey);
     }
 
     return {
-      getAuth: getAuth,
-      genAuth: genAuth,
-      getUsername: getUsername,
-      isLoggedIn: isLoggedIn,
+      authenticated: !!$cookieStore.get(authKey),
+      authorization: $cookieStore.get(authKey),
+      getAuthHeader: getAuthHeader,
       login: login,
       logout: logout,
-      register: register
+      register: register,
+      username: $cookieStore.get(usernameKey)
     };
   })
 
@@ -154,9 +115,7 @@
       }
 
       Restangular = Restangular.withConfig(function(RestangularProvider) {
-        RestangularProvider.setDefaultHeaders({
-          Authorization: 'xBasic ' + User.getAuth()
-        });
+        RestangularProvider.setDefaultHeaders(User.getAuthHeader());
       });
 
       return Restangular.one('feeds', id).getList('entries').then(function(result) {
@@ -180,9 +139,7 @@
       }
 
       Restangular = Restangular.withConfig(function(RestangularProvider) {
-        RestangularProvider.setDefaultHeaders({
-          Authorization: 'xBasic ' + User.getAuth()
-        });
+        RestangularProvider.setDefaultHeaders(User.getAuthHeader());
       });
 
       return Restangular.one('entries').getList(id);
@@ -194,9 +151,7 @@
       }
 
       Restangular = Restangular.withConfig(function(RestangularProvider) {
-        RestangularProvider.setDefaultHeaders({
-          Authorization: 'xBasic ' + User.getAuth()
-        });
+        RestangularProvider.setDefaultHeaders(User.getAuthHeader());
       });
 
       return Restangular.one('entries', id).patch({
@@ -222,9 +177,7 @@
 
     function add(URL) {
       Restangular = Restangular.withConfig(function(RestangularProvider) {
-        RestangularProvider.setDefaultHeaders({
-          Authorization: 'xBasic ' + User.getAuth()
-        });
+        RestangularProvider.setDefaultHeaders(User.getAuthHeader());
       });
 
       return Restangular.all('feeds').post({
@@ -234,9 +187,7 @@
 
     function get() {
       Restangular = Restangular.withConfig(function(RestangularProvider) {
-        RestangularProvider.setDefaultHeaders({
-          Authorization: 'xBasic ' + User.getAuth()
-        });
+        RestangularProvider.setDefaultHeaders(User.getAuthHeader());
       });
 
       return Restangular.all('feeds').getList().then(function(result) {
@@ -250,4 +201,4 @@
     };
   });
 
-}).call(this, angular, _);
+}).call(angular.module('feeder.services', []));

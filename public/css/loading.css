@@ -1,0 +1,113 @@
+@-webkit-keyframes corner {
+  0% {
+    background: #e74c3c;
+    -webkit-transform: rotate(0deg);
+    border-radius:10px;
+  } 50% {
+    background: #ebedee;
+    -webkit-transform: rotate(180deg);
+    border-radius:0;
+  } 100% {
+    background: #e74c3c;
+    -webkit-transform: rotate(360deg);
+    border-radius:10px;
+  }
+}
+
+@-moz-keyframes corner {
+  0% {
+    background: #e74c3c;
+    -moz-transform: rotate(0deg);
+    border-radius:10px;
+  } 50% {
+    background: #ebedee;
+    -moz-transform: rotate(180deg);
+    border-radius:0;
+  } 100% {
+    background: #e74c3c;
+    -moz-transform: rotate(360deg);
+    border-radius:10px;
+  }
+}
+
+@-ms-keyframes corner {
+  0% {
+    background: #e74c3c;
+    -ms-transform: rotate(0deg);
+    border-radius:10px;
+  } 50% {
+    background: #ebedee;
+    -ms-transform: rotate(180deg);
+    border-radius:0;
+  } 100% {
+    background: #e74c3c;
+    -ms-transform: rotate(360deg);
+    border-radius:10px;
+  }
+}
+
+@-o-keyframes corner {
+  0% {
+    background: #e74c3c;
+    -o-transform: rotate(0deg);
+    border-radius:10px;
+  } 50% {
+    background: #ebedee;
+    -o-transform: rotate(180deg);
+    border-radius:0;
+  } 100% {
+    background: #e74c3c;
+    -o-transform: rotate(360deg);
+    border-radius:10px;
+  }
+}
+
+@keyframes corner {
+  0% {
+    background: #e74c3c;
+    transform: rotate(0deg);
+    border-radius:10px;
+  } 50% {
+    background: #ebedee;
+    transform: rotate(180deg);
+    border-radius:0;
+  } 100% {
+    background: #e74c3c;
+    transform: rotate(360deg);
+    border-radius:10px;
+  }
+}
+
+loading {
+  text-align: center;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 9000;
+  top: 0;
+  overflow: hidden;
+  background: rgba(18, 29, 41, 0.9);
+  -webkit-transition: all 0.5s ease-out;
+  -moz-transition: all 0.5s ease-out;
+  -ms-transition: all 0.5s ease-out;
+  -o-transition: all 0.5s ease-out;
+  transition: all 0.5s ease-out;
+}
+
+loading .spinner {
+  border-radius: 10px;
+  height: 16px;
+  width: 16px;
+  background: #ebedee;
+  display: inline-block;
+  position: absolute;
+  -webkit-animation: corner 1s ease infinite;
+  -moz-animation: corner 1s ease infinite;
+  -ms-animation: corner 1s ease infinite;
+  -o-animation: corner 1s ease infinite;
+  animation: corner 1s ease infinite;
+  top: 50%;
+  left: 50%;
+  margin-left: -8px;
+  margin-top: -8px;
+}

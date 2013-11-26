@@ -1,5 +1,5 @@
 <div class="form-container">
-  <form class="form" ng-class="{error:error,loading:loading}">
+  <form class="form">
     <img src="img/avatar_2x.png" class="avatar">
     <div class="usr">
       <input
@@ -20,9 +20,10 @@
         type="password">
       <label for="pwd" class="fui fui-lock">Password</label>
     </div>
-    <input type="submit" ng-click="login()" value="Login" class="submit">
+    <input
+      type="submit"
+      ng-click="login(username, password)"
+      value="Login"
+      class="btn btn-hg btn-success">
   </form>
-  <p class="center-text">
-    <a href="/register">Create an account</a>
-  </p>
 </div>

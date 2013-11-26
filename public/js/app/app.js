@@ -78,11 +78,21 @@
     RestangularProvider.setBaseUrl('/api');
   });
 
-  app.run(function($rootScope, Breadcrumbs, User) {
-    $rootScope.$on('$routeChangeSuccess', function(angularEvent, current) {
-      $rootScope.showHeader = User.isLoggedIn();
-      Breadcrumbs.update(current.params);
+  app.run(function($rootScope, State) {
+    $rootScope.$on('$routeChangeStart', function() {
+      State.loading = true;
+      State.error = false;
     });
-  })
+
+    $rootScope.$on('$routeChangeError', function() {
+      State.loading = false;
+      State.error = true;
+    });
+
+    $rootScope.$on('$routeChangeSuccess', function() {
+      State.loading = false;
+      State.error = false;
+    });
+  });
 
 }).call(this, angular, _);

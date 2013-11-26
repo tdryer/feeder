@@ -1,18 +1,24 @@
 header {
   padding: 0.5em;
-  background: #333;
-  color: #fff;
   text-align: right;
-  clear: both;
+  position: relative;
 }
 
-header .logout {
-  margin-left: 0.5em;
+header .header-user {
+  text-align: right;
+  display: inline-block;
+}
+
+header greeting {
+  color: #fff;
+}
+
+header breadcrumbs {
+  float: left;
 }
 
 header .breadcrumbs {
   float: left;
-  clear: both;
 }
 
 header .breadcrumbs .btn {
