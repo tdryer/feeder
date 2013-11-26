@@ -279,10 +279,7 @@ class Entry(BASE):
         self.guid = guid
 
     def __repr__(self):
-        return (
-            "<Entry('%s','%s','%s')>" % (
-                self.title, self.author, self.date)
-        )
+        return '<Entry({!r})>'.format(self.id)
 
     def remove(self, session):
         session.delete(self)
