@@ -19,7 +19,7 @@
 
 .feed li {
   position: relative;
-  padding: 0.7em 0em 0.5em;
+  padding: 0.7em 0em;
   font-size: 0.95em;
   border-bottom: 1px solid #bababa;
   max-height: 10em;
@@ -33,6 +33,7 @@
 
 .feed article {
   padding: 0em 2em;
+  line-height: 1.2em;
 }
 
 .feed .unread {
@@ -43,10 +44,14 @@
   display: block;
   color: #9a9a9a;
   font-size: 0.8em;
+  line-height: 1em;
   font-style: italic;
 }
 
 .feed .title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   margin: 0.3em 0;
   font-size: 1em;
 }
@@ -54,10 +59,12 @@
 .feed .preview {
   color: #9a9a9a;
   font-size: 0.8em;
-  max-height: 3em;
+  line-height: 1.2em;
+  max-height: 2.4em;
   overflow: hidden;
 }
 
+/*
 .feed .preview:after {
   background: #dadada;
   content: ' ';
@@ -66,5 +73,5 @@
   bottom: 0px;
   left: 0px;
   width: 100%;
-  height: 1em;
-}
+  height: 1.03em;
+}*/
