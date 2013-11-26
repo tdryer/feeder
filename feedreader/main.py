@@ -1,24 +1,24 @@
 """Main entry point for API server."""
 
-import tornado.ioloop
-import tornado.web
-from tornado import gen
-import sys
-import pbkdf2
 from datetime import timedelta
 
-from feedreader.celery_poller import CeleryPoller
-from feedreader.database import models
+from tornado import gen
+import pbkdf2
+import tornado.ioloop
+import tornado.web
+
 from feedreader import handlers
+from feedreader.celery_poller import CeleryPoller
+from feedreader.config import Config
+from feedreader.database import models
 from feedreader.tasks.core import Tasks
 from feedreader.updater import Updater
 
 
-def get_application(db_setup_f=None, enable_dummy_data=False,
-                    periodic_updates=False):
+def get_application(config, db_setup_f=None):
     """Return Tornado application instance."""
     # initialize the DB so sessions can be created
-    create_session = models.initialize_db()
+    create_session = models.initialize_db(config.database_uri)
 
     if db_setup_f is not None:
         db_setup_f(create_session)
@@ -32,13 +32,12 @@ def get_application(db_setup_f=None, enable_dummy_data=False,
         session.add(user)
         session.commit()
 
-
     # TODO: make this configurable
-    tasks = Tasks(debug=True)
+    tasks = Tasks(config.amqp_uri)
 
     celery_poller = CeleryPoller(timedelta(milliseconds=5))
 
-    if enable_dummy_data:
+    if config.dummy_data:
         # add some test feeds
         # don't any anything that we aren't ok with hammering with requests
         TEST_FEEDS = [
@@ -65,7 +64,7 @@ def get_application(db_setup_f=None, enable_dummy_data=False,
     CHECK_UPDATE_PERIOD = timedelta(minutes=1)
     UPDATE_PERIOD = timedelta(minutes=5)
 
-    if periodic_updates:
+    if config.periodic_updates:
         # create updater and attach to IOLoop
         updater = Updater(UPDATE_PERIOD, create_session)
         periodic_callback = tornado.ioloop.PeriodicCallback(
@@ -76,7 +75,7 @@ def get_application(db_setup_f=None, enable_dummy_data=False,
     # create tornado application and listen on the provided port
     default_injections = dict(
         create_session=create_session,
-        enable_dummy_data=enable_dummy_data,
+        enable_dummy_data=config.dummy_data,
         tasks=tasks,
         celery_poller=celery_poller,
     )
@@ -86,8 +85,8 @@ def get_application(db_setup_f=None, enable_dummy_data=False,
         (r'^/feeds/?$', handlers.FeedsHandler, default_injections),
         (r'^/feeds/(?P<feed_id>[0-9]+)$', handlers.FeedHandler,
          default_injections),
-        (r'^/feeds/(?P<feed_id>[0-9]+)/entries/?$', handlers.FeedEntriesHandler,
-         default_injections),
+        (r'^/feeds/(?P<feed_id>[0-9]+)/entries/?$',
+         handlers.FeedEntriesHandler, default_injections),
         (r'^/entries/(?P<entry_ids>(?:\d+,)*\d+)$', handlers.EntriesHandler,
          default_injections),
     ])
@@ -95,8 +94,8 @@ def get_application(db_setup_f=None, enable_dummy_data=False,
 
 def main():
     """Main entry point for the server."""
-    port = int(sys.argv[1])
-    get_application(enable_dummy_data=True, periodic_updates=True).listen(port)
+    config = Config.from_args()
+    get_application(config).listen(config.port)
     tornado.ioloop.IOLoop.instance().start()
 
 

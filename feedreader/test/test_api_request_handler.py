@@ -17,7 +17,7 @@ def get_basic_auth(user, passwd, method="Basic"):
 
 def get_application(handler):
     """Return Tornado application with demo user."""
-    create_session = models.initialize_db()
+    create_session = models.initialize_db('sqlite://')
     app = Application([("/", handler, dict(create_session=create_session,
                                            tasks=None, celery_poller=None))])
     session = create_session()

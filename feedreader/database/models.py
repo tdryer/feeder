@@ -14,7 +14,7 @@ MEDIUM_STR = 1024
 LARGE_STR = 10*MEDIUM_STR
 
 
-def initialize_db():
+def initialize_db(database_uri):
     """Initialize the DB and return SQLAlchemy Session class.
 
     This should only be called once when the server starts.
@@ -29,7 +29,7 @@ def initialize_db():
         'mysql://username:password@localhost[:port]/dbname', echo=False
     )
     """
-    engine = create_engine('sqlite://', echo=False)
+    engine = create_engine(database_uri, echo=False)
 
     # create tables and prepare to make sessions
     BASE.metadata.create_all(engine)

@@ -1,16 +1,18 @@
 """Functional tests for the API."""
 
-from tornado.testing import AsyncHTTPTestCase
-import base64
-import json
-import os
-import multiprocessing
 from contextlib import contextmanager
 import SimpleHTTPServer
 import SocketServer
+import base64
+import json
+import multiprocessing
+import os
 
-import feedreader.main
+from tornado.testing import AsyncHTTPTestCase
+
+from feedreader.config import Config
 from feedreader.database import models
+import feedreader.main
 
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
@@ -86,8 +88,9 @@ class ApiTest(AsyncHTTPTestCase):
 
     def get_app(self):
         # hack to get access to the session class
+        config = Config('', 'sqlite://', False, 8080, False)
         def hook(Session): self.Session = Session
-        return feedreader.main.get_application(db_setup_f=hook)
+        return feedreader.main.get_application(config, db_setup_f=hook)
 
     def assert_api_call(self, api_call, headers=None, json_body=None,
                         expect_code=None, expect_json=None):

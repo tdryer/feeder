@@ -11,7 +11,7 @@ TEST_DATA_DIR = path.join(path.dirname(__file__), "data")
 
 @pytest.fixture
 def tasks():
-    return Tasks(debug=True)
+    return Tasks(amqp_uri='')
 
 
 def test_connection_refused(tasks):

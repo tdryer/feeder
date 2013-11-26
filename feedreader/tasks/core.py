@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 class Tasks(object):
 
-    def __init__(self, debug=False):
+    def __init__(self, amqp_uri=''):
         self.app = Celery()
         self.app.conf.update(
             CELERY_ACCEPT_CONTENT=['json', 'yaml'],
@@ -28,15 +28,15 @@ class Tasks(object):
             CELERY_TIMEZONE='America/Vancouver',
         )
 
-        if debug:
-            # silence warning from pika
-            logging.getLogger("pika").setLevel(logging.ERROR)
-        else:
+        if amqp_uri:
             self.app.conf.update(
-                BROKER_URL='amqp://guest:guest@localhost:5672//',
+                BROKER_URL='amqp://{}'.format(amqp_uri),
                 CELERY_ALWAYS_EAGER=False,
                 CELERY_RESULT_BACKEND='amqp',
             )
+        else:
+            # silence warning from pika
+            logging.getLogger("pika").setLevel(logging.ERROR)
 
         # register tasks with celery
         self.fetch_feed = self.app.task()(self.fetch_feed)

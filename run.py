@@ -8,6 +8,7 @@ dot public/index.html, servers everything else to public.
 import tornado.ioloop
 import tornado.web
 
+import feedreader.config
 import feedreader.main
 
 
@@ -31,14 +32,14 @@ class SingleFileHandler(tornado.web.StaticFileHandler):
 
 
 def main():
-    feedreader_app = feedreader.main.get_application(enable_dummy_data=True,
-                                                     periodic_updates=True)
+    config = feedreader.config.Config.from_args()
+    feedreader_app = feedreader.main.get_application(config)
     application = tornado.web.Application([
         (r"/api/(.*)", PrefixedFallbackHandler, dict(fallback=feedreader_app)),
         (r"/(.*\..*)", tornado.web.StaticFileHandler, {"path": "public"}),
         (r"/(.*)", SingleFileHandler, {"path": "public"}),
     ])
-    application.listen(8080)
+    application.listen(config.port)
     tornado.ioloop.IOLoop.instance().start()
 
 
