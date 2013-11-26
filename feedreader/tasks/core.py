@@ -1,11 +1,12 @@
 """Celery tasks."""
 
-from celery import Celery
-import logging
-import feedparser
-import time
 import calendar
 import hashlib
+import logging
+import time
+
+from celery import Celery
+import feedparser
 
 from feedreader.database import models
 
@@ -19,11 +20,11 @@ class Tasks(object):
     def __init__(self, debug=False):
         self.app = Celery()
         self.app.conf.update(
-            CELERY_ACCEPT_CONTENT=['json'],
+            CELERY_ACCEPT_CONTENT=['json', 'yaml'],
             CELERY_ALWAYS_EAGER=True,
             CELERY_ENABLE_UTC=True,
-            CELERY_TASK_SERIALIZER='json',
-            CELERY_RESULT_SERIALIZER='json',
+            CELERY_TASK_SERIALIZER='yaml',
+            CELERY_RESULT_SERIALIZER='yaml',
             CELERY_TIMEZONE='America/Vancouver',
         )
 

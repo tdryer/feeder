@@ -5,7 +5,7 @@ from sqlalchemy.orm.session import make_transient
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import (and_, create_engine, Column, ForeignKey, Integer,
                         Sequence, String)
-
+import yaml
 
 BASE = declarative_base()
 
@@ -319,3 +319,33 @@ class Read(BASE):
 
     def __repr__(self):
         return "<Read('%s','%s')>" % (self.username, self.entry_id)
+
+
+def make_yaml_bindings():
+    """Use some magic to let yaml dump and load our database models."""
+
+    # XXX: I would like to put this somewhere else but it has to be after all
+    #      the classes are created.
+    for name, cls in BASE._decl_class_registry.iteritems():
+        if name.startswith(u'_sa_'):
+            continue
+
+        tag = '!{}'.format(name.lower())
+
+        def representer(dumper, obj, tag=tag):
+            to_serialize = dict((item[0], item[1]) for item in obj.__dict__.iteritems()
+                                if not item[0].startswith(u'_sa_'))
+            print tag
+            return dumper.represent_mapping(tag, to_serialize)
+
+        def constructor(loader, node, cls=cls):
+            values = loader.construct_mapping(node)
+            return cls(**values)
+
+        yaml.add_representer(cls, representer)
+        yaml.SafeDumper.add_representer(cls, representer)
+        yaml.add_constructor(tag, constructor)
+        yaml.SafeLoader.add_constructor(tag, constructor)
+
+
+make_yaml_bindings()
