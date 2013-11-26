@@ -26,8 +26,11 @@ def get_application(db_setup_f=None, enable_dummy_data=False,
     # XXX create test user
     session = create_session()
     user = models.User("username", pbkdf2.crypt("password"))
-    session.add(user)
-    session.commit()
+    if not session.query(models.User).filter(
+            models.User.username == user.username
+            ).count():
+        session.add(user)
+        session.commit()
 
 
     # TODO: make this configurable
@@ -46,9 +49,14 @@ def get_application(db_setup_f=None, enable_dummy_data=False,
         for url in TEST_FEEDS:
             @gen.coroutine
             def add_feed():
-                yield handlers.FeedsHandler.subscribe_feed(
-                    session, user, celery_poller, tasks, url
-                )
+                # This fails for MySQL once the test data has been added before
+                try:
+                    yield handlers.FeedsHandler.subscribe_feed(
+                        session, user, celery_poller, tasks, url
+                    )
+                # Ignore exceptions for now
+                except:
+                    pass
             tornado.ioloop.IOLoop.instance().run_sync(add_feed)
 
     session.commit()

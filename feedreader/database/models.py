@@ -9,13 +9,26 @@ import yaml
 
 BASE = declarative_base()
 
+SMALL_STR = 100
+MEDIUM_STR = 1024
+LARGE_STR = 10*MEDIUM_STR
+
 
 def initialize_db():
     """Initialize the DB and return SQLAlchemy Session class.
 
     This should only be called once when the server starts.
     """
-    # hard coded might not be the best approach
+    """
+    # Uncomment the block below and comment out the succeeding line. Fill out
+    # the details of the database. This does not work well with tests because
+    # it causes integrity errors when the data has been added before!
+    """
+    """
+    engine = create_engine(
+        'mysql://username:password@localhost[:port]/dbname', echo=False
+    )
+    """
     engine = create_engine('sqlite://', echo=False)
 
     # create tables and prepare to make sessions
@@ -32,8 +45,8 @@ def exists_feed(session, feed_id):
 class User(BASE):
     __tablename__ = 'users'
 
-    username = Column(String, primary_key=True, nullable=False)
-    password_hash = Column(String, nullable=False)
+    username = Column(String(SMALL_STR), primary_key=True, nullable=False)
+    password_hash = Column(String(MEDIUM_STR), nullable=False)
 
     def __init__(self, name, pwhash):
         self.username = name
@@ -121,13 +134,14 @@ class User(BASE):
             Subscription).filter(
             Subscription.username == self.username).all(
         )
-
         for sub in subs:
             id_list.append(sub.feed_id)
-
-        feeds = session.query(Feed).filter(Feed.id.in_(id_list))\
+        if id_list != []:
+            feeds = session.query(Feed).filter(Feed.id.in_(id_list))\
                                    .order_by(Feed.title.asc()).all()
-        return feeds
+            return feeds
+        else:
+            return []
 
     """
     Collects all the entries of a feed
@@ -179,15 +193,15 @@ class Feed(BASE):
 
     id = Column(Integer, Sequence('feed_id_seq'), primary_key=True,
                 nullable=False)
-    title = Column(String, nullable=False)
-    feed_url = Column(String, nullable=False)  # feed resource
-    site_url = Column(String, nullable=False)  # main site
+    title = Column(String(SMALL_STR), nullable=False)
+    feed_url = Column(String(MEDIUM_STR), nullable=False)  # feed resource
+    site_url = Column(String(MEDIUM_STR), nullable=False)  # main site
     # date of last attempted refresh
     last_refresh_date = Column(Integer, nullable=True)
     # last-modifed date used for caching
-    last_modified = Column(String, nullable=True)
+    last_modified = Column(Integer, nullable=True)
     # etag used for caching
-    etag = Column(String, nullable=True)
+    etag = Column(String(MEDIUM_STR), nullable=True)
 
     def __init__(self, title, feed_url, site_url, last_modified=None,
                  etag=None, last_refresh_date=None):
@@ -243,12 +257,12 @@ class Entry(BASE):
     id = Column(Integer, Sequence('entry_id_seq'), primary_key=True,
                 nullable=False)
     feed_id = Column(Integer, ForeignKey('feeds.id'), nullable=False)
-    content = Column(String, nullable=False)
-    url = Column(String, nullable=False)
-    title = Column(String, nullable=False)
-    author = Column(String, nullable=False)
+    content = Column(String(LARGE_STR), nullable=False)
+    url = Column(String(MEDIUM_STR), nullable=False)
+    title = Column(String(SMALL_STR), nullable=False)
+    author = Column(String(SMALL_STR), nullable=False)
     date = Column(Integer, nullable=False)
-    guid = Column(String, nullable=False)
+    guid = Column(String(MEDIUM_STR), nullable=False)
 
     def __init__(self, feed_id, content, url, title, author, date, guid):
         self.feed_id = feed_id
@@ -283,7 +297,7 @@ class Subscription(BASE):
     __tablename__ = 'subscriptions'
 
     username = Column(
-        String(50),
+        String(SMALL_STR),
         ForeignKey('users.username'),
         primary_key=True,
         nullable=False)
@@ -304,7 +318,7 @@ class Read(BASE):
     __tablename__ = 'reads'
 
     username = Column(
-        String(50),
+        String(SMALL_STR),
         ForeignKey('users.username'),
         primary_key=True,
         nullable=False)
