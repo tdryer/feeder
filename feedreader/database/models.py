@@ -354,7 +354,6 @@ def make_yaml_bindings():
         def representer(dumper, obj, tag=tag):
             to_serialize = dict((item[0], item[1]) for item in obj.__dict__.iteritems()
                                 if not item[0].startswith(u'_sa_'))
-            print tag
             return dumper.represent_mapping(tag, to_serialize)
 
         def constructor(loader, node, cls=cls):
