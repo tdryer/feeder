@@ -3,6 +3,23 @@
   angular.module('feeder.directives', [])
 
   /**
+   * Displays the content of an article.
+   *
+   * @directive
+   * @restrict element
+   */
+  .directive('content', function() {
+    return {
+      restrict: 'E',
+      link: function(scope, elem$, attrs) {
+        elem$.ready(function() {
+          elem$.find('a').attr('target', '_blank');
+        });
+      }
+    }
+  })
+
+  /**
    * Navigates a user back one level.
    *
    * @directive
