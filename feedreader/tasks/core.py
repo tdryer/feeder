@@ -116,7 +116,9 @@ class Tasks(object):
                 date = int(calendar.timegm(entry.published_parsed))
             else:
                 date = int(time.time())
-            guid = hashlib.sha1(entry.get("id", title)).hexdigest()
+            guid = hashlib.sha1(
+                entry.get("id", title).encode('utf-8')
+            ).hexdigest()
             entry = models.Entry(None, content, link, title, author, date, guid)
             entries.append(entry)
 
