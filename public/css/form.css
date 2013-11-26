@@ -2,34 +2,23 @@
   width: 100%;
 }
 
-.form-container .error {
-  color: #ff0000;
-  margin-bottom: 0.5em;
-}
-
 .form-container .form {
-  background: #f7f7f7;
   margin: 2em auto 0;
-  width: 16em;
-  padding: 2em 1em;
-  border-radius: 0.4em;
+  max-width: 16em;
+  padding: 2em;
   text-align: center;
-  max-width: 100%;
-  border: 2px solid #eaeaea;
-  -webkit-transition: all 0.4s;
+  -webkit-transition: all 0.5s ease-out;
+  -moz-transition: all 0.5s ease-out;
+  -ms-transition: all 0.5s ease-out;
+  -o-transition: all 0.5s ease-out;
+  transition: all 0.5s ease-out;
 }
 
-.form-container .form.loading {
-  border: 2px solid #1abc9c;
+.form-container .form .error {
+  color: #e74c3c;
+  font-weight: bold;
 }
 
-.form-container .form.error {
-  border: 2px solid #e74c3c;
-}
-
-/**
- * @tag label
- */
 .form-container .form .fui {
   font-size: 0;
   position: absolute;
@@ -46,11 +35,43 @@
   transition: all 0.4s;
 }
 
-/**
- * @tag div
- */
-.form-container .form .usr,
-.form-container .form .pwd {
-  position: relative;
-  margin: 0 0 1em;
+.form-container .form .form-control {
+  width: 100%;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  padding-right: 2em;
+}
+
+.form-container .form .avatar {
+  border-radius: 50%;
+}
+
+.form-control.ng-dirty.ng-invalid {
+  color: #e74c3c;
+  border-color: #e74c3c;
+}
+
+.form-control.ng-dirty.ng-invalid:-moz-placeholder {
+  color: #e74c3c;
+}
+
+.form-control.ng-dirty.ng-invalid::-moz-placeholder {
+  color: #e74c3c;
+}
+
+.form-control.ng-dirty.ng-invalid:-ms-input-placeholder {
+  color: #e74c3c;
+}
+
+.form-control.ng-dirty.ng-invalid::-webkit-input-placeholder {
+  color: #e74c3c;
+}
+
+.form-control.ng-dirty.ng-invalid.placeholder {
+  color: #e74c3c;
+}
+
+.form-control.ng-dirty.ng-invalid:focus {
+  border-color: #e74c3c;
 }

@@ -1,6 +1,4 @@
-(function(angular, _) {
-
-  angular.module('feeder.controllers', [])
+(function() {
 
   /**
    * The splash screen.
@@ -8,8 +6,74 @@
    * @controller
    * @route '/'
    */
-  .controller('IndexCtrl', function($scope, $location, User) {
+  this.controller('IndexCtrl', function($scope, $location, User) {
     $scope.User = User;
+  });
+
+  /**
+   * The login page.
+   *
+   * @controller
+   * @route '/login'
+   * @scope {Function} login Hits the authentication server on button click.
+   * @scope {String} [username=''] Value of the username input field.
+   * @scope {String} [password=''] Value of the password input field.
+   * @scope {Boolean} [error=false] Does the login form have an error?
+   */
+  this.controller('LoginCtrl', function($scope, $location, State, User) {
+    $scope.username = '';
+    $scope.password = '';
+    $scope.error = false;
+
+    $scope.login = function(username, password) {
+      State.loading = true;
+      $scope.error = false;
+      User.login(username, password).then(function() {
+        $location.path('/home');
+      }, function() {
+        State.loading = false;
+        $scope.error = true;
+      });
+    }
+  });
+
+  /**
+   * The logout page, which is actually just a superficial route so we can
+   * bundle the logout and redirect logic together in one controller.
+   *
+   * @controller
+   * @route '/logout'
+   */
+  this.controller('LogoutCtrl', function($location, User) {
+    User.logout();
+    $location.path('/');
+  });
+
+  /**
+   * The register page.
+   *
+   * @controller
+   * @route '/register'
+   * @scope {Function} register Registers the visitor.
+   * @scope {String} [username=''] Value of the username input field.
+   * @scope {String} [password=''] Value of the password input field.
+   * @scope {Boolean} [error=false] Does the login form have an error?
+   */
+  this.controller('RegisterCtrl', function($scope, $location, State, User) {
+    $scope.username = '';
+    $scope.password = '';
+    $scope.error = false;
+
+    $scope.register = function(username, password) {
+      State.loading = true;
+      $scope.error = false;
+      User.register(username, password).then(function() {
+        $location.path('/home');
+      }, function() {
+        State.loading = false;
+        $scope.error = true;
+      });
+    }
   })
 
   /**
@@ -80,73 +144,4 @@
     Article.status($scope.article.id, 'read');
   })
 
-  /**
-   * Registers a new user.
-   * Routes the user to their home page upon successful registration.
-   *
-   * @controller
-   * @route '/register'
-   */
-  .controller('RegisterCtrl', function($scope, $location, $timeout, User) {
-    var timeout;
-
-    $scope.error = false;
-    $scope.loading = false;
-
-    $scope.register = function(username, password) {
-      $timeout.cancel(timeout);
-
-      $scope.loading = true;
-      User.register(username, password).then(function() {
-        $location.path('/home');
-      }, function() {
-        $scope.error = true;
-
-        timeout = $timeout(function() {
-          $scope.error = false;
-        }, 200);
-      }).then(function() {
-        $scope.loading = false;
-      });
-    }
-  })
-
-  /**
-   * The login page.
-   *
-   * @controller
-   * @route '/login'
-   * @scope {Function} login Hits the authentication server on button click.
-   * @scope {String} [username=''] Value of the username input field.
-   * @scope {String} [password=''] Value of the password input field.
-   * @scope {Boolean} [error=false] Does the login form have an error?
-   */
-  .controller('LoginCtrl', function($scope, $location, State, User) {
-    $scope.username = '';
-    $scope.password = '';
-    $scope.error = false;
-
-    $scope.login = function(username, password) {
-      State.loading = true;
-      State.error = false;
-      User.login(username, password).then(function() {
-        $location.path('/home');
-      }, function() {
-        State.loading = false;
-        $scope.error = true;
-      });
-    }
-  })
-
-  /**
-   * The logout page.
-   *
-   * @controller
-   * @route '/logout'
-   */
-  .controller('LogoutCtrl', function($location, User) {
-    User.logout();
-    $location.path('/');
-  });
-
-}).call(this, angular, _);
+}).call(angular.module('feeder.controllers', []));

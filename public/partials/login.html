@@ -1,29 +1,51 @@
 <div class="form-container">
-  <form class="form">
-    <img src="img/avatar_2x.png" class="avatar">
-    <div class="usr">
+  <form
+    name="loginForm"
+    ng-submit="login(username, password)"
+    class="form">
+    <img
+      src="img/avatar_2x.png"
+      class="avatar mbs">
+    <p
+      ng-show="registerForm.username.$error.maxlength"
+      class="small error mbn">Please use between 1 and 32 characters.</p>
+    <p
+      ng-show="registerForm.username.$error.pattern"
+      class="small error mbn">Please do not use colons or white space.</p>
+    <div class="form-group mbs">
       <input
         autofocus
-        id="usr"
+        required
+        maxlength="32"
+        class="form-control"
+        id="username"
+        name="username"
         ng-model="username"
         ng-trim="false"
+        ng-maxlength="32"
+        ng-pattern="/^[^:\s]*$/"
         placeholder="Username"
         type="text">
-      <label for="usr" class="fui fui-user">Username</label>
+      <label for="username" class="fui fui-user">Username</label>
     </div>
-    <div class="pwd">
+    <div class="form-group mts">
       <input
-        id="pwd"
+        required
+        class="form-control"
+        id="password"
         ng-model="password"
         ng-trim="false"
         placeholder="Password"
         type="password">
-      <label for="pwd" class="fui fui-lock">Password</label>
+      <label for="password" class="fui fui-lock">Password</label>
     </div>
+    <p
+      class="small error mbn"
+      ng-show="error">The username or password you entered is incorrect.</p>
     <input
+      ng-disabled="!loginForm.$valid"
       type="submit"
-      ng-click="login(username, password)"
       value="Login"
-      class="btn btn-hg btn-success">
+      class="btn btn-hg btn-success mtl">
   </form>
 </div>

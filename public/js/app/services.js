@@ -31,7 +31,10 @@
    */
   this.factory('User', function($q, $cookieStore, Restangular) {
     var authKey = 'auth'
-      , usernameKey = 'username';
+      , usernameKey = 'username'
+      , authenticated = !!$cookieStore.get(authKey)
+      , authorization = $cookieStore.get(authKey)
+      , username = $cookieStore.get(usernameKey);
 
     /**
      * Generates a header object that needs to be used by every other service to
@@ -62,6 +65,7 @@
 
       return Restangular.one('users').get({}, header).then(_.bind(function() {
         this.authenticated = true;
+        this.authorization = auth;
         this.username = username;
         $cookieStore.put(authKey, auth);
         $cookieStore.put(usernameKey, username);
@@ -76,13 +80,16 @@
      * @returns {Promise} Returns the promise of the registration API hit.
      */
     function register(username, password) {
+      var auth = btoa(username + ':' + password);
+
       return Restangular.all('users').post({
         username: username,
         password: password
       }).then(_.bind(function(result) {
         this.authenticated = true;
+        this.authorization = auth;
         this.username = username;
-        $cookieStore.put(authKey, btoa(username + ':' + password));
+        $cookieStore.put(authKey, auth);
         $cookieStore.put(usernameKey, username);
       }, this), $q.reject);
     }
@@ -98,13 +105,13 @@
     }
 
     return {
-      authenticated: !!$cookieStore.get(authKey),
-      authorization: $cookieStore.get(authKey),
+      authenticated: authenticated,
+      authorization: authorization,
       getAuthHeader: getAuthHeader,
       login: login,
       logout: logout,
       register: register,
-      username: $cookieStore.get(usernameKey)
+      username: username
     };
   })
 
