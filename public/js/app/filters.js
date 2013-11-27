@@ -1,6 +1,4 @@
-(function(angular, _) {
-
-  angular.module('feeder.filters', [])
+(function() {
 
   /**
    * Exposes the power of Moment.js parsing and formatting.
@@ -10,7 +8,7 @@
    * @param {String} [format='LLL'] The format to format `date` with.
    * @returns {String} Returns `date` in the format `format`.
    */
-  .filter('moment', function() {
+  this.filter('moment', function() {
     return function(date, format) {
       format || (format = 'LLL');
 
@@ -41,4 +39,4 @@
     }
   });
 
-}).call(this, angular, _);
+}).call(angular.module('feeder.filters', []));

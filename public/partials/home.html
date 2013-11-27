@@ -1,5 +1,38 @@
-<ul>
+<p ng-show="!Feeds.feeds.length">No feeds yet!</p>
+
+<ul class="feeds">
   <li ng-repeat="feed in Feeds.feeds">
     <a href="/home/{{feed.id}}">{{feed.name}}</a>
   </li>
 </ul>
+
+<div class="form-container mts">
+  <form
+    name="subscribeForm"
+    ng-submit="subscribe(url)"
+    class="form">
+    <p
+      ng-show="!subscribeForm.$valid"
+      class="small error mbn">Please enter a valid URL.</p>
+    <div class="form-group mbs">
+      <input
+        autofocus
+        required
+        class="form-control"
+        id="url"
+        name="url"
+        ng-model="url"
+        placeholder="Feed URL"
+        type="url">
+      <label for="url" class="fui fui-new">Feed URL</label>
+    </div>
+    <p
+      class="small error mbn"
+      ng-show="error">The URL you entered failed to fetch.</p>
+    <input
+      ng-disabled="!subscribeForm.$valid"
+      type="submit"
+      value="Subscribe"
+      class="btn btn-hg btn-success mts">
+  </form>
+</div>

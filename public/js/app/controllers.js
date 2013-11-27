@@ -79,21 +79,25 @@
   });
 
   /**
-   * Displays a user's list of subscriptions.
-   * Allows a user to add subscriptions.
+   * The home page.
    *
    * @controller
    * @route '/home'
-   * @scope {Function} addFeed Adds a new feed.
-   * @scope {String} newFeed The URL of the new feed to add.
+   * @scope {Array} [Feeds=Feeds] The `Feeds` model.
+   * @scope {Function} subscribe Subscribes to a feed.
+   * @scope {Boolean} [error=false] Does the login form have an error?
    */
   this.controller('HomeCtrl', function($scope, $location, Feeds) {
     $scope.Feeds = Feeds;
+    $scope.error = false;
 
-    $scope.goToFeed = function(id) {
-      $location.path('/home/' + id);
+    $scope.subscribe = function(url) {
+      $scope.error = false;
+      Feeds.add(url).then(angular.noop, function() {
+        $scope.error = true;
+      });
     }
-  })
+  });
 
   /**
    * Displays a list of articles for a subscription.
@@ -103,7 +107,7 @@
    * @scope {Number} feedId The id of the current subscription.
    * @scope {Object} feed The data of the current subscription.
    */
-  .controller('FeedCtrl', function($scope, $location, Feed, Articles) {
+  this.controller('FeedCtrl', function($scope, $location, Feed, Articles) {
 
     $scope.feed = Feed;
 

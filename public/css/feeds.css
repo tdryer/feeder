@@ -1,34 +1,4 @@
-.subscriptions {
-  position: relative;
-}
 
-.subscriptions .loading {
-  height: 4em;
-  background: url(../img/spinner.gif) center no-repeat;
-}
-
-.subscriptions .form-container {
-  padding: 1em 0;
-}
-
-.subscriptions .form {
-  margin: 0 auto;
-  width: auto;
-  padding: 0;
-  border: 0;
-  max-width: 20em;
-  background: inherit;
-}
-
-.subscriptions .new-subscription {
-  position: relative;
-  display: inline-block;
-}
-
-.subscriptions .form .submit {
-  display: inline-block;
-  width: auto;
-}
 
 .subscriptions ul {
   margin: 0;
