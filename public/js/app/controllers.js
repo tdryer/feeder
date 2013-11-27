@@ -128,44 +128,6 @@
   })
 
   /**
-   * Displays a list of articles for a subscription based on a filter.
-   *
-   * @controller
-   * @route '/home/:feed/entries'
-   * @scope {Number} feedId The id of the current subscription.
-   * @scope {Object} feed The data of the current subscription.
-   */
-  .controller('FeedCtrlStatus', function($scope, $location, Feed, Articles) {
-
-    $scope.feed = Feed;
-
-    Articles.get(Feed.id).then(function(articles) {
-      var filtered_articles = new Array();
-      if ($location.search().filter == "read") {
-        for (var i=0; i < articles.length; i++) {
-          if (articles[i]["status"] == "read") {
-            filtered_articles.push(articles[i]);
-          }
-        }
-        $scope.articles = filtered_articles;
-      } else if ($location.search().filter == "unread") {
-        for (var i=0; i < articles.length; i++) {
-          if (articles[i]["status"] == "unread") {
-            filtered_articles.push(articles[i]);
-          }
-        }
-        $scope.articles = filtered_articles;
-      } else {
-        $scope.articles = articles;
-      }
-    });
-
-    $scope.goToArticle = function(feed_id, article_id) {
-      $location.path('/home/' + feed_id + '/' + article_id);
-    }
-  })
-
-  /**
    * Displays an article.
    *
    * @controller

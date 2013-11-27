@@ -11,6 +11,23 @@
   border-bottom: 1px solid #bababa;
 }
 
+.feed .filter-bar {
+  position: relative;
+  padding: 0em 0.8em;
+  font-size: 0.9em;
+  border-bottom: 1px solid #bababa;
+}
+
+.feed .filter-bar .filters {
+  position: absolute;
+  top: 0;
+  right: 1em;
+}
+
+.feed .filter-bar .filters .active-filter {
+  font-weight: bold;
+}
+
 .feed ul {
   margin: 0;
   padding: 0;

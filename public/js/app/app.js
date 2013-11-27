@@ -42,20 +42,6 @@
       }
     })
 
-    .when('/home/:feed/entries', {
-      controller: 'FeedCtrlStatus',
-      templateUrl: '/partials/feed.html',
-      resolve: {
-        Feed: function($route, $q, Feeds) {
-          return Feeds.get().then(function(feeds) {
-            return _.find(feeds, {
-              id: +$route.current.params.feed
-            });
-          }, $q.reject);
-        }
-      }
-    })
-
     .when('/home/:feed/:article', {
       controller: 'ArticleCtrl',
       templateUrl: '/partials/article.html',
