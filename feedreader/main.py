@@ -62,11 +62,11 @@ def get_application(config, db_setup_f=None):
     session.close()
 
     CHECK_UPDATE_PERIOD = timedelta(minutes=1)
-    UPDATE_PERIOD = timedelta(minutes=5)
+    UPDATE_PERIOD = timedelta(hours=1)
 
     if config.periodic_updates:
         # create updater and attach to IOLoop
-        updater = Updater(UPDATE_PERIOD, create_session)
+        updater = Updater(UPDATE_PERIOD, create_session, tasks, celery_poller)
         periodic_callback = tornado.ioloop.PeriodicCallback(
             updater.do_updates, CHECK_UPDATE_PERIOD.total_seconds() * 1000
         )

@@ -43,7 +43,8 @@ class Tasks(object):
 
     # celery tasks
 
-    def fetch_feed(self, feed_url, last_modified=None, etag=None):
+    def fetch_feed(self, feed_url, last_modified=None, etag=None,
+                   feed_id=None):
         """Fetch and parse the feed at the given URL.
 
         If the given URL is not a feed, this will attempt to find one.
@@ -92,6 +93,7 @@ class Tasks(object):
         feed = models.Feed(feed_title, feed_url, feed_link, etag=etag,
                            last_modified=last_modified,
                            last_refresh_date=last_refresh_date)
+        feed.id = feed_id
 
         # parse the entries
         entries = []
