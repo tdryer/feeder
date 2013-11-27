@@ -15,6 +15,32 @@ from feedreader.tasks.core import Tasks
 from feedreader.updater import Updater
 
 
+def get_dependencies(config):
+    create_session = models.initialize_db(config.database_uri)
+
+    tasks = Tasks(config.amqp_uri)
+
+    celery_poller = CeleryPoller(timedelta(milliseconds=5))
+
+    CHECK_UPDATE_PERIOD = timedelta(minutes=1)
+    UPDATE_PERIOD = timedelta(hours=1)
+
+    if config.periodic_updates:
+        # create updater and attach to IOLoop
+        updater = Updater(UPDATE_PERIOD, create_session, tasks, celery_poller)
+        periodic_callback = tornado.ioloop.PeriodicCallback(
+            updater.do_updates, CHECK_UPDATE_PERIOD.total_seconds() * 1000
+        )
+        periodic_callback.start()
+
+    return {
+        "create_session": create_session,
+        "tasks": tasks,
+        "celery_poller": celery_poller,
+        "updater": updater,
+    }
+
+
 def get_application(config, db_setup_f=None):
     """Return Tornado application instance."""
     # initialize the DB so sessions can be created

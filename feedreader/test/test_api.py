@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """Functional tests for the API."""
 
 from contextlib import contextmanager
@@ -241,6 +243,23 @@ class ApiTest(AsyncHTTPTestCase):
             self.assert_api_call("POST /feeds", headers=self.headers,
                                  json_body={'url': url + "awesome-blog.xml"},
                                  expect_code=201)
+
+    def test_add_feed_unicode_success(self):
+        with serve_dir(TEST_DATA_DIR, TEST_SERVER_PORT) as url:
+            self.assert_api_call("POST /feeds", headers=self.headers,
+                                 json_body={'url': url + "unicode-test.xml"},
+                                 expect_code=201)
+        self.assert_api_call("GET /feeds", headers=self.headers,
+                             expect_code=200, expect_json={
+            "feeds": [
+                {
+                    "id": 1,
+                    "name": u"David Yan's CMPT 376W Blog😄",
+                    "unreads": 1,
+                    "url" : u"http://awesome-blog.github.io/😄",
+                },
+            ]
+        })
 
     def test_add_feed_404(self):
         with serve_dir(TEST_DATA_DIR, TEST_SERVER_PORT) as url:
