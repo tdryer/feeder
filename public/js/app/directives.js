@@ -1,6 +1,4 @@
-(function(angular) {
-
-  angular.module('feeder.directives', [])
+(function() {
 
   /**
    * Overlays the entire screen if the application is loading.
@@ -8,14 +6,14 @@
    * @directive
    * @restrict element
    */
-  .directive('loading', function() {
+  this.directive('loading', function() {
     return {
       restrict: 'E',
       controller: function($scope, State) {
         $scope.State = State;
       }
     }
-  })
+  });
 
   /**
    * The header houses the breadcrumbs, a greeting to the user if he or she is
@@ -24,43 +22,15 @@
    * @directive
    * @restrict element
    */
-  .directive('header', function() {
+  this.directive('header', function() {
     return {
       restrict: 'E',
+      controller: function($scope, User) {
+        $scope.User = User;
+      },
       templateUrl: '/partials/header.html'
     }
-  })
-
-  /**
-   * Displays breadcrumbs. The items in the breadcrumbs depends on the current
-   * route.
-   *
-   * @directive
-   * @restrict element
-   */
-  .directive('breadcrumbs', function() {
-    return {
-      restrict: 'E',
-      controller: function($scope, User) {
-        $scope.User = User;
-      }
-    }
-  })
-
-  /**
-   * Displays a greeting to the user.
-   *
-   * @directive
-   * @restrict element
-   */
-  .directive('greeting', function() {
-    return {
-      restrict: 'E',
-      controller: function($scope, User) {
-        $scope.User = User;
-      }
-    }
-  })
+  });
 
   /**
    * Displays the content of an article.
@@ -68,7 +38,7 @@
    * @directive
    * @restrict element
    */
-  .directive('content', function() {
+  this.directive('content', function() {
     return {
       restrict: 'E',
       link: function(scope, elem$, attrs) {
@@ -106,4 +76,4 @@
     }
   });
 
-}).call(this, angular);
+}).call(angular.module('feeder.directives', []));

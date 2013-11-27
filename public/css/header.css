@@ -9,12 +9,8 @@ header .header-user {
   display: inline-block;
 }
 
-header greeting {
+header .greeting {
   color: #fff;
-}
-
-header breadcrumbs {
-  float: left;
 }
 
 header .breadcrumbs {
@@ -22,17 +18,12 @@ header .breadcrumbs {
 }
 
 header .breadcrumbs .btn {
-  margin-right: 0.5em;
-  vertical-align: middle;
-}
-
-header .breadcrumbs .breadcrumb {
   display: none;
 }
 
 @media (min-width: 60em) {
-  header .breadcrumbs .breadcrumb {
-    display: inline-block;
+  header .breadcrumbs .btn {
+    display: inline;
   }
 
   header .breadcrumbs .back {

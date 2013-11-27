@@ -1,13 +1,14 @@
 <nav>
-  <breadcrumbs>
+  <span class="breadcrumbs">
     <a
       href="/home"
       class="btn btn-primary mrs"
       ng-show="User.authenticated">Home</a>
-  </breadcrumbs>
+  </span>
   <div class="header-user">
-    <greeting
-      ng-show="User.authenticated">Hello, {{User.username}}!</greeting>
+    <span
+      class="greeting"
+      ng-show="User.authenticated">Hello, {{User.username}}!</span>
     <a
       href="/login"
       class="btn btn-success mls"
