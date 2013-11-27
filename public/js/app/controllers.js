@@ -6,9 +6,15 @@
    * @controller
    * @route '/'
    */
-  this.controller('IndexCtrl', function($scope, $location, User) {
-    $scope.User = User;
-  });
+  this.controller('IndexCtrl', angular.noop);
+
+  /**
+   * The 404 page.
+   *
+   * @controller
+   * @route '/404'
+   */
+  this.controller('404Ctrl', angular.noop);
 
   /**
    * The login page.
@@ -74,7 +80,7 @@
         $scope.error = true;
       });
     }
-  })
+  });
 
   /**
    * Displays a user's list of subscriptions.
@@ -85,7 +91,7 @@
    * @scope {Function} addFeed Adds a new feed.
    * @scope {String} newFeed The URL of the new feed to add.
    */
-  .controller('HomeCtrl', function($scope, $location, Feeds) {
+  this.controller('HomeCtrl', function($scope, $location, Feeds) {
 
     $scope.updateFeeds = function() {
       $scope.loadingFeeds = true;

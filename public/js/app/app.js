@@ -1,29 +1,36 @@
-(function(angular, _) {
+(function() {
 
-  var app = angular.module('feeder', [
-    'ngCookies',
-    'ngRoute',
-    'ngSanitize',
-    'restangular',
-    'feeder.controllers',
-    'feeder.directives',
-    'feeder.filters',
-    'feeder.services'
-  ]);
-
-  app.config(function($locationProvider) {
+  this.config(function($locationProvider) {
     $locationProvider.html5Mode(true);
   });
 
-  app.config(function($routeProvider) {
-    $routeProvider
-
-    .when('/', {
+  this.config(function($routeProvider) {
+    $routeProvider.when('/', {
       controller: 'IndexCtrl',
       templateUrl: '/partials/index.html'
-    })
+    });
 
-    .when('/home', {
+    $routeProvider.when('/404', {
+      controller: '404Ctrl',
+      templateUrl: '/partials/404.html'
+    });
+
+    $routeProvider.when('/login', {
+      controller: 'LoginCtrl',
+      templateUrl: '/partials/login.html'
+    });
+
+    $routeProvider.when('/logout', {
+      controller: 'LogoutCtrl',
+      template: ' '
+    });
+
+    $routeProvider.when('/register', {
+      controller: 'RegisterCtrl',
+      templateUrl: '/partials/register.html'
+    });
+
+    $routeProvider.when('/home', {
       controller: 'HomeCtrl',
       templateUrl: '/partials/home.html'
     })
@@ -54,31 +61,16 @@
       }
     })
 
-    .when('/login', {
-      controller: 'LoginCtrl',
-      templateUrl: '/partials/login.html'
-    })
-
-    .when('/logout', {
-      controller: 'LogoutCtrl',
-      template: ' '
-    })
-
-    .when('/register', {
-      controller: 'RegisterCtrl',
-      templateUrl: '/partials/register.html'
-    })
-
     .otherwise({
-      redirectTo: '/'
+      redirectTo: '/404'
     });
   });
 
-  app.config(function(RestangularProvider) {
+  this.config(function(RestangularProvider) {
     RestangularProvider.setBaseUrl('/api');
   });
 
-  app.run(function($rootScope, State) {
+  this.run(function($rootScope, State) {
     $rootScope.$on('$routeChangeStart', function() {
       State.loading = true;
       State.error = false;
@@ -95,4 +87,13 @@
     });
   });
 
-}).call(this, angular, _);
+}).call(angular.module('feeder', [
+  'ngCookies',
+  'ngRoute',
+  'ngSanitize',
+  'restangular',
+  'feeder.controllers',
+  'feeder.directives',
+  'feeder.filters',
+  'feeder.services'
+]));
