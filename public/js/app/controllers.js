@@ -26,18 +26,16 @@
    * @scope {String} [password=''] Value of the password input field.
    * @scope {Boolean} [error=false] Does the login form have an error?
    */
-  this.controller('LoginCtrl', function($scope, $location, State, User) {
+  this.controller('LoginCtrl', function($scope, $location, User) {
     $scope.username = '';
     $scope.password = '';
     $scope.error = false;
 
     $scope.login = function(username, password) {
-      State.loading = true;
       $scope.error = false;
       User.login(username, password).then(function() {
         $location.path('/home');
       }, function() {
-        State.loading = false;
         $scope.error = true;
       });
     }
@@ -65,18 +63,16 @@
    * @scope {String} [password=''] Value of the password input field.
    * @scope {Boolean} [error=false] Does the login form have an error?
    */
-  this.controller('RegisterCtrl', function($scope, $location, State, User) {
+  this.controller('RegisterCtrl', function($scope, $location, User) {
     $scope.username = '';
     $scope.password = '';
     $scope.error = false;
 
     $scope.register = function(username, password) {
-      State.loading = true;
       $scope.error = false;
       User.register(username, password).then(function() {
         $location.path('/home');
       }, function() {
-        State.loading = false;
         $scope.error = true;
       });
     }

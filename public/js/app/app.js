@@ -34,7 +34,7 @@
       controller: 'HomeCtrl',
       templateUrl: '/partials/home.html',
       resolve: {
-        updateFeeds: function(Feeds) {
+        fetchFeeds: function(Feeds) {
           return Feeds.update();
         }
       }
@@ -45,8 +45,8 @@
       templateUrl: '/partials/feed.html',
       resolve: {
         Feed: function($route, $q, Feeds) {
-          return Feeds.get().then(function(feeds) {
-            return _.find(feeds, {
+          return Feeds.update().then(function(result) {
+            return _.find(result.feeds, {
               id: +$route.current.params.feed
             });
           }, $q.reject);
@@ -73,6 +73,29 @@
 
   this.config(function(RestangularProvider) {
     RestangularProvider.setBaseUrl('/api');
+  });
+
+  this.config(function($httpProvider) {
+    $httpProvider.interceptors.push(function($q, State) {
+      return {
+        request: function(config) {
+          State.loading = true;
+          return config;
+        },
+        requestError: function(rejection) {
+          State.loading = false;
+          return $q.reject(rejection);
+        },
+        response: function(response) {
+          State.loading = false;
+          return response;
+        },
+        responseError: function(rejection) {
+          State.loading = false;
+          return $q.reject(rejection);
+        }
+      };
+    });
   });
 
   this.run(function($rootScope, State) {
