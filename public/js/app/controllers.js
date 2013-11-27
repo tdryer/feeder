@@ -92,20 +92,7 @@
    * @scope {String} newFeed The URL of the new feed to add.
    */
   this.controller('HomeCtrl', function($scope, $location, Feeds) {
-
-    $scope.updateFeeds = function() {
-      $scope.loadingFeeds = true;
-      Feeds.get().then(function(feeds) {
-        $scope.subscriptions = feeds;
-        $scope.loadingFeeds = false;
-      });
-    }
-
-    $scope.addFeed = function() {
-      Feeds.add($scope.newFeed).then(function(feeds) {
-        $scope.updateFeeds();
-      });
-    }
+    $scope.Feeds = Feeds;
 
     $scope.goToFeed = function(id) {
       $location.path('/home/' + id);

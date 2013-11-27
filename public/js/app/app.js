@@ -32,10 +32,15 @@
 
     $routeProvider.when('/home', {
       controller: 'HomeCtrl',
-      templateUrl: '/partials/home.html'
-    })
+      templateUrl: '/partials/home.html',
+      resolve: {
+        updateFeeds: function(Feeds) {
+          return Feeds.update();
+        }
+      }
+    });
 
-    .when('/home/:feed', {
+    $routeProvider.when('/home/:feed', {
       controller: 'FeedCtrl',
       templateUrl: '/partials/feed.html',
       resolve: {

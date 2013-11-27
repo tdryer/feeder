@@ -7,13 +7,11 @@
    * @factory
    * @var {Boolean} [error=false] Has the application encountered an error?
    * @var {Boolean} [loading=false] Is the application is loading something?
-   * @var {String} [message=''] A message to display to the user.
    */
   this.factory('State', function() {
     return {
       error: false,
-      loading: false,
-      message: ''
+      loading: false
     }
   });
 
@@ -30,7 +28,8 @@
    * @var {String} username The username of the user.
    */
   this.factory('User', function($q, $cookieStore, Restangular) {
-    var authKey = 'auth'
+    var endpoint = Restangular.one('users')
+      , authKey = 'auth'
       , usernameKey = 'username'
       , authenticated = !!$cookieStore.get(authKey)
       , authorization = $cookieStore.get(authKey)
@@ -63,7 +62,7 @@
       var auth = btoa(username + ':' + password)
         , header = getAuthHeader(auth);
 
-      return Restangular.one('users').get({}, header).then(_.bind(function() {
+      return endpoint.get({}, header).then(_.bind(function() {
         this.authenticated = true;
         this.authorization = auth;
         this.username = username;
@@ -82,10 +81,10 @@
     function register(username, password) {
       var auth = btoa(username + ':' + password);
 
-      return Restangular.all('users').post({
+      return endpoint.all('').post({
         username: username,
         password: password
-      }).then(_.bind(function(result) {
+      }).then(_.bind(function() {
         this.authenticated = true;
         this.authorization = auth;
         this.username = username;
@@ -113,9 +112,74 @@
       register: register,
       username: username
     };
-  })
+  });
 
-  .factory('Articles', function($q, User, Article, Restangular) {
+  /**
+   * The `Feeds` model represents all the subscribed feeds of the user.
+   *
+   * @factory
+   * @var {Function} update Fetches and stores the subscribed feeds of the user.
+   * @var {Array} [feeds=[]] The feeds of the current user.
+   * @var {Function} update Fetches and stores the subscribed feeds of the user.
+   * @var {Function} remove Unsubscribes a feed.
+   */
+  this.factory('Feeds', function($q, User, Restangular) {
+    var endpoint = Restangular.one('feeds')
+      , feeds = [];
+
+    /**
+     * Adds a new feed to the list of subscribed feeds of the current user.
+     *
+     * @param {String} url The url of the feed.
+     * @returns {Promise} Returns the promise of the add feed API hit.
+     */
+    function add(url) {
+      var header = User.getAuthHeader();
+
+      return endpoint.all('').post({
+        url: url
+      }, {}, header).then(_.bind(function() {
+        return this.update();
+      }, this));
+    }
+
+    /**
+     * Removes a feed from the list of subscribed feeds of the current user.
+     *
+     * @returns {Promise} Returns the promise of the remove feed API hit.
+     */
+    function remove(id) {
+      var header = User.getAuthHeader();
+
+      return endpoint.one(id).remove({}, header).then(_.bind(function() {
+        return this.update();
+      }, this), $q.reject);
+    }
+
+    /**
+     * Fetches the list of subscribed feeds of the current user, and stores it
+     * within the current `Feeds` model.
+     *
+     * @returns {Promise} Returns the promise of the update feeds API hit.
+     */
+    function update() {
+      var header = User.getAuthHeader();
+
+      return endpoint.get({}, header).then(_.bind(function(result) {
+        this.feeds = result.feeds;
+        return result;
+      }, this), $q.reject);
+    }
+
+    return {
+      add: add,
+      feeds: feeds,
+      remove: remove,
+      update: update
+    };
+  });
+
+  this.factory('Articles', function($q, User, Article, Restangular) {
     function get(id) {
       if (!id) {
         return $q.reject();
@@ -169,42 +233,6 @@
     return {
       get: get,
       status: status
-    };
-  })
-
-  /**
-   * Creates a `User` model.
-   *
-   * @factory
-   * @var {Function} User `User` constructor.
-   * @var {String} cookieKey The identifier for the user cookie.
-   * @var {Function} genAuth Creates a base64 encoding of the username/password.
-   */
-  .factory('Feeds', function($q, User, Restangular) {
-
-    function add(URL) {
-      Restangular = Restangular.withConfig(function(RestangularProvider) {
-        RestangularProvider.setDefaultHeaders(User.getAuthHeader());
-      });
-
-      return Restangular.all('feeds').post({
-        url: URL
-      });
-    }
-
-    function get() {
-      Restangular = Restangular.withConfig(function(RestangularProvider) {
-        RestangularProvider.setDefaultHeaders(User.getAuthHeader());
-      });
-
-      return Restangular.all('feeds').getList().then(function(result) {
-        return result.feeds;
-      }, $q.reject);
-    }
-
-    return {
-      add: add,
-      get: get
     };
   });
 
