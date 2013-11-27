@@ -1,40 +1,40 @@
-.feed {
+.article-list .feed {
   width: 20%;
   background: #dadada;
   border-right: 2px solid #bababa;
 }
 
-.feed .feed-title {
+.article-list .feed .feed-title {
   background: #cacaca ;
   padding: 0.7em 0.8em;
   font-size: 0.9em;
   border-bottom: 1px solid #bababa;
 }
 
-.feed .filter-bar {
+.article-list .feed .filter-bar {
   position: relative;
   padding: 0em 0.8em;
   font-size: 0.9em;
   border-bottom: 1px solid #bababa;
 }
 
-.feed .filter-bar .filters {
+.article-list .feed .filter-bar .filters {
   position: absolute;
   top: 0;
   right: 1em;
 }
 
-.feed .filter-bar .filters .active-filter {
+.article-list .feed .filter-bar .filters .active-filter {
   font-weight: bold;
 }
 
-.feed ul {
+.article-list .feed ul {
   margin: 0;
   padding: 0;
-  list-style-type: none; 
+  list-style-type: none;
 }
 
-.feed li {
+.article-list .feed li {
   position: relative;
   padding: 0.7em 0em;
   font-size: 0.95em;
@@ -42,22 +42,22 @@
   max-height: 10em;
 }
 
-.feed li:hover,
-.feed li:hover .preview:after {
+.article-list .feed li:hover,
+.article-list .feed li:hover .preview:after {
   background: #eaeaea;
   cursor: pointer;
 }
 
-.feed article {
+.article-list .feed article {
   padding: 0em 2em;
   line-height: 1.2em;
 }
 
-.feed .unread {
+.article-list .feed .unread {
   border-left: 0.3em solid #1abc9c;
 }
 
-.feed time {
+.article-list .feed time {
   display: block;
   color: #9a9a9a;
   font-size: 0.8em;
@@ -65,7 +65,7 @@
   font-style: italic;
 }
 
-.feed .title {
+.article-list .feed .title {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -73,7 +73,7 @@
   font-size: 1em;
 }
 
-.feed .preview {
+.article-list .feed .preview {
   color: #9a9a9a;
   font-size: 0.8em;
   line-height: 1.2em;

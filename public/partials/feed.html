@@ -1,39 +1,41 @@
-<div class="feed">
-  <div class="feed-title">{{feed.name}}</div>
-  <div class="filter-bar">
-    Filter by:
-    <div class="filters">
-      <span
-        ng-class="{'active-filter': feedFilter == null}"
-        ng-click="feedFilter = null">
-          All
-      </span> |
-      <span
-        ng-class="{'active-filter': feedFilter.status == 'unread'}"
-        ng-click="feedFilter = {status: 'unread'}">
-          Unread
-      </span> |
-      <span
-        ng-class="{'active-filter': feedFilter.status == 'read'}"
-        ng-click="feedFilter = {status: 'read'}">
-          Read
-      </span>
+<div class="article-list">
+  <div class="feed">
+    <div class="feed-title">{{feed.name}}</div>
+    <div class="filter-bar">
+      Filter by:
+      <div class="filters">
+        <span
+          ng-class="{'active-filter': feedFilter == null}"
+          ng-click="feedFilter = null">
+            All
+        </span> |
+        <span
+          ng-class="{'active-filter': feedFilter.status == 'unread'}"
+          ng-click="feedFilter = {status: 'unread'}">
+            Unread
+        </span> |
+        <span
+          ng-class="{'active-filter': feedFilter.status == 'read'}"
+          ng-click="feedFilter = {status: 'read'}">
+            Read
+        </span>
+      </div>
     </div>
+    <ul>
+      <li
+        ng-repeat="article in articles | filter:feedFilter:true"
+        ng-click="goToArticle(feed.id, article.id)">
+          <article class="{{article.status}}">
+            <time
+              class="pub-date"
+              title="{{article['pub-date'] |
+                moment:'dddd, MMMM Do YYYY, h:mm:ss a'}}">
+                  {{article['pub-date'] | moment:'relative'}}
+            </time>
+            <div class="title">{{article.title}}</div>
+            <div class="preview">{{article.content | htmlToPlainText}}</div>
+          </article>
+      </li>
+    </ul>
   </div>
-  <ul>
-    <li 
-      ng-repeat="article in articles | filter:feedFilter:true"
-      ng-click="goToArticle(feed.id, article.id)">
-        <article class="{{article.status}}">
-          <time
-            class="pub-date"
-            title="{{article['pub-date'] |
-              moment:'dddd, MMMM Do YYYY, h:mm:ss a'}}">
-                {{article['pub-date'] | moment:'relative'}}
-          </time>
-          <div class="title">{{article.title}}</div>
-          <div class="preview">{{article.content | htmlToPlainText}}</div>
-        </article>
-    </li>
-  </ul>
 </div>

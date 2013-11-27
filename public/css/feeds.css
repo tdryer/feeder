@@ -1,45 +1,56 @@
+.no-feeds {
+  text-align: center;
+  margin: 2em auto 0;
+}
 
-
-.subscriptions ul {
-  margin: 0;
-  padding: 1em;
+.feeds {
   list-style-type: none;
-}
-
-.subscriptions .subscription {
-  position: relative;
-  width: 12em;
-  display: inline-block;
-  margin: 0 1em;
-  cursor: pointer;
-  background: #f7f7f7;
-  border-radius: 0.5em;
-}
-
-.subscriptions .subscription .name {
-  border-radius: 0.5em;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
   margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding: 0.5em;
-  background: #1abc9c;
+  padding: 1em 1em 0;
+  position: relative;
+}
+
+.feeds.empty {
+  display: none;
+}
+
+.feeds li {
+  width: 10em;
+  margin: 1em;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.feeds .feed {
+  display: block;
   color: #fff;
+}
+
+.feeds .feed span {
+  display: block;
   text-align: center;
 }
 
-.subscriptions .subscription .unread {
-  margin: 0;
-  padding: 0.5em;
-  border-top: 1px solid #1abc9c;
-  text-align: right;
+.feeds .feed .icon {
+  display: block;
 }
 
-.subscriptions .subscription .icon {
+.feeds .feed .unreads {
+  padding: 0;
+}
+
+.feeds .feed .unreads:before {
+  content: 'Unreads: ';
+}
+
+.feeds .feed .name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.feeds .remove {
   width: 100%;
-  vertical-align: bottom;
 }
 
 @media (max-width: 60em) {

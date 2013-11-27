@@ -3,3 +3,7 @@
   padding: 1em;
   margin: 2em 0 0;
 }
+
+img {
+  max-width: 100%;
+}

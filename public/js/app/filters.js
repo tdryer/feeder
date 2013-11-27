@@ -24,7 +24,7 @@
         return date.format(format);
       }
     }
-  })
+  });
 
   /**
    * Converts HTML to plain text by stripping all HTML tags off.
@@ -33,7 +33,7 @@
    * @param {*} text The text to be stripped.
    * @returns {String} Returns `text` without any HTML tags.
    */
-  .filter('htmlToPlainText', function() {
+  this.filter('htmlToPlainText', function() {
     return function(text) {
       return String(text).replace(/<(?:.|\n)*?>/gm, '');
     }

@@ -1,8 +1,24 @@
-<p ng-show="!Feeds.feeds.length">No feeds yet!</p>
+<div class="no-feeds" ng-show="!Feeds.feeds.length">
+  <p class="mbl h6">Welcome to feeder!</p>
+  <p class="mbn">You are not subscribed to any feeds yet!</p>
+  <p class="mtn">Try adding one below!</p>
+</div>
 
-<ul class="feeds">
+<ul class="feeds" ng-class="{empty:!Feeds.feeds.length}">
   <li ng-repeat="feed in Feeds.feeds">
-    <a href="/home/{{feed.id}}">{{feed.name}} - {{feed.unreads}}</a>
+    <button
+      class="remove btn btn-danger btn-xs mbs"
+      ng-click="Feeds.remove(feed.id)">Remove</button>
+    <a
+      class="feed"
+      title="{{feed.name}}"
+      href="/home/{{feed.id}}">
+      <img
+        class="icon palette-peter-river"
+        src="//robohash.org/{{feed.name}}">
+      <span class="small unreads palette-belize-hole">{{feed.unreads}}</span>
+      <span class="small name text-primary">{{feed.name}}</span>
+    </a>
   </li>
 </ul>
 
