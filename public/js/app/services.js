@@ -120,12 +120,14 @@
    * @factory
    * @var {Function} update Fetches and stores the subscribed feeds of the user.
    * @var {Array} [feeds=[]] The feeds of the current user.
+   * @var {Number} [unreads=0 The total number of unreads in all the feeds.
    * @var {Function} update Fetches and stores the subscribed feeds of the user.
    * @var {Function} remove Unsubscribes a feed.
    */
   this.factory('Feeds', function($q, User, Restangular) {
     var endpoint = Restangular.one('feeds')
-      , feeds = [];
+      , feeds = []
+      , unreads = 0;
 
     /**
      * Adds a new feed to the list of subscribed feeds of the current user.
@@ -166,7 +168,13 @@
       var header = User.getAuthHeader();
 
       return endpoint.get({}, header).then(_.bind(function(result) {
-        this.feeds = result.feeds;
+        var feeds = result.feeds;
+
+        this.feeds = feeds;
+        this.unreads = _.reduce(feeds, function(unreads, feed) {
+          return unreads + feed.unreads;
+        }, 0);
+
         return result;
       }, this), $q.reject);
     }
@@ -175,6 +183,7 @@
       add: add,
       feeds: feeds,
       remove: remove,
+      unreads : unreads,
       update: update
     };
   });
