@@ -44,9 +44,10 @@
 }
 
 .feeds .feed .name {
+  text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  background: transparent;
 }
 
 .feeds .remove {
@@ -54,29 +55,46 @@
 }
 
 @media (max-width: 60em) {
-  .subscriptions ul {
+  .feeds {
     padding: 0;
   }
 
-  .subscriptions .subscription {
-    width: auto;
-    height: auto;
+  .feeds li,
+  .feeds .feed {
+    margin: 0;
     display: block;
-    border-radius: 0;
-    background: 0;
-    border-top: 1px solid #666;
-    padding: 1em;
+    width: 100%;
+    position: relative;
   }
 
-  .subscriptions .subscription:last-child {
-
-    border-bottom: 1px solid #666;
+  .feeds .remove,
+  .feeds .feed .icon {
+    display: none;
   }
 
-  .subscriptions .subscription .name {
-    background: 0;
-    color: #333;
+  .feeds .feed .name {
+    width: 100%;
+    background: #3498db;
+    color: #fff;
     text-align: left;
-    padding: 0;
+    padding: 1em 0;
+    text-indent: 1em;
+  }
+
+  .feeds li:nth-child(even) .feed .name {
+    background: #2980b9;
+
+  }
+  .feeds .feed .unreads {
+    display: inline-block;
+    width: auto;
+    position: absolute;
+    right: 1em;
+    top: 50%;
+    line-height: 0;
+  }
+
+  .feeds .feed .unreads:before {
+    content: '';
   }
 }
