@@ -40,9 +40,29 @@ def get_application(config, db_setup_f=None):
         # add some test feeds
         # don't any anything that we aren't ok with hammering with requests
         TEST_FEEDS = [
-            "http://feeds.feedburner.com/Tombuntu",
-            "https://mtomwing.com/blog/feed",
-            "http://awesome-blog.github.io/atom.xml",
+            'http://feeds.feedburner.com/Tombuntu',
+            'https://mtomwing.com/blog/feed',
+            'http://awesome-blog.github.io/atom.xml',
+            'http://www.reddit.com/r/Android/.rss',
+            'http://www.reddit.com/.rss',
+            'http://feeds2.feedburner.com/Line25',
+            'http://feeds.igvita.com/igvita',
+            'https://news.ycombinator.com/rss',
+            'http://marissamayr.tumblr.com/rss',
+            'http://feeds.feedburner.com/tedblog',
+            'http://news.google.com/?output=rss',
+            'http://awesome-blog.github.io/atom.xml',
+            'http://www.ea.com/rss/news',
+            'http://feeds.feedburner.com/TheImgurBlog?format=xml',
+            'http://blog.dota2.com/feed/',
+            'http://feeds.feedburner.com/jquery/',
+            'http://blogs.valvesoftware.com/feed/?cat=6',
+            'http://feeds.feedburner.com/youtube/PKJx',
+            'https://github.com/blog.atom',
+            'http://christianheilmann.com/feed/',
+            'http://feeds.feedburner.com/yayQuery',
+            'http://feeds.feedburner.com/ImgurGallery?format=xml',
+            'http://blog.angularjs.org/atom.xml',
         ]
         for url in TEST_FEEDS:
             @gen.coroutine
