@@ -83,11 +83,11 @@
    *
    * @controller
    * @route '/home'
-   * @scope {Array} [Feeds=Feeds] The `Feeds` model.
+   * @scope {Model} [Feeds=Feeds] The `Feeds` model.
    * @scope {Function} subscribe Subscribes to a feed.
    * @scope {Boolean} [error=false] Does the login form have an error?
    */
-  this.controller('HomeCtrl', function($scope, $location, Feeds) {
+  this.controller('HomeCtrl', function($scope, Feeds) {
     $scope.Feeds = Feeds;
     $scope.error = false;
 
@@ -100,25 +100,15 @@
   });
 
   /**
-   * Displays a list of articles for a subscription.
+   * Displays a list of articles for a feed.
    *
    * @controller
    * @route '/home/:feed'
-   * @scope {Number} feedId The id of the current subscription.
-   * @scope {Object} feed The data of the current subscription.
+   * @scope {Model} ArticleList The `ArticleList` model.
    */
-  this.controller('FeedCtrl', function($scope, $location, Feed, Articles) {
-
-    $scope.feed = Feed;
-
-    Articles.get(Feed.id).then(function(articles) {
-      $scope.articles = articles;
-    });
-
-    $scope.goToArticle = function(feed_id, article_id) {
-      $location.path('/home/' + feed_id + '/' + article_id);
-    }
-  })
+  this.controller('FeedCtrl', function($scope, ArticleList, Article) {
+    $scope.ArticleList = ArticleList;
+  });
 
   /**
    * Displays an article.
@@ -126,7 +116,7 @@
    * @controller
    * @route '/home/:feed/:article'
    */
-  .controller('ArticleCtrl', function($scope, $location, Article, data) {
+  this.controller('ArticleCtrl', function($scope, $location, Article, data) {
     $scope.article = data;
 
     $scope.unread = function() {

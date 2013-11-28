@@ -26,8 +26,8 @@
     </div>
     <ul>
       <li
-        ng-repeat="article in articles | filter:feedFilter:true"
-        ng-click="goToArticle(feed.id, article.id)">
+        ng-repeat="article in ArticleList.list | filter:feedFilter:true">
+        <a href="/home/{{article.feed_id}}/{{article.id}}">
           <article ng-class="{'unread': !article.status}">
             <time
               class="pub-date"
@@ -38,6 +38,7 @@
             <div class="title">{{article.title}}</div>
             <div class="preview">{{article.content | htmlToPlainText}}</div>
           </article>
+        </a>
       </li>
     </ul>
   </div>

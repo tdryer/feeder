@@ -94,6 +94,10 @@ loading {
   transition: all 0.5s ease-out;
 }
 
+loading.ng-hide {
+  background: rgba(0, 0, 0, 0);
+}
+
 loading .spinner {
   border-radius: 10px;
   height: 16px;

@@ -44,12 +44,13 @@
       controller: 'FeedCtrl',
       templateUrl: '/partials/feed.html',
       resolve: {
-        Feed: function($route, $q, Feeds) {
-          return Feeds.update().then(function(result) {
-            return _.find(result.feeds, {
-              id: +$route.current.params.feed
-            });
-          }, $q.reject);
+        fetchArticleList: function($route, ArticleList) {
+          var id = parseInt($route.current.params.feed, 10);
+          if (ArticleList.id !== id || ArticleList.list === false) {
+            return ArticleList.update(id);
+          } else {
+            return ArticleList.list;
+          }
         }
       }
     })

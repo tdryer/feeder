@@ -119,14 +119,15 @@
    *
    * @factory
    * @var {Function} update Fetches and stores the subscribed feeds of the user.
-   * @var {Array} [feeds=[]] The feeds of the current user.
-   * @var {Number} [unreads=0 The total number of unreads in all the feeds.
+   * @var {Array|Boolean} [feeds=false] The feeds of the current user.
+   * @var {Function} id Returns a feed with a specific id.
+   * @var {Number} [unreads=0] The total number of unreads in all the feeds.
    * @var {Function} update Fetches and stores the subscribed feeds of the user.
    * @var {Function} remove Unsubscribes a feed.
    */
   this.factory('Feeds', function($q, User, Restangular) {
     var endpoint = Restangular.one('feeds')
-      , feeds = []
+      , feeds = false
       , unreads = 0;
 
     /**
@@ -143,6 +144,24 @@
       }, {}, header).then(_.bind(function() {
         return this.update();
       }, this));
+    }
+
+    /**
+     * Returns the feed object with id `id`.
+     *
+     * @param {String|Number} id The id of the feed.
+     * @returns {Object} Returns the feed object with id `id`.
+     */
+    function id(id) {
+      id = parseInt(id, 10);
+
+      if (!this.feeds) {
+        return;
+      }
+
+      return _.find(this.feeds, {
+        id: id
+      });
     }
 
     /**
@@ -182,31 +201,44 @@
     return {
       add: add,
       feeds: feeds,
+      id: id,
       remove: remove,
       unreads : unreads,
       update: update
     };
   });
 
-  this.factory('Articles', function($q, User, Article, Restangular) {
-    function get(id) {
-      if (!id) {
-        return $q.reject();
-      }
+  /**
+   * The `ArticleList` model represents the list of articles for the feed that
+   * the user is currently viewing.
+   *
+   * @factory
+   * @var {Number} [id=0] The id of the feed parent of the article list.
+   * @var {Array|Boolean} [list=false] The list of articles.
+   * @var {Function} update Fetches and stores the article ids of a feed.
+   */
+  this.factory('ArticleList', function($q, Restangular, User, Article) {
+    var endpoint = Restangular.one('feeds')
+      , id = 0
+      , list = false
+      , unreads = 0;
 
-      Restangular = Restangular.withConfig(function(RestangularProvider) {
-        RestangularProvider.setDefaultHeaders(User.getAuthHeader());
-      });
+    function update(id) {
+      var header = User.getAuthHeader()
+        , entriesEndpoint = endpoint.one(id).getList('entries', {}, header);
 
-      return Restangular.one('feeds', id).getList('entries').then(function(result) {
-        return Article.get(result.entries).then(function(result) {
-          return result.entries;
-        }, $q.reject);
-      }, $q.reject);
+      return entriesEndpoint.then(_.bind(function(result) {
+        return Article.get(result.entries).then(_.bind(function(result) {
+          this.id = id;
+          this.list = result.entries;
+        }, this), $q.reject);
+      }, this), $q.reject);
     }
 
     return {
-      get: get
+      id: id,
+      list: list,
+      update: update
     };
   })
 
