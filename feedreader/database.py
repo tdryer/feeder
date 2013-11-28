@@ -106,7 +106,8 @@ class Feed(BASE):
                 nullable=False)
     title = Column(String(SMALL_STR), nullable=False)
     feed_url = Column(String(MEDIUM_STR), nullable=False)  # feed resource
-    site_url = Column(String(MEDIUM_STR), nullable=False)  # main site
+    # url of html page associated with the feed (None if not provided)
+    site_url = Column(String(MEDIUM_STR), nullable=True)
     # date of last attempted refresh
     last_refresh_date = Column(Integer, nullable=True)
     # last-modifed date used for caching
