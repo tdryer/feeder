@@ -44,7 +44,7 @@ class User(BASE):
     password_hash = Column(String(MEDIUM_STR), nullable=False)
 
     subscriptions = relationship('Feed', secondary=subscriptions_table,
-                                 backref='users')
+                                 backref='users', order_by='Feed.title')
     read_entries = relationship('Entry', secondary=read_table,
                                 backref='read_by', lazy='dynamic')
 
@@ -115,7 +115,8 @@ class Feed(BASE):
     # etag used for caching
     etag = Column(String(MEDIUM_STR), nullable=True)
 
-    entries = relationship('Entry', backref='feed', lazy='dynamic')
+    entries = relationship('Entry', backref='feed', lazy='dynamic',
+                           order_by='desc(Entry.date)')
 
     @staticmethod
     def find_last_updated_before(session, unix_date):
