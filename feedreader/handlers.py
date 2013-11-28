@@ -1,5 +1,6 @@
 """APIRequestHandler subclasses for API endpoints."""
 
+from bs4 import BeautifulSoup
 from tornado.web import HTTPError, asynchronous
 from tornado import gen
 import pbkdf2
@@ -193,8 +194,20 @@ class FeedEntriesHandler(APIRequestHandler):
 
 class EntriesHandler(APIRequestHandler):
 
+    @classmethod
+    @gen.coroutine
+    def truncate(cls, content, length):
+        return BeautifulSoup(content).get_text()[:length]
+
+    @asynchronous
+    @gen.coroutine
     def get(self, entry_ids):
         entry_ids = [int(entry_id) for entry_id in entry_ids.split(",")]
+
+        try:
+            length = int(self.get_argument('truncate', 0))
+        except ValueError:
+            raise HTTPError(400, reason="Invalid truncation size.")
 
         with self.get_db_session() as session:
             user = session.query(User).get(self.require_auth(session))
@@ -203,8 +216,9 @@ class EntriesHandler(APIRequestHandler):
             if len(entries) != len(entry_ids):
                 raise HTTPError(404, "Entry does not exist.")
 
-            entries_json = [
-                {
+            entries_json = []
+            for entry in entries:
+                entry_json = {
                     "id": entry.id,
                     "title": entry.title,
                     "pub-date": entry.date,
@@ -212,9 +226,15 @@ class EntriesHandler(APIRequestHandler):
                     "author": entry.author,
                     "feed_id": entry.feed_id,
                     "url": entry.url,
-                    "content": entry.content,
-                } for entry in entries
-            ]
+                }
+
+                if length:
+                    entry_json['content'] = yield self.truncate(entry.content,
+                                                                length)
+                else:
+                    entry_json['content'] = entry.content
+                entries_json.append(entry_json)
+
             self.write({'entries': entries_json})
         self.set_status(200)
 
