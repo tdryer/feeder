@@ -92,12 +92,11 @@ loading {
   -ms-transition: all 0.5s ease-out;
   -o-transition: all 0.5s ease-out;
   transition: all 0.5s ease-out;
-  -webkit-animation: 0.5s fadein;
-  -moz-animation: 0.5s fadein;
-  -ms-animation: 0.5s fadein;
-  -o-animation: 0.5s fadein;
-  animation: 0.5s fadein;
-  
+  -webkit-animation: 0.5s fade-in;
+  -moz-animation: 0.5s fade-in;
+  -ms-animation: 0.5s fade-in;
+  -o-animation: 0.5s fade-in;
+  animation: 0.5s fade-in;
 }
 
 loading.ng-hide {
@@ -122,38 +121,34 @@ loading .spinner {
   margin-top: -8px;
 }
 
-@keyframes fadein {
+@keyframes fade-in {
   from {
     opacity: 0;
-  }
-  to {
+  } to {
     opacity: 1;
   }
 }
 
-@-moz-keyframes fadein {
+@-moz-keyframes fade-in {
   from {
     opacity: 0;
-  }
-  to {
+  } to {
     opacity: 1;
   }
 }
 
-@-webkit-keyframes fadein { 
+@-webkit-keyframes fade-in {
   from {
     opacity:0;
-  }
-  to {
+  } to {
     opacity:1;
   }
 }
 
-@-o-keyframes fadein { 
+@-o-keyframes fade-in {
   from {
     opacity: 0;
-  }
-  to {
+  } to {
     opacity: 1;
   }
 }​

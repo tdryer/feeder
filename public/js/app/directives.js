@@ -47,33 +47,6 @@
         });
       }
     }
-  })
-
-  /**
-   * Navigates a user back one level.
-   *
-   * @directive
-   */
-  .directive('back', function() {
-    return {
-      controller: function($rootScope, $scope) {
-        $rootScope.$watch('breadcrumbs', function(breadcrumbs) {
-          $scope.anchor = _.last(breadcrumbs);
-        });
-      }
-    }
-  })
-
-  /**
-   * Displays the user's list of subscriptions.
-   *
-   * @directive
-   * @route '/home'
-   */
-  .directive('subscriptions', function() {
-    return {
-      templateUrl: 'partials/subscriptions.html'
-    }
   });
 
 }).call(angular.module('feeder.directives', []));

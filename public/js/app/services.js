@@ -215,6 +215,7 @@
    * @factory
    * @var {Number} [id=0] The id of the feed parent of the article list.
    * @var {Array|Boolean} [list=false] The list of articles.
+   * @var {Function} push Adds to the article list, or update an article in it.
    * @var {Function} update Fetches and stores the article ids of a feed.
    */
   this.factory('ArticleList', function($q, Restangular, User, Article) {
@@ -223,13 +224,30 @@
       , list = false
       , unreads = 0;
 
+    function push() {
+      var list = this.list
+        , updatedArticle = Article.article;
+
+      if (!updatedArticle) {
+        return;
+      }
+
+      list = _.each(list, function(article, key) {
+        if (article.id === updatedArticle.id) {
+          list[key].read = updatedArticle.read;
+        }
+      });
+
+      this.list = list;
+    }
+
     function update(id) {
       var header = User.getAuthHeader()
         , entriesEndpoint = endpoint.one(id).getList('entries', {}, header);
 
       return entriesEndpoint.then(_.bind(function(result) {
         return Article.get(result.entries, {
-          truncate: 200
+          truncate: 300
         }).then(_.bind(function(result) {
           this.id = id;
           this.list = result.entries;
@@ -240,38 +258,59 @@
     return {
       id: id,
       list: list,
+      push: push,
       update: update
     };
-  })
+  });
 
-  .factory('Article', function($q, User, Restangular) {
-
+  /**
+   * The `Article` model represents the list of articles for the feed that
+   * the user is currently viewing.
+   *
+   * @factory
+   * @var {Object|Boolean} [article=false] The article.
+   * @var {Function} get Fetches and stores an article.
+   * @var {Function} read Reads an article.
+   * @var {Function} unread Unreads an article.
+   * @var {Function} update Fetches and stores the article ids of a feed.
+   */
+  this.factory('Article', function($q, User, Restangular) {
+    var endpoint = Restangular.one('entries')
+      , article = false;
 
     function get(id, queryParams) {
-      Restangular = Restangular.withConfig(function(RestangularProvider) {
-        RestangularProvider.setDefaultHeaders(User.getAuthHeader());
-      });
-
-      return Restangular.one('entries').getList(id, queryParams);
+      queryParams || (queryParams = {});
+      return endpoint.getList(id, queryParams, User.getAuthHeader());
     }
 
-    function status(id, read_status) {
-      if (!id) {
-        return $q.reject();
-      }
+    function update(id) {
+      return this.get(id).then(_.bind(function(result) {
+        this.article = result.entries.pop();
+      }, this), $q.reject);
+    }
 
-      Restangular = Restangular.withConfig(function(RestangularProvider) {
-        RestangularProvider.setDefaultHeaders(User.getAuthHeader());
-      });
+    function read(id) {
+      return endpoint.one(id).patch({
+        read: true
+      }, {}, User.getAuthHeader()).then(_.bind(function(result) {
+        this.article.read = true;
+      }, this), $q.reject);
+    }
 
-      return Restangular.one('entries', id).patch({
-        read: read_status
-      });
+    function unread(id) {
+      return endpoint.one(id).patch({
+        read: false
+      }, {}, User.getAuthHeader()).then(_.bind(function(result) {
+        this.article.read = false;
+      }, this), $q.reject);
     }
 
     return {
+      article: article,
       get: get,
-      status: status
+      read: read,
+      unread: unread,
+      update: update
     };
   });
 

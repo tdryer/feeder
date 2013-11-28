@@ -3,52 +3,18 @@
   padding: 1em;
 }
 
-.article .pub-date,
-.article .source {
-  font-size: 0.9em;
-}
-
 .article .title {
   display: block;
   font-size: 2em;
   font-weight: bold;
 }
 
-.article .title a:link,
-.article .title a:visited {
-  color: #000;
-  text-decoration: none;
-}
-
-.article .title a:hover {
-  color: #1abc9c;
-}
-
-.article .unread {
+.article button {
   float: right;
-  top: 1em;
-  right: 2em;
 }
 
 .article .content {
   position: relative;
-}
-
-.article .content:empty {
-  height: 4em;
-  background: url(../img/spinner.gif) center no-repeat;
-}
-
-.article .content a:link,
-.article .content a:visited {
-  color: #1abc9c;
-  text-decoration: none;
-}
-
-.article .content a:hover {
-  text-decoration: underline;
-}
-
-.article .content img {
-  max-width: 100%;
+  display: block;
+  border-top: 1px solid #bdc3c7;
 }

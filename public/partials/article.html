@@ -1,16 +1,29 @@
 <article class="article">
-  <a class="btn unread" ng-click="unread()">Mark as Unread</a>
+  <button
+    ng-show="!Article.article.read"
+    class="btn btn-xs btn-primary"
+    ng-click="Article.read(Article.article.id)">Mark as read</button>
+  <button
+    ng-show="Article.article.read"
+    class="btn btn-xs btn-primary"
+    ng-click="Article.unread(Article.article.id)">Mark as unread</button>
   <div class="metadata">
     <time
-      class="pub-date"
-      title="{{article['pub-date'] |
-        moment:'dddd, MMMM Do YYYY, h:mm:ss A'}}">
-          {{article['pub-date'] | moment:'relative'}}
-    </time>
-    <span class="title">
-      <a href="{{article.url}}" target="_blank">{{article.title}}</a>
-    </span>
-    <span class="source">By: {{article.author}}</span>
+      class="pub-date small"
+      title="{{Article.article['pub-date'] | moment}}"
+      ng-bind="Article.article['pub-date'] | moment | fromNow"></time>
+    <h1 class="title mts mbs">
+      <a
+        href="{{Article.article.url}}"
+        target="_blank"
+        ng-bind="Article.article.title"></a>
+    </h1>
+    <span
+      ng-show="article.author"
+      class="source small"
+      ng-bind="article.author"></span>
   </div>
-  <content class="content" ng-bind-html="article.content"></content>
+  <content
+    class="content ptm pbm"
+    ng-bind-html="Article.article.content"></content>
 </article>

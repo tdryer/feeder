@@ -64,15 +64,13 @@
       controller: 'ArticleCtrl',
       templateUrl: '/partials/article.html',
       resolve: {
-        data: function($route, $q, Article) {
-          return Article.get($route.current.params.article).then(function(result) {
-            return result.entries[0];
-          }, $q.reject);
+        fetchArticle: function($route, Article) {
+          return Article.update($route.current.params.article);
         }
       }
-    })
+    });
 
-    .otherwise({
+    $routeProvider.otherwise({
       redirectTo: '/404'
     });
   });
@@ -104,7 +102,7 @@
     });
   });
 
-  this.run(function($rootScope, State) {
+  this.run(function($rootScope, $location, State) {
     $rootScope.$on('$routeChangeStart', function() {
       State.loading = true;
       State.error = false;
@@ -113,6 +111,7 @@
     $rootScope.$on('$routeChangeError', function() {
       State.loading = false;
       State.error = true;
+      $location.path('/404');
     });
 
     $rootScope.$on('$routeChangeSuccess', function() {

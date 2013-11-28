@@ -100,7 +100,7 @@
   });
 
   /**
-   * Displays a list of articles for a feed.
+   * The feed article list page.
    *
    * @controller
    * @route '/home/:feed'
@@ -111,23 +111,19 @@
     $scope.filter = null;
     $scope.feed = Feeds.id(ArticleList.id);
     $scope.ArticleList = ArticleList;
+    ArticleList.push();
   });
 
   /**
-   * Displays an article.
+   * The article page.
    *
    * @controller
    * @route '/home/:feed/:article'
+   * @scope {Model} Article The `Article` model.
    */
-  this.controller('ArticleCtrl', function($scope, $location, Article, data) {
-    $scope.article = data;
-
-    $scope.unread = function() {
-      Article.status($scope.article.id, false);
-      $location.path('/home/' + $scope.article.feed_id);
-    }
-
-    Article.status($scope.article.id, true);
-  })
+  this.controller('ArticleCtrl', function($scope, Article) {
+    $scope.Article = Article;
+    Article.read(Article.article.id);
+  });
 
 }).call(angular.module('feeder.controllers', []));
