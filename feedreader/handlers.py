@@ -208,7 +208,7 @@ class EntriesHandler(APIRequestHandler):
                     "id": entry.id,
                     "title": entry.title,
                     "pub-date": entry.date,
-                    "status": user.has_read(entry),
+                    "read": user.has_read(entry),
                     "author": entry.author,
                     "feed_id": entry.feed_id,
                     "url": entry.url,
@@ -223,13 +223,10 @@ class EntriesHandler(APIRequestHandler):
         body = self.require_body_schema({
             "type": "object",
             "properties": {
-                "status": {"type": "string"},
+                "read": {"type": "boolean"},
             },
-            "required": ["status"],
+            "required": ["read"],
         })
-
-        if body["status"] not in ["read", "unread"]:
-            raise HTTPError(400, "That is not a valid status")
 
         with self.get_db_session() as session:
             user = session.query(User).get(self.require_auth(session))
@@ -238,7 +235,7 @@ class EntriesHandler(APIRequestHandler):
             if len(entries) != len(entry_ids):
                 raise HTTPError(404, "Entry does not exist.")
 
-            if body["status"] == "read":
+            if body["read"]:
                 for entry in entries:
                     if not user.has_read(entry):
                         user.read(entry)

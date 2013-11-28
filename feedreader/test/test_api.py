@@ -386,7 +386,7 @@ class ApiTest(AsyncHTTPTestCase):
                     "id": self.feed1_entry1.id,
                     "title": self.feed1_entry1.title,
                     "pub-date": self.feed1_entry1.date,
-                    "status": self.user.has_read(self.feed1_entry1),
+                    "read": self.user.has_read(self.feed1_entry1),
                     "author": self.feed1_entry1.author,
                     "feed_id": self.feed1.id,
                     "url": self.feed1_entry1.url,
@@ -412,7 +412,7 @@ class ApiTest(AsyncHTTPTestCase):
                     "id": self.feed1_entry1.id,
                     "title": self.feed1_entry1.title,
                     "pub-date": self.feed1_entry1.date,
-                    "status": self.user.has_read(self.feed1_entry1),
+                    "read": self.user.has_read(self.feed1_entry1),
                     "author": self.feed1_entry1.author,
                     "feed_id": self.feed1.id,
                     "url": self.feed1_entry1.url,
@@ -422,7 +422,7 @@ class ApiTest(AsyncHTTPTestCase):
                     "id": self.feed1_entry2.id,
                     "title": self.feed1_entry2.title,
                     "pub-date": self.feed1_entry2.date,
-                    "status": self.user.has_read(self.feed1_entry2),
+                    "read": self.user.has_read(self.feed1_entry2),
                     "author": self.feed1_entry2.author,
                     "feed_id": self.feed1.id,
                     "url": self.feed1_entry2.url,
@@ -441,13 +441,13 @@ class ApiTest(AsyncHTTPTestCase):
 
     def test_patch_entries_requires_auth(self):
         self.assert_api_call("PATCH /entries/1",
-                             json_body={"status": "read"},
+                             json_body={"read": True},
                              expect_code=401)
 
     def test_path_entries_bad_input_value(self):
         self.assert_api_call("PATCH /entries/1", headers=self.headers,
                              json_body={
-                                 "status": ""
+                                 "read": ""
                              }, expect_code=400)
 
     def test_path_entries_bad_input_keyword(self):
@@ -459,7 +459,7 @@ class ApiTest(AsyncHTTPTestCase):
     def test_patch_entries_not_exists(self):
         self.assert_api_call("PATCH /entries/1", headers=self.headers,
                              json_body={
-                                 "status": "read"
+                                 "read": True
                              }, expect_code=404)
 
     def test_patch_entries_not_subbed(self):
@@ -468,7 +468,7 @@ class ApiTest(AsyncHTTPTestCase):
 
         self.assert_api_call("PATCH /entries/1", headers=self.headers,
                              json_body={
-                                 "status": "read"
+                                 "read": True
                              }, expect_code=404)
 
     def test_patch_entries_update_read(self):
@@ -479,7 +479,7 @@ class ApiTest(AsyncHTTPTestCase):
 
         self.assert_api_call("PATCH /entries/1,2", headers=self.headers,
                              json_body={
-                                 "status": "read"
+                                 "read": True
                              }, expect_code=200)
 
     def test_patch_entries_update_unread(self):
@@ -491,7 +491,7 @@ class ApiTest(AsyncHTTPTestCase):
 
         self.assert_api_call("PATCH /entries/1,2", headers=self.headers,
                              json_body={
-                                 "status": "unread"
+                                 "read": False
                              }, expect_code=200)
 
     ######################################################################
