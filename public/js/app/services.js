@@ -228,7 +228,9 @@
         , entriesEndpoint = endpoint.one(id).getList('entries', {}, header);
 
       return entriesEndpoint.then(_.bind(function(result) {
-        return Article.get(result.entries).then(_.bind(function(result) {
+        return Article.get(result.entries, {
+          truncate: 200
+        }).then(_.bind(function(result) {
           this.id = id;
           this.list = result.entries;
         }, this), $q.reject);
@@ -245,16 +247,12 @@
   .factory('Article', function($q, User, Restangular) {
 
 
-    function get(id) {
-      if (!id) {
-        return $q.reject();
-      }
-
+    function get(id, queryParams) {
       Restangular = Restangular.withConfig(function(RestangularProvider) {
         RestangularProvider.setDefaultHeaders(User.getAuthHeader());
       });
 
-      return Restangular.one('entries').getList(id);
+      return Restangular.one('entries').getList(id, queryParams);
     }
 
     function status(id, read_status) {

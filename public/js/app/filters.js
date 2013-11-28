@@ -35,17 +35,4 @@
     }
   });
 
-  /**
-   * Converts HTML to plain text by stripping all HTML tags off.
-   *
-   * @filter
-   * @param {*} text The text to be stripped.
-   * @returns {String} Returns `text` without any HTML tags.
-   */
-  this.filter('inline', function() {
-    return function(text) {
-      return String(text).replace(/<(?:.|\n)*?>/gm, '');
-    }
-  });
-
 }).call(angular.module('feeder.filters', []));

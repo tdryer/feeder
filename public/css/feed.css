@@ -5,7 +5,7 @@
 
 @media (min-width: 60em) {
   .article-list {
-    width: 24em;
+    /*width: 24em;*/
   }
 }
 
