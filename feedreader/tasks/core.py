@@ -78,8 +78,8 @@ class Tasks(object):
             logger.warning("Feed '{}' set the bozo bit: '{}'"
                            .format(feed_url, parsed_feed.bozo_exception))
 
-        # check for failure
-        if parsed_feed.version == "":
+        # check for failure (version is "" or not an attribute)
+        if parsed_feed.get("version", "") == "":
             logger.warning("Cannot determine version of feed '{}'"
                            .format(feed_url))
             raise ValueError("Failed to fetch feed")
