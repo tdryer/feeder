@@ -1,6 +1,9 @@
 <div class="article-list">
   <div class="feed">
-    <div class="feed-title">{{feed.name}}</div>
+    <div class="feed-title" ng-switch on="feed.url">
+      <span ng-switch-when="">{{feed.name}}</span>
+      <a href="{{feed.url}}" target="_blank" ng-switch-default>{{feed.name}}</a>
+    </div>
     <div class="filter-bar">
       Filter by:
       <div class="filters">
