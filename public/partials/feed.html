@@ -1,45 +1,37 @@
 <div class="article-list">
-  <div class="feed">
-    <div class="feed-title" ng-switch on="feed.url">
-      <span ng-switch-when=null>{{feed.name}}</span>
-      <a href="{{feed.url}}" target="_blank" ng-switch-default>{{feed.name}}</a>
-    </div>
-    <div class="filter-bar">
-      Filter by:
-      <div class="filters">
-        <span
-          ng-class="{'active-filter': feedFilter == null}"
-          ng-click="feedFilter = null">
-            All
-        </span> |
-        <span
-          ng-class="{'active-filter': feedFilter.read == false}"
-          ng-click="feedFilter = {read: false}">
-            Unread
-        </span> |
-        <span
-          ng-class="{'active-filter': feedFilter.read == true}"
-          ng-click="feedFilter = {read: true}">
-            Read
-        </span>
-      </div>
-    </div>
-    <ul>
-      <li
-        ng-repeat="article in ArticleList.list | filter:feedFilter:true">
-        <a href="/home/{{article.feed_id}}/{{article.id}}">
-          <article ng-class="{'unread': !article.read}">
-            <time
-              class="pub-date"
-              title="{{article['pub-date'] |
-                moment:'dddd, MMMM Do YYYY, h:mm:ss a'}}">
-                  {{article['pub-date'] | moment:'relative'}}
-            </time>
-            <div class="title">{{article.title}}</div>
-            <div class="preview">{{article.content | htmlToPlainText}}</div>
-          </article>
-        </a>
-      </li>
-    </ul>
+  <a
+    target="_blank"
+    class="feed palette-belize-hole"
+    title="{{feed.name}}"
+    href="{{feed.url}}">
+    <span class="small name">{{feed.name}}</span>
+    <span class="small unreads">{{feed.unreads}}</span>
+  </a>
+  <div class="filters small palette-peter-river">
+    <button
+      class="btn btn-xs btn-info mls"
+      ng-class="{active:filter===null}"
+      ng-click="filter=null">All</button>
+    <button
+      class="btn btn-xs btn-info mls"
+      ng-class="{active:filter.read===false}"
+      ng-click="filter={read:false}">Unread</button>
+    <button
+      class="btn btn-xs btn-info mls"
+      ng-class="{active:filter.read===true}"
+      ng-click="filter={read:true}">Read</button>
   </div>
+  <ul>
+    <li ng-repeat="article in ArticleList.list | filter:filter">
+      <a href="/home/{{article.feed_id}}/{{article.id}}">
+        <article ng-class="{unread:!article.read}">
+          <time
+            title="{{article['pub-date'] | moment}}"
+            class="pub-date">{{article['pub-date'] | moment | fromNow}}</time>
+          <div class="title">{{article.title}}</div>
+          <div class="preview">{{article.content | htmlToPlainText}}</div>
+        </article>
+      </a>
+    </li>
+  </ul>
 </div>

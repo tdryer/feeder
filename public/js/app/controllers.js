@@ -105,8 +105,11 @@
    * @controller
    * @route '/home/:feed'
    * @scope {Model} ArticleList The `ArticleList` model.
+   * @scope {Object} feed The parent feed object of the article list.
    */
-  this.controller('FeedCtrl', function($scope, ArticleList, Article) {
+  this.controller('FeedCtrl', function($scope, Feeds, ArticleList) {
+    $scope.filter = null;
+    $scope.feed = Feeds.id(ArticleList.id);
     $scope.ArticleList = ArticleList;
   });
 

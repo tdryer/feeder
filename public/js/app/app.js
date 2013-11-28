@@ -44,18 +44,23 @@
       controller: 'FeedCtrl',
       templateUrl: '/partials/feed.html',
       resolve: {
+        fetchFeeds: function(Feeds) {
+          if (Feeds.feeds === false) {
+            return Feeds.update();
+          }
+        },
         fetchArticleList: function($route, ArticleList) {
           var id = parseInt($route.current.params.feed, 10);
-          if (ArticleList.id !== id || ArticleList.list === false) {
+          if (ArticleList.list === false || ArticleList.id !== id) {
             return ArticleList.update(id);
           } else {
             return ArticleList.list;
           }
         }
       }
-    })
+    });
 
-    .when('/home/:feed/:article', {
+    $routeProvider.when('/home/:feed/:article', {
       controller: 'ArticleCtrl',
       templateUrl: '/partials/article.html',
       resolve: {

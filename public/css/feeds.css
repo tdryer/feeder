@@ -83,8 +83,8 @@
 
   .feeds li:nth-child(even) .feed .name {
     background: #2980b9;
-
   }
+
   .feeds .feed .unreads {
     display: inline-block;
     width: auto;

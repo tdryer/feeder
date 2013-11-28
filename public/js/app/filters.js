@@ -5,12 +5,12 @@
    *
    * @filter
    * @param {*} date The date to parse.
-   * @param {String} [format='LLL'] The format to format `date` with.
+   * @param {String} [format='LLLL'] The format to format `date` with.
    * @returns {String} Returns `date` in the format `format`.
    */
   this.filter('moment', function() {
     return function(date, format) {
-      format || (format = 'LLL');
+      format || (format = 'LLLL');
 
       if (angular.isNumber(date)) {
         date = moment.unix(date);
@@ -18,11 +18,20 @@
         date = moment(date);
       }
 
-      if (format.toLowerCase() == 'relative') {
-        return date.fromNow();
-      } else {
-        return date.format(format);
-      }
+      return date;
+    }
+  });
+
+  /**
+   * Converts a Moment.js date object into a human-readable from now format.
+   *
+   * @filter
+   * @param {Object} date The Moment.js date object to parse.
+   * @returns {String} Returns `date` in a human-readable format from now.
+   */
+  this.filter('fromNow', function() {
+    return function(date) {
+      return date.fromNow();
     }
   });
 
