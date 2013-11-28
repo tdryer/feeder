@@ -5,6 +5,8 @@ Runs the feedreader server under the /api prefix, serves URI not containing a
 dot public/index.html, servers everything else to public.
 """
 
+import logging
+
 import tornado.ioloop
 import tornado.web
 
@@ -32,6 +34,9 @@ class SingleFileHandler(tornado.web.StaticFileHandler):
 
 
 def main():
+    logging.basicConfig(format='[%(levelname)s][%(name)s]: %(message)s')
+    logging.getLogger().setLevel(logging.INFO)
+
     config = feedreader.config.Config.from_args()
     feedreader_app = feedreader.main.get_application(config)
     application = tornado.web.Application([

@@ -1,6 +1,7 @@
 """Main entry point for API server."""
 
 from datetime import timedelta
+import logging
 
 from tornado import gen
 import pbkdf2
@@ -118,6 +119,9 @@ def get_application(config, db_setup_f=None):
 
 def main():
     """Main entry point for the server."""
+    logging.basicConfig(format='[%(levelname)s][%(name)s]: %(message)s')
+    logging.getLogger().setLevel(logging.INFO)
+
     config = Config.from_args()
     get_application(config).listen(config.port)
     tornado.ioloop.IOLoop.instance().start()

@@ -5,7 +5,6 @@ from tornado import ioloop
 
 from feedreader import database
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 

@@ -5,8 +5,6 @@ from tornado import ioloop
 from tornado import stack_context
 import logging
 
-
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 

@@ -8,8 +8,6 @@ import logging
 from feedreader.api_request_handler import APIRequestHandler
 from feedreader.database import Feed, User
 
-
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
