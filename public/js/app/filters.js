@@ -42,7 +42,7 @@
    * @param {*} text The text to be stripped.
    * @returns {String} Returns `text` without any HTML tags.
    */
-  this.filter('htmlToPlainText', function() {
+  this.filter('inline', function() {
     return function(text) {
       return String(text).replace(/<(?:.|\n)*?>/gm, '');
     }

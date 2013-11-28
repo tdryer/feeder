@@ -61,49 +61,36 @@
   list-style-type: none;
 }
 
-.article-list li {
+.article-list ul li {
   position: relative;
-  padding: 0.7em 0em;
-  font-size: 0.95em;
-  border-bottom: 1px solid #bababa;
-  max-height: 10em;
 }
 
-.article-list li:hover,
-.article-list li:hover .preview:after {
-  background: #eaeaea;
-  cursor: pointer;
+.article-list ul li:nth-child(even) {
+  background: #ecf0f1;
 }
 
-.article-list article {
-  padding: 0em 2em;
-  line-height: 1.2em;
-}
-
-.article-list [unread] {
-  border-left: 0.3em solid #1abc9c;
-}
-
-.article-list time {
+.article-list ul li a {
+  border-bottom: 1px solid #bdc3c7;
+  padding: 1em;
   display: block;
-  color: #9a9a9a;
-  font-size: 0.8em;
-  line-height: 1em;
-  font-style: italic;
+  color: #34495e;
 }
 
-.article-list .title {
-  white-space: nowrap;
-  overflow: hidden;
+
+@media (min-width: 60em) {
+  .article-list ul li a {
+    border-right: 1px solid #bdc3c7;
+  }
+}
+
+.article-list ul li a .pub-date,
+.article-list ul li a .h6,
+.article-list ul li a .summary {
+  display: block;
+}
+
+.article-list ul li a .summary {
   text-overflow: ellipsis;
-  margin: 0.3em 0;
-  font-size: 1em;
-}
-
-.article-list .preview {
-  color: #9a9a9a;
-  font-size: 0.8em;
-  line-height: 1.2em;
-  max-height: 2.4em;
+  white-space: nowrap;
   overflow: hidden;
 }
