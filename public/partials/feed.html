@@ -13,13 +13,13 @@
             All
         </span> |
         <span
-          ng-class="{'active-filter': feedFilter.status == false}"
-          ng-click="feedFilter = {status: false}">
+          ng-class="{'active-filter': feedFilter.read == false}"
+          ng-click="feedFilter = {read: false}">
             Unread
         </span> |
         <span
-          ng-class="{'active-filter': feedFilter.status == true}"
-          ng-click="feedFilter = {status: true}">
+          ng-class="{'active-filter': feedFilter.read == true}"
+          ng-click="feedFilter = {read: true}">
             Read
         </span>
       </div>
@@ -28,7 +28,7 @@
       <li
         ng-repeat="article in ArticleList.list | filter:feedFilter:true">
         <a href="/home/{{article.feed_id}}/{{article.id}}">
-          <article ng-class="{'unread': !article.status}">
+          <article ng-class="{'unread': !article.read}">
             <time
               class="pub-date"
               title="{{article['pub-date'] |

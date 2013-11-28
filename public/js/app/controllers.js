@@ -120,11 +120,11 @@
     $scope.article = data;
 
     $scope.unread = function() {
-      Article.status($scope.article.id, 'unread');
+      Article.status($scope.article.id, false);
       $location.path('/home/' + $scope.article.feed_id);
     }
 
-    Article.status($scope.article.id, 'read');
+    Article.status($scope.article.id, true);
   })
 
 }).call(angular.module('feeder.controllers', []));

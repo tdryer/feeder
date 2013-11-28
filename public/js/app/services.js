@@ -258,7 +258,7 @@
     }
 
     function status(id, read_status) {
-      if (!id || (read_status != 'read' && read_status != 'unread')) {
+      if (!id) {
         return $q.reject();
       }
 
@@ -267,7 +267,7 @@
       });
 
       return Restangular.one('entries', id).patch({
-        status: read_status
+        read: read_status
       });
     }
 
