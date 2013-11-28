@@ -92,6 +92,12 @@ loading {
   -ms-transition: all 0.5s ease-out;
   -o-transition: all 0.5s ease-out;
   transition: all 0.5s ease-out;
+  -webkit-animation: 0.5s fadein;
+  -moz-animation: 0.5s fadein;
+  -ms-animation: 0.5s fadein;
+  -o-animation: 0.5s fadein;
+  animation: 0.5s fadein;
+  
 }
 
 loading.ng-hide {
@@ -105,13 +111,49 @@ loading .spinner {
   background: #ebedee;
   display: inline-block;
   position: absolute;
-  -webkit-animation: corner 1s ease infinite;
-  -moz-animation: corner 1s ease infinite;
-  -ms-animation: corner 1s ease infinite;
-  -o-animation: corner 1s ease infinite;
-  animation: corner 1s ease infinite;
+  -webkit-animation: corner 0.5s ease infinite;
+  -moz-animation: corner 0.5s ease infinite;
+  -ms-animation: corner 0.5s ease infinite;
+  -o-animation: corner 0.5s ease infinite;
+  animation: corner 0.5s ease infinite;
   top: 50%;
   left: 50%;
   margin-left: -8px;
   margin-top: -8px;
 }
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@-moz-keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadein { 
+  from {
+    opacity:0;
+  }
+  to {
+    opacity:1;
+  }
+}
+
+@-o-keyframes fadein { 
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}​
