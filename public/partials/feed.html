@@ -1,7 +1,7 @@
 <div class="article-list">
   <div class="feed">
     <div class="feed-title" ng-switch on="feed.url">
-      <span ng-switch-when="">{{feed.name}}</span>
+      <span ng-switch-when=null>{{feed.name}}</span>
       <a href="{{feed.url}}" target="_blank" ng-switch-default>{{feed.name}}</a>
     </div>
     <div class="filter-bar">
