@@ -27,6 +27,7 @@ TEST_PASSWORD = "password1"
 TEST_NEW_USER = "username2"
 TEST_NEW_PASSWORD = "password2"
 
+
 @contextmanager
 def serve_dir(dir_path, port):
     """Context manager that runs a web server to serve the given directory.
@@ -72,17 +73,16 @@ class ApiTest(AsyncHTTPTestCase):
                                  "http://feeds.feedburner.com/Tombuntu",
                                  "http://tombuntu.com")
         self.feed1_entry1 = models.Entry(
-            None, "This is test content.", "http://tombuntu.com/test-content",
+            "This is test content.", "http://tombuntu.com/test-content",
             "Test title", "Tom", 1384402853, "veryrandomguid1"
         )
         # TODO: make this entry different
         self.feed1_entry2 = models.Entry(
-            None, "This is test content.",
-            "http://tombuntu.com/test-content", "Test title", "Tom", 1384402853,
-            "veryrandomguid2"
+            "This is test content.",
+            "http://tombuntu.com/test-content", "Test title", "Tom",
+            1384402853, "veryrandomguid2"
         )
-        self.sub1 = models.Subscription(TEST_USER, None)
-        self.read1 = models.Read(TEST_USER, None)
+        self.user = self.s.query(models.User).get(TEST_USER)
 
     def tearDown(self):
         self.s.close()
@@ -91,7 +91,10 @@ class ApiTest(AsyncHTTPTestCase):
     def get_app(self):
         # hack to get access to the session class
         config = Config('', 'sqlite://', False, 8080, False)
-        def hook(Session): self.Session = Session
+
+        def hook(Session):
+            self.Session = Session
+
         return feedreader.main.get_application(config, db_setup_f=hook)
 
     def assert_api_call(self, api_call, headers=None, json_body=None,
@@ -185,11 +188,11 @@ class ApiTest(AsyncHTTPTestCase):
 
     def test_get_feeds(self):
         # add a feed with an entry, and subscribe to it
-        self.add_commit(self.feed1)
-        self.add_commit(self.feed1_entry1, {"feed_id": self.feed1.id})
-        self.add_commit(self.sub1, {"feed_id": self.feed1.id})
-        self.assert_api_call('GET /feeds/', headers=self.headers,
-                             expect_code=200, expect_json={
+        self.feed1.add(self.feed1_entry1)
+        self.user.subscribe(self.feed1)
+        self.add_commit(self.user)
+
+        expect_json = {
             "feeds": [
                 {
                     "id": self.feed1.id,
@@ -199,24 +202,27 @@ class ApiTest(AsyncHTTPTestCase):
                 },
             ],
 
-        })
+        }
+        self.assert_api_call('GET /feeds/', headers=self.headers,
+                             expect_code=200, expect_json=expect_json)
 
     def test_get_feeds_only_shows_subscribed_feeds(self):
         # add a feed with an entry
-        self.add_commit(self.feed1)
-        self.add_commit(self.feed1_entry1, {"feed_id": self.feed1.id})
+        self.feed1.add(self.feed1_entry1)
+        self.add_commit(self.user)
+
         self.assert_api_call("GET /feeds", headers=self.headers,
                              expect_code=200,
                              expect_json={"feeds": []})
 
     def test_get_feeds_does_not_count_read_entries(self):
         # add a feed with an entry, subscribe to it, and read the entry
-        self.add_commit(self.feed1)
-        self.add_commit(self.feed1_entry1, {"feed_id": self.feed1.id})
-        self.add_commit(self.sub1, {"feed_id": self.feed1.id})
-        self.add_commit(self.read1, {"entry_id": self.feed1_entry1.id})
-        self.assert_api_call('GET /feeds/', headers=self.headers,
-                             expect_code=200, expect_json={
+        self.feed1.add(self.feed1_entry1)
+        self.user.subscribe(self.feed1)
+        self.user.read(self.feed1_entry1)
+        self.add_commit(self.user)
+
+        expect_json = {
             "feeds": [
                 {
                     "id": self.feed1.id,
@@ -226,7 +232,9 @@ class ApiTest(AsyncHTTPTestCase):
                 },
             ],
 
-        })
+        }
+        self.assert_api_call('GET /feeds/', headers=self.headers,
+                             expect_code=200, expect_json=expect_json)
 
     ######################################################################
     # POST /feeds/
@@ -289,20 +297,22 @@ class ApiTest(AsyncHTTPTestCase):
 
     def test_get_feed_entries_all(self):
         # add a feed with an entry, and subscribe to it
+        self.feed1.add(self.feed1_entry1)
+        self.user.subscribe(self.feed1)
         self.add_commit(self.feed1)
-        self.add_commit(self.feed1_entry1, {"feed_id": self.feed1.id})
-        self.add_commit(self.sub1, {"feed_id": self.feed1.id})
+
         self.assert_api_call("GET /feeds/{}/entries".format(self.feed1.id),
                              headers=self.headers, expect_code=200,
                              expect_json={"entries": [self.feed1_entry1.id]})
 
     def test_get_feed_entries_unread(self):
         # add feed with 2 entries, subscribe to the feed, read the first entry
-        self.add_commit(self.feed1)
-        self.add_commit(self.feed1_entry1, {"feed_id": self.feed1.id})
-        self.add_commit(self.feed1_entry2, {"feed_id": self.feed1.id})
-        self.add_commit(self.sub1, {"feed_id": self.feed1.id})
-        self.add_commit(self.read1, {"entry_id": self.feed1_entry1.id})
+        self.feed1.add(self.feed1_entry1)
+        self.feed1.add(self.feed1_entry2)
+        self.user.subscribe(self.feed1)
+        self.user.read(self.feed1_entry1)
+        self.add_commit(self.user)
+
         self.assert_api_call(
             "GET /feeds/{}/entries?filter=unread".format(self.feed1.id),
             headers=self.headers, expect_code=200,
@@ -311,11 +321,12 @@ class ApiTest(AsyncHTTPTestCase):
 
     def test_get_feed_entries_read(self):
         # add feed with 2 entries, subscribe to the feed, read the first entry
-        self.add_commit(self.feed1)
-        self.add_commit(self.feed1_entry1, {"feed_id": self.feed1.id})
-        self.add_commit(self.feed1_entry2, {"feed_id": self.feed1.id})
-        self.add_commit(self.sub1, {"feed_id": self.feed1.id})
-        self.add_commit(self.read1, {"entry_id": self.feed1_entry1.id})
+        self.feed1.add(self.feed1_entry1)
+        self.feed1.add(self.feed1_entry2)
+        self.user.subscribe(self.feed1)
+        self.user.read(self.feed1_entry1)
+        self.add_commit(self.user)
+
         self.assert_api_call(
             "GET /feeds/{}/entries?filter=read".format(self.feed1.id),
             headers=self.headers, expect_code=200,
@@ -324,8 +335,9 @@ class ApiTest(AsyncHTTPTestCase):
 
     def test_get_feed_entries_invalid_filter(self):
         # add feed, subscribe to the feed
-        self.add_commit(self.feed1)
-        self.add_commit(self.sub1, {"feed_id": self.feed1.id})
+        self.user.subscribe(self.feed1)
+        self.add_commit(self.user)
+
         self.assert_api_call(
             "GET /feeds/{}/entries?filter=foobar".format(self.feed1.id),
             headers=self.headers, expect_code=400
@@ -344,65 +356,66 @@ class ApiTest(AsyncHTTPTestCase):
 
     def test_get_entries_single(self):
         # add feed with 2 entries, subscribe to the feed, read the first entry
-        self.add_commit(self.feed1)
-        self.add_commit(self.feed1_entry1, {"feed_id": self.feed1.id})
-        self.add_commit(self.feed1_entry2, {"feed_id": self.feed1.id})
-        self.add_commit(self.sub1, {"feed_id": self.feed1.id})
-        self.add_commit(self.read1, {"entry_id": self.feed1_entry1.id})
+        self.feed1.add(self.feed1_entry1)
+        self.feed1.add(self.feed1_entry2)
+        self.user.subscribe(self.feed1)
+        self.user.read(self.feed1_entry1)
+        self.add_commit(self.user)
+
+        expect_json = {
+            "entries": [
+                {
+                    "id": self.feed1_entry1.id,
+                    "title": self.feed1_entry1.title,
+                    "pub-date": self.feed1_entry1.date,
+                    "status": self.user.has_read(self.feed1_entry1),
+                    "author": self.feed1_entry1.author,
+                    "feed_id": self.feed1.id,
+                    "url": self.feed1_entry1.url,
+                    "content": self.feed1_entry1.content,
+                },
+            ]
+        }
         self.assert_api_call(
             "GET /entries/{}".format(self.feed1_entry1.id),
-            headers=self.headers, expect_code=200, expect_json={
-                "entries": [
-                    {
-                        "id": self.feed1_entry1.id,
-                        "title": self.feed1_entry1.title,
-                        "pub-date": self.feed1_entry1.date,
-                        "status": self.feed1_entry1.been_read(self.s,
-                                                              TEST_USER),
-                        "author": self.feed1_entry1.author,
-                        "feed_id": self.feed1.id,
-                        "url": self.feed1_entry1.url,
-                        "content": self.feed1_entry1.content,
-                    },
-                ]
-        })
+            headers=self.headers, expect_code=200, expect_json=expect_json)
 
     def test_get_entries_multiple(self):
         # add feed with 2 entries, subscribe to the feed, read the first entry
-        self.add_commit(self.feed1)
-        self.add_commit(self.feed1_entry1, {"feed_id": self.feed1.id})
-        self.add_commit(self.feed1_entry2, {"feed_id": self.feed1.id})
-        self.add_commit(self.sub1, {"feed_id": self.feed1.id})
-        self.add_commit(self.read1, {"entry_id": self.feed1_entry1.id})
+        self.feed1.add(self.feed1_entry1)
+        self.feed1.add(self.feed1_entry2)
+        self.user.subscribe(self.feed1)
+        self.user.read(self.feed1_entry1)
+        self.add_commit(self.user)
+
+        expect_json = {
+            "entries": [
+                {
+                    "id": self.feed1_entry1.id,
+                    "title": self.feed1_entry1.title,
+                    "pub-date": self.feed1_entry1.date,
+                    "status": self.user.has_read(self.feed1_entry1),
+                    "author": self.feed1_entry1.author,
+                    "feed_id": self.feed1.id,
+                    "url": self.feed1_entry1.url,
+                    "content": self.feed1_entry1.content,
+                },
+                {
+                    "id": self.feed1_entry2.id,
+                    "title": self.feed1_entry2.title,
+                    "pub-date": self.feed1_entry2.date,
+                    "status": self.user.has_read(self.feed1_entry2),
+                    "author": self.feed1_entry2.author,
+                    "feed_id": self.feed1.id,
+                    "url": self.feed1_entry2.url,
+                    "content": self.feed1_entry2.content,
+                },
+            ]
+        }
         self.assert_api_call(
             "GET /entries/{},{}".format(self.feed1_entry1.id,
                                         self.feed1_entry2.id),
-            headers=self.headers, expect_code=200, expect_json={
-                "entries": [
-                    {
-                        "id": self.feed1_entry1.id,
-                        "title": self.feed1_entry1.title,
-                        "pub-date": self.feed1_entry1.date,
-                        "status": self.feed1_entry1.been_read(self.s,
-                                                              TEST_USER),
-                        "author": self.feed1_entry1.author,
-                        "feed_id": self.feed1.id,
-                        "url": self.feed1_entry1.url,
-                        "content": self.feed1_entry1.content,
-                    },
-                    {
-                        "id": self.feed1_entry2.id,
-                        "title": self.feed1_entry2.title,
-                        "pub-date": self.feed1_entry2.date,
-                        "status": self.feed1_entry2.been_read(self.s,
-                                                              TEST_USER),
-                        "author": self.feed1_entry2.author,
-                        "feed_id": self.feed1.id,
-                        "url": self.feed1_entry2.url,
-                        "content": self.feed1_entry2.content,
-                    },
-                ]
-        })
+            headers=self.headers, expect_code=200, expect_json=expect_json)
 
     ######################################################################
     # PATCH /entries/ID
@@ -432,29 +445,32 @@ class ApiTest(AsyncHTTPTestCase):
                              }, expect_code=404)
 
     def test_patch_entries_not_subbed(self):
+        self.feed1.add(self.feed1_entry1)
         self.add_commit(self.feed1)
-        self.add_commit(self.feed1_entry1, {"feed_id": self.feed1.id})
+
         self.assert_api_call("PATCH /entries/1", headers=self.headers,
                              json_body={
                                  "status": "read"
-                             }, expect_code=403)
+                             }, expect_code=404)
 
     def test_patch_entries_update_read(self):
-        self.add_commit(self.feed1)
-        self.add_commit(self.feed1_entry1, {"feed_id": self.feed1.id})
-        self.add_commit(self.feed1_entry2, {"feed_id": self.feed1.id})
-        self.add_commit(self.sub1, {"feed_id": self.feed1.id})
+        self.feed1.add(self.feed1_entry1)
+        self.feed1.add(self.feed1_entry2)
+        self.user.subscribe(self.feed1)
+        self.add_commit(self.user)
+
         self.assert_api_call("PATCH /entries/1,2", headers=self.headers,
                              json_body={
                                  "status": "read"
                              }, expect_code=200)
 
     def test_patch_entries_update_unread(self):
-        self.add_commit(self.feed1)
-        self.add_commit(self.feed1_entry1, {"feed_id": self.feed1.id})
-        self.add_commit(self.feed1_entry2, {"feed_id": self.feed1.id})
-        self.add_commit(self.sub1, {"feed_id": self.feed1.id})
-        self.add_commit(self.read1, {"entry_id": self.feed1_entry1.id})
+        self.feed1.add(self.feed1_entry1)
+        self.feed1.add(self.feed1_entry2)
+        self.user.subscribe(self.feed1)
+        self.user.read(self.feed1_entry1)
+        self.add_commit(self.user)
+
         self.assert_api_call("PATCH /entries/1,2", headers=self.headers,
                              json_body={
                                  "status": "unread"
@@ -479,16 +495,18 @@ class ApiTest(AsyncHTTPTestCase):
 
     def test_get_feed(self):
         # add a feed and subscribe to it
-        self.add_commit(self.feed1)
-        self.add_commit(self.sub1, {"feed_id": self.feed1.id})
+        self.user.subscribe(self.feed1)
+        self.add_commit(self.user)
+
+        expect_json = {
+            'id': self.feed1.id,
+            'name': self.feed1.title,
+            'unreads': 0,
+            'url': self.feed1.site_url,
+        }
         self.assert_api_call(
             "GET /feeds/{}".format(self.feed1.id), headers=self.headers,
-            expect_code=200, expect_json={
-                'id': self.feed1.id,
-                'name': self.feed1.title,
-                'unreads': 0,
-                'url': self.feed1.site_url,
-        })
+            expect_code=200, expect_json=expect_json)
 
     ######################################################################
     # DELETE /feeds/ID
@@ -509,7 +527,8 @@ class ApiTest(AsyncHTTPTestCase):
 
     def test_delete_feed(self):
         # add a feed and subscribe to it
-        self.add_commit(self.feed1)
-        self.add_commit(self.sub1, {"feed_id": self.feed1.id})
+        self.user.subscribe(self.feed1)
+        self.add_commit(self.user)
+
         self.assert_api_call("DELETE /feeds/{}".format(self.feed1.id),
                              headers=self.headers, expect_code=204)

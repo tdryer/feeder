@@ -1,9 +1,6 @@
-"""SQLAlchemy models."""
-
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm.session import make_transient
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import (and_, create_engine, Column, ForeignKey, Integer,
+from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy import (create_engine, Column, ForeignKey, Integer, Table,
                         Sequence, String)
 import yaml
 
@@ -11,23 +8,13 @@ BASE = declarative_base()
 
 SMALL_STR = 100
 MEDIUM_STR = 1024
-LARGE_STR = 10*MEDIUM_STR
+LARGE_STR = 10 * MEDIUM_STR
 
 
-def initialize_db(database_uri):
+def initialize_db(database_uri='sqlite://'):
     """Initialize the DB and return SQLAlchemy Session class.
 
     This should only be called once when the server starts.
-    """
-    """
-    # Uncomment the block below and comment out the succeeding line. Fill out
-    # the details of the database. This does not work well with tests because
-    # it causes integrity errors when the data has been added before!
-    """
-    """
-    engine = create_engine(
-        'mysql://username:password@localhost[:port]/dbname', echo=False
-    )
     """
     engine = create_engine(database_uri, echo=False)
 
@@ -36,9 +23,18 @@ def initialize_db(database_uri):
     return sessionmaker(bind=engine)
 
 
-# Counts the number of Feeds with id == feed_id, i.e., returns 0 or 1
-def exists_feed(session, feed_id):
-    return session.query(Feed).filter(Feed.id == feed_id).count()
+subscriptions_table = Table('subscriptions', BASE.metadata,
+                            Column('username', String(SMALL_STR),
+                                   ForeignKey('users.username',
+                                              ondelete='CASCADE')),
+                            Column('feed_id', Integer,
+                                   ForeignKey('feeds.id',
+                                              ondelete='CASCADE')))
+read_table = Table('read', BASE.metadata,
+                   Column('username', String(SMALL_STR),
+                          ForeignKey('users.username', ondelete='CASCADE')),
+                   Column('entry_id', Integer,
+                          ForeignKey('entries.id', ondelete='CASCADE')))
 
 
 class User(BASE):
@@ -47,156 +43,60 @@ class User(BASE):
     username = Column(String(SMALL_STR), primary_key=True, nullable=False)
     password_hash = Column(String(MEDIUM_STR), nullable=False)
 
-    def __init__(self, name, pwhash):
+    subscriptions = relationship('Feed', secondary=subscriptions_table,
+                                 backref='users')
+    read_entries = relationship('Entry', secondary=read_table,
+                                backref='read_by', lazy='dynamic')
+
+    def __init__(self, name, password_hash):
         self.username = name
-        self.password_hash = pwhash
+        self.password_hash = password_hash
 
     def __repr__(self):
         return "<User('%s')>" % (self.username)
 
-    # deletes user from database and associated rows in Subcription and Read
-    def remove(self, session):
-        # remove subscriptions for this user
-        subs = session.query(
-            Subscription).filter(
-            Subscription.username == self.username).all()
-        for sub in subs:
-            session.delete(sub)
-        # also remove read entries
-        reads = session.query(Read).filter(
-            Read.username == self.username
-        ).all()
-        for read in reads:
-            session.delete(read)
-        session.delete(self)
-        make_transient(self)
+    # Subscription related stuff
 
-    # subscribes user to a feed
-    # not useful since session.add(Subscription( ... )) is just
-    # as easy
-    def subscribe(self, session, feed_id):
-        sub = Subscription(self.username, feed_id)
-        session.add(sub)
+    def has_subscription(self, feed):
+        """Check if the user is subscribed to this feed."""
+        return feed in self.subscriptions
 
-    # checks if the user is subscribed to the feed with id == feed_id
-    # since the query is filtering on a primary key, returns 0 or 1
-    def is_sub_of_feed(self, session, feed_id):
-        return session.query(Subscription).filter(and_(
-            Subscription.username == self.username,
-            Subscription.feed_id == feed_id,
-        )).count()
+    def subscribe(self, feed):
+        """Subscribe the user to a feed."""
+        self.subscriptions.append(feed)
 
-    # unsubscribes a user from a feed
-    # if the subscription does not exists one() will throw an exception
-    def unsubscribe(self, session, feed_id):
-        sub = session.query(
-            Subscription).filter(
-            and_(
-                Subscription.username == self.username,
-                Subscription.feed_id == feed_id)).one(
-        )
-        session.delete(sub)
+    def unsubscribe(self, feed):
+        """Unsubscribe the user from a feed."""
+        self.subscriptions.remove(feed)
 
-    # checks if the user is allowed to view the entry with id == entry_id
-    def can_read(self, session, entry_id):
-        entry = session.query(Entry).filter(Entry.id == entry_id).one()
-        return self.is_sub_of_feed(session, entry.feed_id)
+    # Entry related stuff
 
-    # records that the user has read the entry
-    # not useful since session.add(Read( ... )) is just as easy
-    def mark_read(self, session, entry_id):
-        read = Read(self.username, entry_id)
-        session.add(read)
+    def has_read(self, entry):
+        """Check if the user has marked this entry as read."""
+        return bool(self.read_entries.filter(Entry.id == entry.id).count())
 
-    # checks if the user has read the entry with id == entry_id
-    # since the query is filtering on a primary key, returns 0 or 1
-    def has_read(self, session, entry_id):
-        return session.query(Read).filter(and_(
-                Read.username == self.username,
-                Read.entry_id == entry_id
-                )).count()
+    def read(self, entry):
+        """Mark the entry as read."""
+        self.read_entries.append(entry)
 
-    # returns the number of unread entries in a feed the user is subbed to
-    def num_unread_in_feed(self, session, feed_id):
-        read_ids = self.get_read_ids(session)
-        if read_ids != []:
-            return session.query(Entry).filter(and_(
-                Entry.feed_id == feed_id,
-                ~Entry.id.in_(read_ids)
-            )).count()
-        else:
-            return session.query(Entry).filter(Entry.feed_id == feed_id
-                                               ).count()
+    def unread(self, entry):
+        """Mark the entry as unread."""
+        self.read_entries.remove(entry)
 
-    # returns a list of ids of all entries for all feeds the user has read
-    def get_read_ids(self, session):
-        id_list = []
-        reads = session.query(
-            Read).filter(
-            Read.username == self.username).all(
-        )
-        for read in reads:
-            id_list.append(read.entry_id)
-        return id_list
+    def get_entries(self, ids):
+        """Retrieve all entries, by their ids, from feeds that the user is
+           subscribed to."""
+        entries = []
+        for feed in self.subscriptions:
+            for entry in feed.entries.filter(Entry.id.in_(ids)).all():
+                entries.append(entry)
+        return entries
 
-    # returns a list of feeds that the user is subbed to
-    def get_feeds(self, session):
-        id_list = []
-        subs = session.query(
-            Subscription).filter(
-            Subscription.username == self.username).all(
-        )
-        for sub in subs:
-            id_list.append(sub.feed_id)
-        if id_list != []:
-            feeds = session.query(Feed).filter(Feed.id.in_(id_list))\
-                                   .order_by(Feed.title.asc()).all()
-            return feeds
-        else:
-            return []
-
-    """
-    Collects all the entries of a feed
-    precondition: is_sub_of_feed should be called prior to
-                  this function call
-    Input: session, Feed.id, optional: filter="read"|"unread"
-    Ouput: a list of entries
-    """
-    def get_feed_entries(self, session, feed_id, **kwargs):
-        do_filter = False
-        if 'filter' in kwargs:
-            entry_filter = kwargs.get('filter')
-            do_filter = True
-        # Queries
-        entry_ids = []
-        # Can't make this a single statement because query(Entry.id) produces
-        #  a list [(1,), (2,), . . . ]
-        for row in session.query(Entry).filter(
-                Entry.feed_id == feed_id).all():
-            entry_ids.append(row.id)
-        read_ids = []
-        if entry_ids != []:
-            for row in session.query(Read).filter(and_(
-                    Read.username == self.username,
-                    Read.entry_id.in_(entry_ids)
-            )).all():
-                read_ids.append(row.entry_id)
-        raw_entries = session.query(Entry).filter(Entry.feed_id == feed_id)\
-                                          .order_by(Entry.date.desc()).all()
-        if not do_filter:
-            return raw_entries
-        else:
-            feed_entries = []
-            if entry_filter == "read":
-                for entry in raw_entries:
-                    if entry.id in read_ids:
-                        feed_entries.append(entry)
-            elif entry_filter == "unread":
-                for entry in raw_entries:
-                    if entry.id not in read_ids:
-                        feed_entries.append(entry)
-
-            return feed_entries
+    def get_num_unread_entries(self, feed):
+        """Count the total number of entries the user has in a feed."""
+        total = feed.entries.count()
+        read = self.read_entries.filter_by(feed_id=feed.id).count()
+        return total - read
 
 
 class Feed(BASE):
@@ -214,8 +114,17 @@ class Feed(BASE):
     # etag used for caching
     etag = Column(String(MEDIUM_STR), nullable=True)
 
+    entries = relationship('Entry', backref='feed', lazy='dynamic')
+
+    @staticmethod
+    def find_last_updated_before(session, unix_date):
+        """Return all feeds with last_modified earlier than unix_date."""
+        return session.query(Feed).filter(Feed.last_refresh_date < unix_date)\
+                                  .all()
+
     def __init__(self, title, feed_url, site_url, last_modified=None,
-                 etag=None, last_refresh_date=None):
+                 etag=None, last_refresh_date=None, id=None):
+        self.id = id
         self.title = title
         self.feed_url = feed_url
         self.site_url = site_url
@@ -226,49 +135,26 @@ class Feed(BASE):
     def __repr__(self):
         return "<RSSFeed('%s','%s')>" % (self.title, self.site_url)
 
-    @classmethod
-    def find_last_updated_before(cls, session, unix_date):
-        """Return all feeds with last_modified earlier than unix_date."""
-        return session.query(Feed).filter(Feed.last_refresh_date < unix_date).all()
+    # Entry related stuff
 
-    # deletes a feed and associated entries from database unless any user is
-    # still subbed
-    def remove(self, session):
-        # check that no users are subscribed
-        if session.query(Subscription).filter(
-                Subscription.feed_id == self.id).count() == 0:
-            # remove all associated entries
-            entries = session.query(Entry).filter(
-                Entry.feed_id == self.id
-            ).all()
-            entry_ids = []
-            for entry in entries:
-                entry_ids.append(entry.id)
-                session.delete(entry)
-            reads = session.query(Read).filter(Read.entry_id.in_(entry_ids))\
-                                       .all()
+    def add(self, entry):
+        """Add an entry to the feed."""
+        self.entries.append(entry)
 
-            for read in reads:
-                session.delete(read)
+    def add_all(self, entries):
+        """Add all entries from an iterable to the feed."""
+        for entry in entries:
+            self.add(entry)
 
-            session.delete(self)
-            make_transient(self)
-
-    # fetches entries associated with the feed
-    def get_entries(self, session):
-        return session.query(Entry).filter(Entry.feed_id == self.id).all()
-
-    # returns a list of users that are subbed to this feed
-    def get_users(self, session):
-        name_list = []
-        subs = session.query(
-            Subscription).filter(
-            Subscription.feed_id == self.id).all(
-        )
-        for sub in subs:
-            name_list.append(sub.username)
-        users = session.query(User).filter(User.username.in_(name_list)).all()
-        return users
+    def get_entries(self, user, filter_=None):
+        """Retrieve all entries for a user from the feed.
+           The entries can optionally be filtered by read or unread."""
+        for entry in self.entries.all():
+            if filter_ == 'read' and not user.has_read(entry):
+                continue
+            elif filter_ == 'unread' and user.has_read(entry):
+                continue
+            yield entry
 
 
 class Entry(BASE):
@@ -276,7 +162,8 @@ class Entry(BASE):
 
     id = Column(Integer, Sequence('entry_id_seq'), primary_key=True,
                 nullable=False)
-    feed_id = Column(Integer, ForeignKey('feeds.id'), nullable=False)
+    feed_id = Column(Integer, ForeignKey('feeds.id', ondelete='CASCADE'),
+                     nullable=False)
     content = Column(String(LARGE_STR), nullable=False)
     url = Column(String(MEDIUM_STR), nullable=False)
     title = Column(String(SMALL_STR), nullable=False)
@@ -284,8 +171,7 @@ class Entry(BASE):
     date = Column(Integer, nullable=False)
     guid = Column(String(MEDIUM_STR), nullable=False)
 
-    def __init__(self, feed_id, content, url, title, author, date, guid):
-        self.feed_id = feed_id
+    def __init__(self, content, url, title, author, date, guid):
         self.content = content
         self.url = url
         self.title = title
@@ -295,64 +181,6 @@ class Entry(BASE):
 
     def __repr__(self):
         return '<Entry({!r})>'.format(self.id)
-
-    # a safer way to delete an entry from the database (in case it's to be
-    # added again for some reason)
-    def remove(self, session):
-        session.delete(self)
-        make_transient(self)
-
-    # returns a string representing the state of this entry for a user
-    def been_read(self, session, username):
-        if session.query(Read).filter(and_(
-                Read.username == username,
-                Read.entry_id == self.id
-                )).count():
-            return "read"
-        else:
-            return "unread"
-
-
-class Subscription(BASE):
-    __tablename__ = 'subscriptions'
-
-    username = Column(
-        String(SMALL_STR),
-        ForeignKey('users.username'),
-        primary_key=True,
-        nullable=False)
-    feed_id = Column(Integer,
-        ForeignKey('feeds.id'),
-        primary_key=True,
-        nullable=False)
-
-    def __init__(self, user, feed):
-        self.username = user
-        self.feed_id = feed
-
-    def __repr__(self):
-        return "<Subscription('%s','%s')>" % (self.username, self.feed_id)
-
-
-class Read(BASE):
-    __tablename__ = 'reads'
-
-    username = Column(
-        String(SMALL_STR),
-        ForeignKey('users.username'),
-        primary_key=True,
-        nullable=False)
-    entry_id = Column(Integer,
-        ForeignKey('entries.id'),
-        primary_key=True,
-        nullable=False)
-
-    def __init__(self, user, entry_id):
-        self.username = user
-        self.entry_id = entry_id
-
-    def __repr__(self):
-        return "<Read('%s','%s')>" % (self.username, self.entry_id)
 
 
 def make_yaml_bindings():
@@ -367,9 +195,9 @@ def make_yaml_bindings():
         tag = '!{}'.format(name.lower())
 
         def representer(dumper, obj, tag=tag):
-            to_serialize = dict((item[0], item[1]) for item in obj.__dict__.iteritems()
-                                if not item[0].startswith(u'_sa_'))
-            return dumper.represent_mapping(tag, to_serialize)
+            cols = dict((item[0], item[1]) for item in obj.__dict__.iteritems()
+                        if not item[0].startswith(u'_sa_'))
+            return dumper.represent_mapping(tag, cols)
 
         def constructor(loader, node, cls=cls):
             values = loader.construct_mapping(node)

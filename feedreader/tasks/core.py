@@ -121,7 +121,7 @@ class Tasks(object):
             guid = hashlib.sha1(
                 entry.get("id", title).encode('utf-8')
             ).hexdigest()
-            entry = models.Entry(None, content, link, title, author, date, guid)
+            entry = models.Entry(content, link, title, author, date, guid)
             entries.append(entry)
 
         return {
