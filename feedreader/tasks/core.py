@@ -8,7 +8,7 @@ import time
 from celery import Celery
 import feedparser
 
-from feedreader.database import models
+from feedreader import database
 
 
 logging.basicConfig(level=logging.INFO)
@@ -90,9 +90,9 @@ class Tasks(object):
         etag = parsed_feed.get("etag", None)
         last_modified = parsed_feed.get("modified", None)
         last_refresh_date = int(time.time())
-        feed = models.Feed(feed_title, feed_url, feed_link, etag=etag,
-                           last_modified=last_modified,
-                           last_refresh_date=last_refresh_date)
+        feed = database.Feed(feed_title, feed_url, feed_link, etag=etag,
+                             last_modified=last_modified,
+                             last_refresh_date=last_refresh_date)
         feed.id = feed_id
 
         # parse the entries
@@ -121,7 +121,7 @@ class Tasks(object):
             guid = hashlib.sha1(
                 entry.get("id", title).encode('utf-8')
             ).hexdigest()
-            entry = models.Entry(content, link, title, author, date, guid)
+            entry = database.Entry(content, link, title, author, date, guid)
             entries.append(entry)
 
         return {

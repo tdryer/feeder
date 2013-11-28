@@ -12,8 +12,8 @@ import os
 
 from tornado.testing import AsyncHTTPTestCase
 
+from feedreader import database
 from feedreader.config import Config
-from feedreader.database import models
 import feedreader.main
 
 
@@ -69,20 +69,23 @@ class ApiTest(AsyncHTTPTestCase):
 
         # create a session and some model instances for tests to use
         self.s = self.Session()
-        self.feed1 = models.Feed("Tombuntu",
-                                 "http://feeds.feedburner.com/Tombuntu",
-                                 "http://tombuntu.com")
-        self.feed1_entry1 = models.Entry(
-            "This is test content.", "http://tombuntu.com/test-content",
-            "Test title", "Tom", 1384402853, "veryrandomguid1"
-        )
+        self.feed1 = database.Feed("Tombuntu",
+                                   "http://feeds.feedburner.com/Tombuntu",
+                                   "http://tombuntu.com")
+        self.feed1_entry1 = database.Entry("This is test content.",
+                                           "http://tombuntu.com/test-content",
+                                           "Test title",
+                                           "Tom",
+                                           1384402853,
+                                           "veryrandomguid1")
         # TODO: make this entry different
-        self.feed1_entry2 = models.Entry(
-            "This is test content.",
-            "http://tombuntu.com/test-content", "Test title", "Tom",
-            1384402853, "veryrandomguid2"
-        )
-        self.user = self.s.query(models.User).get(TEST_USER)
+        self.feed1_entry2 = database.Entry("This is test content.",
+                                           "http://tombuntu.com/test-content",
+                                           "Test title",
+                                           "Tom",
+                                           1384402853,
+                                           "veryrandomguid2")
+        self.user = self.s.query(database.User).get(TEST_USER)
 
     def tearDown(self):
         self.s.close()
@@ -257,17 +260,18 @@ class ApiTest(AsyncHTTPTestCase):
             self.assert_api_call("POST /feeds", headers=self.headers,
                                  json_body={'url': url + "unicode-test.xml"},
                                  expect_code=201)
-        self.assert_api_call("GET /feeds", headers=self.headers,
-                             expect_code=200, expect_json={
+        expect_json = {
             "feeds": [
                 {
                     "id": 1,
                     "name": u"David Yan's CMPT 376W Blog😄",
                     "unreads": 1,
-                    "url" : u"http://awesome-blog.github.io/😄",
+                    "url": u"http://awesome-blog.github.io/😄",
                 },
             ]
-        })
+        }
+        self.assert_api_call("GET /feeds", headers=self.headers,
+                             expect_code=200, expect_json=expect_json)
 
     def test_add_feed_404(self):
         with serve_dir(TEST_DATA_DIR, TEST_SERVER_PORT) as url:

@@ -6,8 +6,8 @@ import base64
 import json
 import pbkdf2
 
+from feedreader import database
 from feedreader.api_request_handler import APIRequestHandler
-from feedreader.database import models
 
 
 def get_basic_auth(user, passwd, method="Basic"):
@@ -17,12 +17,12 @@ def get_basic_auth(user, passwd, method="Basic"):
 
 def get_application(handler):
     """Return Tornado application with demo user."""
-    create_session = models.initialize_db('sqlite://')
+    create_session = database.initialize_db('sqlite://')
     app = Application([("/", handler, dict(create_session=create_session,
                                            tasks=None, celery_poller=None))])
     session = create_session()
     # TODO: better way of creating the demo user
-    session.add(models.User("demo", pbkdf2.crypt("demo")))
+    session.add(database.User("demo", pbkdf2.crypt("demo")))
     session.commit()
     session.close()
     return app

@@ -5,7 +5,7 @@ from tornado import gen
 import pbkdf2
 
 from feedreader.api_request_handler import APIRequestHandler
-from feedreader.database.models import Feed, User
+from feedreader.database import Feed, User
 
 
 class MainHandler(APIRequestHandler):

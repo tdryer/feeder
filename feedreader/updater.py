@@ -1,10 +1,9 @@
 import logging
 import time
+
 from tornado import ioloop
-from sqlalchemy import and_
 
-from feedreader.database import models
-
+from feedreader import database
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -29,7 +28,8 @@ class Updater(object):
         session = self._create_session_f()
 
         stale_date = int(time.time()) - self._update_period.total_seconds()
-        stale_feeds = models.Feed.find_last_updated_before(session, stale_date)
+        stale_feeds = database.Feed.find_last_updated_before(session,
+                                                             stale_date)
         logger.info("Found stale feeds: {}".format(stale_feeds))
 
         for feed in stale_feeds:
@@ -65,10 +65,10 @@ class Updater(object):
 
         for entry in entries:
             # if guid is unique for this feed's entries, this is a new entry
-            existing_entry = session.query(models.Entry).filter(and_(
-                models.Entry.feed_id == feed.id,
-                models.Entry.guid == entry.guid,
-            )).all()
+            existing_entry = session.query(database.Entry)\
+                                    .filter(database.Entry.feed_id == feed.id)\
+                                    .filter(database.Entry.guid == entry.guid)\
+                                    .all()
             if len(existing_entry) == 0:
                 logger.info("Adding new entry for feed {}".format(feed.id))
                 entry.feed_id = feed.id

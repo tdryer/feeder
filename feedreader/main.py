@@ -7,16 +7,15 @@ import pbkdf2
 import tornado.ioloop
 import tornado.web
 
-from feedreader import handlers
+from feedreader import database, handlers
 from feedreader.celery_poller import CeleryPoller
 from feedreader.config import Config
-from feedreader.database import models
 from feedreader.tasks.core import Tasks
 from feedreader.updater import Updater
 
 
 def get_dependencies(config):
-    create_session = models.initialize_db(config.database_uri)
+    create_session = database.initialize_db(config.database_uri)
 
     tasks = Tasks(config.amqp_uri)
 
@@ -44,17 +43,16 @@ def get_dependencies(config):
 def get_application(config, db_setup_f=None):
     """Return Tornado application instance."""
     # initialize the DB so sessions can be created
-    create_session = models.initialize_db(config.database_uri)
+    create_session = database.initialize_db(config.database_uri)
 
     if db_setup_f is not None:
         db_setup_f(create_session)
 
     # XXX create test user
     session = create_session()
-    user = models.User("username", pbkdf2.crypt("password"))
-    if not session.query(models.User).filter(
-            models.User.username == user.username
-            ).count():
+    user = database.User("username", pbkdf2.crypt("password"))
+    if not session.query(database.User).filter(
+            database.User.username == user.username).count():
         session.add(user)
         session.commit()
 

@@ -6,7 +6,7 @@ import jsonschema
 import tornado.web
 import pbkdf2
 
-from feedreader.database import models
+from feedreader import database
 
 
 class APIRequestHandler(tornado.web.RequestHandler):
@@ -40,7 +40,7 @@ class APIRequestHandler(tornado.web.RequestHandler):
             if auth_type not in ["Basic", "xBasic"]:
                 raise ValueError("Authorization type is not Basic")
             self.use_www_authenticate = auth_type == "Basic"
-            user_model = session.query(models.User).get(user)
+            user_model = session.query(database.User).get(user)
             if user_model is None:
                 raise ValueError("Invalid username or password")
             passwd_hash = user_model.password_hash
