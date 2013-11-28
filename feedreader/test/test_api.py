@@ -255,6 +255,15 @@ class ApiTest(AsyncHTTPTestCase):
                                  json_body={'url': url + "awesome-blog.xml"},
                                  expect_code=201)
 
+    def test_add_feed_failure_then_success(self):
+        with serve_dir(TEST_DATA_DIR, TEST_SERVER_PORT) as url:
+            self.assert_api_call("POST /feeds", headers=self.headers,
+                                 json_body={'url': url + "null.xml"},
+                                 expect_code=400)
+            self.assert_api_call("POST /feeds", headers=self.headers,
+                                 json_body={'url': url + "awesome-blog.xml"},
+                                 expect_code=201)
+
     def test_add_feed_unicode_success(self):
         with serve_dir(TEST_DATA_DIR, TEST_SERVER_PORT) as url:
             self.assert_api_call("POST /feeds", headers=self.headers,

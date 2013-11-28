@@ -2,6 +2,7 @@
 
 from tornado import concurrent
 from tornado import ioloop
+from tornado import stack_context
 import logging
 
 
@@ -21,8 +22,13 @@ class CeleryPoller(object):
         callback = kwargs["callback"]
         del kwargs["callback"]
 
-        self._results_callbacks.append((task.delay(*args, **kwargs), callback))
-        #if len(self._results_callbacks) == 0:
+        # Wrap the callback it takes the result and raises exceptions in the
+        # correct stack context.
+        def result_callback(result): callback(result.get())
+        result_callback = stack_context.wrap(result_callback)
+
+        self._results_callbacks.append((task.delay(*args, **kwargs),
+                                        result_callback))
         self._poll_tasks()
 
     def _poll_tasks(self):
@@ -31,7 +37,9 @@ class CeleryPoller(object):
         for result, callback in self._results_callbacks:
             if result.ready():
                 logger.info("Task is done")
-                callback(result.get())
+                # Exception should never be raised here or bad things will
+                # happen.
+                callback(result)
             else:
                 logger.info("Task is still pending")
                 results_callbacks.append((result, callback))

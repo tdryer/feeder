@@ -70,7 +70,7 @@ class Tasks(object):
             check the http status code
         """
 
-        logger.info("Parsing feed '{}'".format(feed_url))
+        logger.info("Fetch feed task STARTED for '{}'".format(feed_url))
 
         # download and parse the feed
         parsed_feed = feedparser.parse(feed_url)
@@ -80,8 +80,7 @@ class Tasks(object):
 
         # check for failure (version is "" or not an attribute)
         if parsed_feed.get("version", "") == "":
-            logger.warning("Cannot determine version of feed '{}'"
-                           .format(feed_url))
+            logger.info("Fetch feed task FAILED for '{}'".format(feed_url))
             raise ValueError("Failed to fetch feed")
 
         # parse the feed
@@ -123,6 +122,8 @@ class Tasks(object):
             ).hexdigest()
             entry = database.Entry(content, link, title, author, date, guid)
             entries.append(entry)
+
+        logger.info("Fetch feed task SUCCEEDED for '{}'".format(feed_url))
 
         return {
             "feed": feed,

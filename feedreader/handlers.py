@@ -3,9 +3,14 @@
 from tornado.web import HTTPError, asynchronous
 from tornado import gen
 import pbkdf2
+import logging
 
 from feedreader.api_request_handler import APIRequestHandler
 from feedreader.database import Feed, User
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class MainHandler(APIRequestHandler):
@@ -88,6 +93,7 @@ class FeedsHandler(APIRequestHandler):
             try:
                 res = yield celery_poller.run_task(tasks.fetch_feed, url)
             except ValueError as e:
+                logger.warning("Failed to fetch new feed: '{}'".format(e))
                 raise HTTPError(400, reason=str(e))
             feed = res['feed']
             feed.add_all(res['entries'])
