@@ -14,8 +14,7 @@
       ng-click="ArticleList.filter=null">All</button>
     <button
       class="btn btn-xs btn-info mls"
-      ng-class="{active:ArticleList.filter.read===false ||
-        ArticleList.filter===undefined}"
+      ng-class="{active:ArticleList.filter.read===false}"
       ng-click="ArticleList.filter={read:false}">Unread</button>
     <button
       class="btn btn-xs btn-info mls"
