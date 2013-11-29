@@ -10,21 +10,22 @@
   <div class="filters small palette-peter-river">
     <button
       class="btn btn-xs btn-info mls"
-      ng-class="{active:filter===null}"
-      ng-click="filter=null">All</button>
+      ng-class="{active:ArticleList.filter===null}"
+      ng-click="ArticleList.filter=null">All</button>
     <button
       class="btn btn-xs btn-info mls"
-      ng-class="{active:filter.read===false}"
-      ng-click="filter={read:false}">Unread</button>
+      ng-class="{active:ArticleList.filter.read===false ||
+        ArticleList.filter===undefined}"
+      ng-click="ArticleList.filter={read:false}">Unread</button>
     <button
       class="btn btn-xs btn-info mls"
-      ng-class="{active:filter.read===true}"
-      ng-click="filter={read:true}">Read</button>
+      ng-class="{active:ArticleList.filter.read===true}"
+      ng-click="ArticleList.filter={read:true}">Read</button>
   </div>
   <ul>
     <li
       ng-class="{unread:!article.read}"
-      ng-repeat="article in ArticleList.list | filter:filter">
+      ng-repeat="article in ArticleList.list | filter:ArticleList.filter">
       <a
         href="/home/{{article.feed_id}}/{{article.id}}">
         <time

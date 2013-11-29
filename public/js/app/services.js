@@ -220,6 +220,7 @@
    */
   this.factory('ArticleList', function($q, Restangular, User, Article) {
     var endpoint = Restangular.one('feeds')
+      , filter = null
       , id = 0
       , list = false
       , unreads = 0;
