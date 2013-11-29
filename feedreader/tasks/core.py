@@ -53,38 +53,38 @@ class Tasks(object):
         Any returned models will be missing foreign keys that don't exist yet
         (like Entry.feed_id if the feed is new).
 
-        Raises ValueError if feed_url can't be fetch, with a description of
-        the error.
-
-        Returns dict containing:
+        On success, returns dict containing:
             - feed: new instance of the Feed model, or None if the feed was
               unmodified
             - entries: list of new instances of the Entry model, or empty list
               if the feed was unmodified
 
+        On error, returns dict containing:
+            - error: description of the error
+
         TODO:
-            feed discovery
             disallow local URLs
             use etag and last-modified if provided
-            save guid and use it for updating feeds
             check content types and escape html if necessary
             check the http status code
         """
 
         logger.info("Fetch feed task STARTED for '{}'".format(feed_url))
 
-        # download and parse the feed
-        parsed_feed = feedparser.parse(feed_url)
-        if parsed_feed.bozo:
-            logger.warning("Feed '{}' set the bozo bit: '{}'"
-                           .format(feed_url, parsed_feed.bozo_exception))
-
-        # check for failure (version is "" or not an attribute)
-        if parsed_feed.get("version", "") == "":
-            logger.info("Fetch feed task FAILED for '{}'".format(feed_url))
-            return yaml.safe_dump({
-                "error": "Failed to fetch feed",
-            })
+        parsed_feed = get_parsed_feed(feed_url)
+        if not is_valid(parsed_feed):
+            discovered_feed_url = discover_feed(parsed_feed)
+            if discovered_feed_url is not None:
+                discovered_parsed_feed = get_parsed_feed(discovered_feed_url)
+            if (discovered_feed_url is None
+                or not is_valid(discovered_parsed_feed)):
+                logger.info("Fetch feed task FAILED for '{}'".format(feed_url))
+                return yaml.safe_dump({
+                    "error": "Failed to fetch feed",
+                })
+            else:
+                feed_url = discovered_feed_url
+                parsed_feed = discovered_parsed_feed
 
         # parse the feed
         feed_title = parsed_feed.feed.get("title", "Untitled")
@@ -134,3 +134,67 @@ class Tasks(object):
             "feed": feed,
             "entries": entries,
         })
+
+# helpers
+
+# link type attribute values that indicate a feed
+FEED_MIME_TYPES = [
+    'application/rss+xml',
+    'application/atom+xml',
+]
+
+
+def get_parsed_feed(feed_url):
+    """Return parsed feed from feedparser."""
+    parsed_feed = feedparser.parse(feed_url)
+    if parsed_feed.bozo:
+        logger.warning("Feed '{}' set the bozo bit: '{}'"
+                       .format(feed_url, parsed_feed.bozo_exception))
+    return parsed_feed
+
+
+def is_valid(parsed_feed):
+    """Return True if parsed_feed looks valid."""
+    # version can be "" or not an attribute if invalid
+    is_valid_ = parsed_feed.get("version", "") != ""
+    if is_valid_:
+        logger.info("Parsed feed is valid")
+    else:
+        logger.info("Parsed feed is invalid")
+    return is_valid_
+
+
+def discover_feed(parsed_feed):
+    """Attempt to discover a feed.
+
+    Given a result from feedparser that is not a feed, return an associated
+    feed URL or return None.
+
+    See: http://www.rssboard.org/rss-autodiscovery
+    """
+    logger.info("Attempting to discover feed")
+
+    # extract the list of links from feedparser at all costs
+    try:
+        links = parsed_feed.feed.links
+    except AttributeError:
+        links = []
+    else:
+        if not isinstance(links, list):
+            links = []
+
+    # find link urls that appear to be feeds
+    discovered_feeds = [
+        link.href for link in links if
+        link.get('rel', None) == "alternate" and
+        link.get('type', None) in FEED_MIME_TYPES and
+        len(link.get('href', '')) > 0
+    ]
+
+    if len(discovered_feeds) > 0:
+        url = discovered_feeds[0]
+        logger.info("Feed discovery succeeded: '{}'".format(url))
+        return url
+    else:
+        logger.info("Feed discovery failed")
+        return None
