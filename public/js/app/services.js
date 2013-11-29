@@ -218,9 +218,10 @@
    * @var {Function} push Adds to the article list, or update an article in it.
    * @var {Function} update Fetches and stores the article ids of a feed.
    */
-  this.factory('ArticleList', function($q, Restangular, User, Article) {
+  this.factory('ArticleList', function($q, $cookieStore, Restangular, User,
+                                       Article) {
     var endpoint = Restangular.one('feeds')
-      , filter = {read:false}
+      , filter = $cookieStore.get('statusFilter') || {read:false}
       , id = 0
       , list = false
       , unreads = 0;
@@ -256,12 +257,23 @@
       }, this), $q.reject);
     }
 
+    function updateFilter(readStatus) {
+      if (readStatus === null) {
+        this.filter = null;
+      } else {
+        this.filter = {read: readStatus};
+      }
+
+      $cookieStore.put('statusFilter', this.filter);
+    }
+
     return {
       filter: filter,
       id: id,
       list: list,
       push: push,
-      update: update
+      update: update,
+      updateFilter: updateFilter
     };
   });
 

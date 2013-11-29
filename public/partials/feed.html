@@ -11,15 +11,15 @@
     <button
       class="btn btn-xs btn-info mls"
       ng-class="{active:ArticleList.filter===null}"
-      ng-click="ArticleList.filter=null">All</button>
+      ng-click="ArticleList.updateFilter(null)">All</button>
     <button
       class="btn btn-xs btn-info mls"
       ng-class="{active:ArticleList.filter.read===false}"
-      ng-click="ArticleList.filter={read:false}">Unread</button>
+      ng-click="ArticleList.updateFilter(false)">Unread</button>
     <button
       class="btn btn-xs btn-info mls"
       ng-class="{active:ArticleList.filter.read===true}"
-      ng-click="ArticleList.filter={read:true}">Read</button>
+      ng-click="ArticleList.updateFilter(true)">Read</button>
   </div>
   <ul>
     <li
