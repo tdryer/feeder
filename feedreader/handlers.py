@@ -5,6 +5,7 @@ from tornado.web import HTTPError, asynchronous
 from tornado import gen
 import pbkdf2
 import logging
+import yaml
 
 from feedreader.api_request_handler import APIRequestHandler
 from feedreader.database import Feed, User
@@ -89,11 +90,12 @@ class FeedsHandler(APIRequestHandler):
         # add a new feed if it doesn't exist already
         feed = session.query(Feed).filter(Feed.feed_url == url).first()
         if feed is None:
-            try:
-                res = yield celery_poller.run_task(tasks.fetch_feed, url)
-            except ValueError as e:
-                logger.warning("Failed to fetch new feed: '{}'".format(e))
-                raise HTTPError(400, reason=str(e))
+            res = yield celery_poller.run_task(tasks.fetch_feed, url)
+            res = yaml.safe_load(res)
+            if "error" in res:
+                logger.warning("Failed to fetch new feed: '{}'"
+                               .format(res['error']))
+                raise HTTPError(400, reason=res['error'])
             feed = res['feed']
             feed.add_all(res['entries'])
             session.commit()

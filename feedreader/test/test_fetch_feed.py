@@ -2,6 +2,7 @@
 import pytest
 import httpretty
 from os import path
+import yaml
 
 from feedreader.tasks.core import Tasks
 
@@ -19,9 +20,8 @@ def test_connection_refused(tasks):
     httpretty.enable()
     feed_url = "http://example.com/feed.xml"
     httpretty.register_uri(httpretty.GET, feed_url, status=404)
-    with pytest.raises(ValueError):
-        tasks.fetch_feed.delay(feed_url).get()
-
+    res = yaml.safe_load(tasks.fetch_feed.delay(feed_url).get())
+    assert "error" in res
     httpretty.disable()
     httpretty.reset()
 
@@ -36,7 +36,7 @@ def test_awesome_blog(tasks):
                                 "ETag": "1337",
                                 "Last-Modified": "Tue, 15 Nov 1994 12:45:26 +0000",
                            })
-    res = tasks.fetch_feed.delay(feed_url).get()
+    res = yaml.safe_load(tasks.fetch_feed.delay(feed_url).get())
     assert res["feed"].title == "David Yan's CMPT 376W Blog"
     assert res["feed"].site_url == "http://awesome-blog.github.io/"
     assert res["feed"].feed_url == feed_url

@@ -1,14 +1,17 @@
 """Celery tasks."""
 
+#pylint: disable=E0202
+
 import calendar
 import hashlib
 import logging
 import time
-
+import yaml
 from celery import Celery
-import feedparser
 
+import feedparser
 from feedreader import database
+
 
 logger = logging.getLogger(__name__)
 
@@ -18,11 +21,11 @@ class Tasks(object):
     def __init__(self, amqp_uri=''):
         self.app = Celery()
         self.app.conf.update(
-            CELERY_ACCEPT_CONTENT=['json', 'yaml'],
+            CELERY_ACCEPT_CONTENT=['json'],
             CELERY_ALWAYS_EAGER=True,
             CELERY_ENABLE_UTC=True,
-            CELERY_TASK_SERIALIZER='yaml',
-            CELERY_RESULT_SERIALIZER='yaml',
+            CELERY_TASK_SERIALIZER='json',
+            CELERY_RESULT_SERIALIZER='json',
             CELERY_TIMEZONE='America/Vancouver',
         )
 
@@ -79,7 +82,9 @@ class Tasks(object):
         # check for failure (version is "" or not an attribute)
         if parsed_feed.get("version", "") == "":
             logger.info("Fetch feed task FAILED for '{}'".format(feed_url))
-            raise ValueError("Failed to fetch feed")
+            return yaml.safe_dump({
+                "error": "Failed to fetch feed",
+            })
 
         # parse the feed
         feed_title = parsed_feed.feed.get("title", "Untitled")
@@ -123,7 +128,9 @@ class Tasks(object):
 
         logger.info("Fetch feed task SUCCEEDED for '{}'".format(feed_url))
 
-        return {
+        # Serialize manually so tests that run in eager mode cover
+        # serialization.
+        return yaml.safe_dump({
             "feed": feed,
             "entries": entries,
-        }
+        })
