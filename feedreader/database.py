@@ -16,20 +16,6 @@ SMALL_STR = 100
 MEDIUM_STR = 1024
 LARGE_STR = 10 * MEDIUM_STR
 
-# column size variables for keeping track of changes
-size_user_username = SMALL_STR
-size_user_pw_hash = MEDIUM_STR
-size_feed_title = MEDIUM_STR
-size_feed_resource = MEDIUM_STR
-size_feed_site = MEDIUM_STR
-size_feed_modified = SMALL_STR
-size_feed_etag = MEDIUM_STR
-size_entry_content = LARGE_STR
-size_entry_content = MEDIUM_STR
-size_entry_title = MEDIUM_STR
-size_entry_author = SMALL_STR
-size_entry_guid = SMALL_STR
-
 
 def initialize_db(database_uri='sqlite://'):
     """Initialize the DB and return SQLAlchemy Session class.
@@ -77,13 +63,11 @@ class User(BASE):
     def __init__(self, name, password_hash):
         self.username = column_size(
             name,
-            size_user_username,
             'users',
             'username'
         )
         self.password_hash = column_size(
             password_hash,
-            size_user_pw_hash,
             'users',
             'pw_hash'
         )
@@ -171,29 +155,25 @@ class Feed(BASE):
         self.id = id
         self.title = column_size(
             title,
-            size_feed_title,
             'feeds',
             'title'
         )
         self.feed_url = column_size(
             feed_url,
-            size_feed_resource,
             'feeds',
             'resource'
         )
         self.site_url = column_size(
             site_url,
-            size_feed_site,
             'feeds',
             'site'
         )
         self.last_modified = column_size(
             last_modified,
-            size_feed_modified,
             'feeds',
             'modified'
         )
-        self.etag = column_size(etag, size_feed_etag, 'feeds', 'etag')
+        self.etag = column_size(etag, 'feeds', 'etag')
         self.last_refresh_date = last_refresh_date
 
     def __repr__(self):
@@ -239,38 +219,38 @@ class Entry(BASE):
     def __init__(self, content, url, title, author, date, guid):
         self.content = column_size(
             content,
-            size_entry_content,
             'entries',
             'content'
         )
-        self.url = column_size(url, size_entry_content, 'entries', 'url')
+        self.url = column_size(url, 'entries', 'url')
         self.title = column_size(
             title,
-            size_entry_title,
             'entries',
             'title'
         )
         self.author = column_size(
             author,
-            size_entry_author,
             'entries',
             'author'
         )
         self.date = date
-        self.guid = column_size(guid, size_entry_guid, 'entries', 'guid')
+        self.guid = column_size(guid, 'entries', 'guid')
 
     def __repr__(self):
         return '<Entry({!r})>'.format(self.id)
 
 
-def column_size(string, size, table, column):
+def column_size(string, table, column):
     if string is None:
         return string
     length = len(string)
-    if length > size:
-        table_obj = Table(table, BASE.metadata, autoload=True)
+    table_obj = Table(table, BASE.metadata, autoload=True)
+    if length > table_obj.c[column].type.length:
         # alter the username columns in Subscription and Read
         if table == 'users' and column == 'username':
+            # TODO: check if the foreign key constraint takes care of this.
+            #       I suspect it does not since altering tables is not in the
+            #       core of sqlalchemy
             sub_table = Table('subscriptions', BASE.metadata, autoload=True)
             read_table = Table('read', BASE.metadata, autoload=True)
             alter_column(column, table=sub_table, type=String(length))
