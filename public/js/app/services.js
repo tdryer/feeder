@@ -301,6 +301,7 @@
    * @var {Array|Boolean} [list=false] The list of articles.
    * @var {Function} push Adds to the article list, or update an article in it.
    * @var {Function} update Fetches and stores the article ids of a feed.
+   * @var {Function} updateFilter Changes the filter of the article list view.
    */
   this.factory('ArticleList', function($q, Cookie, User, Article) {
     var endpoint = User.call().one('feeds')
@@ -312,6 +313,11 @@
       , list = false
       , unreads = 0;
 
+    /**
+     * Either adds a new article to the article list, or updates an already
+     * existing article. The article to push or update comes from the `Article`
+     * model.
+     */
     function push() {
       var list = this.list
         , updatedArticle = Article.article;
@@ -329,6 +335,15 @@
       this.list = list;
     }
 
+    /**
+     * Fetches all the articles belonging to a feed identified by `id`. These
+     * articles will not have their full content. Instead, a truncated version
+     * will be requested for the purposes of a short preview in the article
+     * list view.
+     *
+     * @param {Number} id The id of the feed.
+     * @returns {Promise} Returns the promise of the fetch articles API hit.
+     */
     function update(id) {
       return endpoint.one(id).getList('entries').then(_.bind(function(result) {
         return Article.get(result.entries, {
@@ -340,6 +355,12 @@
       }, this), $q.reject);
     }
 
+    /**
+     * Updates the filter for the article list view. This setting persists on a
+     * per browser basis due to cookie usage.
+     *
+     * @param {Null|Object} filter The filter object.
+     */
     function updateFilter(filter) {
       if (_.isBoolean(filter)) {
         this.filter = {
@@ -368,7 +389,7 @@
    *
    * @factory
    * @var {Object|Boolean} [article=false] The article.
-   * @var {Function} get Fetches and stores an article.
+   * @var {Function} get Fetches an article.
    * @var {Function} read Reads an article.
    * @var {Function} unread Unreads an article.
    * @var {Function} update Fetches and stores the article ids of a feed.
@@ -377,17 +398,24 @@
     var endpoint = User.call().one('entries')
       , article = false;
 
+    /**
+     * Fetches an article.
+     *
+     * @param {Array|Number} id The id(s) of the feed.
+     * @param {Object} [queryParams={}] Any query parameters.
+     * @returns {Promise} Returns the promise of the fetch article API hit.
+     */
     function get(id, queryParams) {
       queryParams || (queryParams = {});
       return endpoint.getList(id, queryParams);
     }
 
-    function update(id) {
-      return this.get(id).then(_.bind(function(result) {
-        this.article = result.entries.pop();
-      }, this), $q.reject);
-    }
-
+    /**
+     * Sets an article as read.
+     *
+     * @param {Number} id The id of the feed.
+     * @returns {Promise} Returns the promise of the read article API hit.
+     */
     function read(id) {
       return endpoint.one(id).patch({
         read: true
@@ -396,11 +424,29 @@
       }, this), $q.reject);
     }
 
+    /**
+     * Sets an article as unread.
+     *
+     * @param {Number} id The id of the feed.
+     * @returns {Promise} Returns the promise of the unread article API hit.
+     */
     function unread(id) {
       return endpoint.one(id).patch({
         read: false
       }).then(_.bind(function(result) {
         this.article.read = false;
+      }, this), $q.reject);
+    }
+
+    /**
+     * Fetches and stores an article.
+     *
+     * @param {Array|Number} id The id(s) of the feed.
+     * @returns {Promise} Returns the promise of the fetch article API hit.
+     */
+    function update(id) {
+      return this.get(id).then(_.bind(function(result) {
+        this.article = result.entries.pop();
       }, this), $q.reject);
     }
 
