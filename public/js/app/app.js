@@ -96,19 +96,29 @@
     $httpProvider.interceptors.push(function($q, State) {
       return {
         request: function(config) {
+          State.requests++;
           State.loading = true;
           return config;
         },
         requestError: function(rejection) {
-          State.loading = false;
+          State.requests--;
+          if (!State.requests) {
+            State.loading = false;
+          }
           return $q.reject(rejection);
         },
         response: function(response) {
-          State.loading = false;
+          State.requests--;
+          if (!State.requests) {
+            State.loading = false;
+          }
           return response;
         },
         responseError: function(rejection) {
-          State.loading = false;
+          State.requests--;
+          if (!State.requests) {
+            State.loading = false;
+          }
           return $q.reject(rejection);
         }
       };

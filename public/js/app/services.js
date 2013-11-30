@@ -7,14 +7,17 @@
    * @factory
    * @var {Boolean} [error=false] Has the application encountered an error?
    * @var {Boolean} [loading=false] Is the application is loading something?
+   * @var {Number} [requests=0] The number of outstanding requests.
    */
   this.factory('State', function() {
     var error = false
-      , loading = false;
+      , loading = false
+      , requests = 0;
 
     return {
       error: error,
-      loading: loading
+      loading: loading,
+      requests: requests
     };
   });
 
