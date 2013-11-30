@@ -78,6 +78,46 @@
   }
 }
 
+@-webkit-keyframes fade-in {
+  from {
+    opacity:0;
+  } to {
+    opacity:1;
+  }
+}
+
+@-moz-keyframes fade-in {
+  from {
+    opacity: 0;
+  } to {
+    opacity: 1;
+  }
+}
+
+@-ms-keyframes fade-in {
+  from {
+    opacity: 0;
+  } to {
+    opacity: 1;
+  }
+}
+
+@-o-keyframes fade-in {
+  from {
+    opacity: 0;
+  } to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  } to {
+    opacity: 1;
+  }
+}
+
 loading {
   text-align: center;
   position: fixed;
@@ -110,45 +150,13 @@ loading .spinner {
   background: #ebedee;
   display: inline-block;
   position: absolute;
-  -webkit-animation: corner 0.5s ease infinite;
-  -moz-animation: corner 0.5s ease infinite;
-  -ms-animation: corner 0.5s ease infinite;
-  -o-animation: corner 0.5s ease infinite;
-  animation: corner 0.5s ease infinite;
+  -webkit-animation: corner 1s ease infinite;
+  -moz-animation: corner 1s ease infinite;
+  -ms-animation: corner 1s ease infinite;
+  -o-animation: corner 1s ease infinite;
+  animation: corner 1s ease infinite;
   top: 50%;
   left: 50%;
   margin-left: -8px;
   margin-top: -8px;
 }
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  } to {
-    opacity: 1;
-  }
-}
-
-@-moz-keyframes fade-in {
-  from {
-    opacity: 0;
-  } to {
-    opacity: 1;
-  }
-}
-
-@-webkit-keyframes fade-in {
-  from {
-    opacity:0;
-  } to {
-    opacity:1;
-  }
-}
-
-@-o-keyframes fade-in {
-  from {
-    opacity: 0;
-  } to {
-    opacity: 1;
-  }
-}​

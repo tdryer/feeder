@@ -5,6 +5,10 @@ header {
   white-space: nowrap;
 }
 
+header .feeder {
+  color: #fff;
+}
+
 header .header-user {
   padding: 0.5em;
   text-align: right;

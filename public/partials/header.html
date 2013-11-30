@@ -9,6 +9,10 @@
       href="/home/{{ArticleList.id}}"
       ng-show="$routeParams.article">Back</a>
     <a
+      class="btn mrs feeder"
+      href="/"
+      ng-show="!User.authenticated">feeder</a>
+    <a
       class="btn btn-primary mrs"
       href="/home"
       ng-show="User.authenticated">Home</a>
