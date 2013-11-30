@@ -28,13 +28,13 @@
    * @var {Function} register Creates a user for the current visitor.
    * @var {String} username The username of the user.
    */
-  this.factory('User', function($q, $cookieStore, Restangular) {
+  this.factory('User', function($q, Restangular) {
     var endpoint = Restangular.one('users')
       , authKey = 'auth'
       , usernameKey = 'username'
-      , authenticated = !!$cookieStore.get(authKey)
-      , authorization = $cookieStore.get(authKey)
-      , username = $cookieStore.get(usernameKey);
+      , authenticated = !!cookie.get(authKey)
+      , authorization = cookie.get(authKey)
+      , username = cookie.get(usernameKey);
 
     /**
      * Returns an authenticated `Restangular` instance.
@@ -42,12 +42,16 @@
      * @returns {Object} Returns a `Restangular` object.
      */
     function call() {
-      return Restangular.withConfig(_.bind(function(RestangularConfigurer) {
-        var header = this.getAuthHeader();
-
-        if (header) {
-          RestangularConfigurer.setDefaultHeaders(header);
+      return Restangular.withConfig(_.bind(function(configurer) {
+        function interceptor(element, operation, route, url, headers, params) {
+          return {
+            element: element,
+            params: params,
+            headers: _.extend(headers, this.getAuthHeader())
+          };
         }
+
+        configurer.setFullRequestInterceptor(_.bind(interceptor, this));
       }, this));
     }
 
@@ -82,8 +86,13 @@
         this.authenticated = true;
         this.authorization = auth;
         this.username = username;
-        $cookieStore.put(authKey, auth);
-        $cookieStore.put(usernameKey, username);
+        cookie.set(authKey, auth, {
+          expires: 9001,
+          path: '/'
+        }).set(usernameKey, username, {
+          expires: 9001,
+          path: '/'
+        });
       }, this), $q.reject);
     };
 
@@ -104,8 +113,13 @@
         this.authenticated = true;
         this.authorization = auth;
         this.username = username;
-        $cookieStore.put(authKey, auth);
-        $cookieStore.put(usernameKey, username);
+        cookie.set(authKey, auth, {
+          expires: 9001,
+          path: '/'
+        }).set(usernameKey, username, {
+          expires: 9001,
+          path: '/'
+        });
       }, this), $q.reject);
     }
 
@@ -115,8 +129,7 @@
     function logout() {
       this.authenticated = false;
       this.username = '';
-      $cookieStore.remove(authKey);
-      $cookieStore.remove(usernameKey);
+      cookie.remove(authKey).remove(usernameKey);
     }
 
     return {
@@ -229,10 +242,10 @@
    * @var {Function} push Adds to the article list, or update an article in it.
    * @var {Function} update Fetches and stores the article ids of a feed.
    */
-  this.factory('ArticleList', function($q, $cookieStore, User, Article) {
+  this.factory('ArticleList', function($q, User, Article) {
     var endpoint = User.call().one('feeds')
       , filterKey = 'filter'
-      , filter = $cookieStore.get(filterKey) || {
+      , filter = JSON.parse(cookie.get(filterKey)) || {
           read: false
         }
       , id = 0
@@ -276,7 +289,10 @@
         this.filter = null;
       }
 
-      $cookieStore.put(filterKey, this.filter);
+      cookie.set(filterKey, JSON.stringify(this.filter), {
+        expires: 9001,
+        path: '/'
+      });
     }
 
     return {

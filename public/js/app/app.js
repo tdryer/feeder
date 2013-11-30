@@ -121,7 +121,6 @@
   });
 
 }).call(angular.module('feeder', [
-  'ngCookies',
   'ngRoute',
   'ngSanitize',
   'restangular',
