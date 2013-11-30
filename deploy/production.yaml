@@ -1,0 +1,2 @@
+amqp: "guest:guest@localhost:5672//"
+database: "mysql://feeder:qwerty123@localhost/feeder?charset=utf8"

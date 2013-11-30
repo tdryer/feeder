@@ -13,7 +13,7 @@ import os
 from tornado.testing import AsyncHTTPTestCase
 
 from feedreader import database
-from feedreader.config import Config
+from feedreader.config import ConnectionConfig, FeederConfig
 import feedreader.main
 
 
@@ -92,13 +92,14 @@ class ApiTest(AsyncHTTPTestCase):
         super(ApiTest, self).tearDown()
 
     def get_app(self):
-        # hack to get access to the session class
-        config = Config('', 'sqlite://', False, 8080, False)
+        feeder_config = FeederConfig('', False, 8080, False, 0)
+        conn_config = ConnectionConfig('', 'sqlite://')
 
         def hook(Session):
             self.Session = Session
 
-        return feedreader.main.get_application(config, db_setup_f=hook)
+        return feedreader.main.get_application(feeder_config, conn_config,
+                                               db_setup_f=hook)
 
     def assert_api_call(self, api_call, headers=None, json_body=None,
                         expect_code=None, expect_json=None):

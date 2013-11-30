@@ -10,15 +10,15 @@ import tornado.web
 
 from feedreader import database, handlers
 from feedreader.celery_poller import CeleryPoller
-from feedreader.config import Config
+from feedreader.config import ConnectionConfig, FeederConfig
 from feedreader.tasks.core import Tasks
 from feedreader.updater import Updater
 
 
-def get_application(config, db_setup_f=None):
+def get_application(feeder_config, conn_config, db_setup_f=None):
     """Return Tornado application instance."""
     # initialize the DB so sessions can be created
-    create_session = database.initialize_db(config.database_uri)
+    create_session = database.initialize_db(conn_config.database_uri)
 
     if db_setup_f is not None:
         db_setup_f(create_session)
@@ -32,11 +32,11 @@ def get_application(config, db_setup_f=None):
         session.commit()
 
     # TODO: make this configurable
-    tasks = Tasks(config.amqp_uri)
+    tasks = Tasks(conn_config.amqp_uri)
 
     celery_poller = CeleryPoller(timedelta(milliseconds=5))
 
-    if config.dummy_data:
+    if feeder_config.dummy_data:
         # add some test feeds
         # don't any anything that we aren't ok with hammering with requests
         TEST_FEEDS = [
@@ -83,7 +83,7 @@ def get_application(config, db_setup_f=None):
     CHECK_UPDATE_PERIOD = timedelta(minutes=1)
     UPDATE_PERIOD = timedelta(hours=1)
 
-    if config.periodic_updates:
+    if feeder_config.periodic_updates:
         # create updater and attach to IOLoop
         updater = Updater(UPDATE_PERIOD, create_session, tasks, celery_poller)
         periodic_callback = tornado.ioloop.PeriodicCallback(
@@ -94,7 +94,7 @@ def get_application(config, db_setup_f=None):
     # create tornado application and listen on the provided port
     default_injections = dict(
         create_session=create_session,
-        enable_dummy_data=config.dummy_data,
+        enable_dummy_data=feeder_config.dummy_data,
         tasks=tasks,
         celery_poller=celery_poller,
     )
@@ -113,11 +113,15 @@ def get_application(config, db_setup_f=None):
 
 def main():
     """Main entry point for the server."""
-    logging.basicConfig(format='[%(levelname)s][%(name)s]: %(message)s')
+    feeder_config = FeederConfig.from_args()
+    conn_config = ConnectionConfig.from_file(feeder_config.conn_filepath)
+
+    logformat = '[feeder.{}][%(levelname)s][%(name)s]: %(message)s'\
+                .format(feeder_config.instance_number)
+    logging.basicConfig(format=logformat)
     logging.getLogger().setLevel(logging.INFO)
 
-    config = Config.from_args()
-    get_application(config).listen(config.port)
+    get_application(feeder_config, conn_config).listen(feeder_config.port)
     tornado.ioloop.IOLoop.instance().start()
 
 

@@ -10,6 +10,7 @@ import logging
 import tornado.ioloop
 import tornado.web
 
+from feedreader.config import ConnectionConfig, FeederConfig
 import feedreader.config
 import feedreader.main
 
@@ -37,14 +38,17 @@ def main():
     logging.basicConfig(format='[%(levelname)s][%(name)s]: %(message)s')
     logging.getLogger().setLevel(logging.DEBUG)
 
-    config = feedreader.config.Config.from_args()
-    feedreader_app = feedreader.main.get_application(config)
+    feeder_config = FeederConfig.from_args()
+    conn_config = ConnectionConfig.from_file(feeder_config.conn_filepath)
+
+    feedreader_app = feedreader.main.get_application(feeder_config,
+                                                     conn_config)
     application = tornado.web.Application([
         (r"/api/(.*)", PrefixedFallbackHandler, dict(fallback=feedreader_app)),
         (r"/(.*\..*)", tornado.web.StaticFileHandler, {"path": "public"}),
         (r"/(.*)", SingleFileHandler, {"path": "public"}),
     ])
-    application.listen(config.port)
+    application.listen(feeder_config.port)
     tornado.ioloop.IOLoop.instance().start()
 
 
