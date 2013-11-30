@@ -245,9 +245,7 @@
   this.factory('ArticleList', function($q, User, Article) {
     var endpoint = User.call().one('feeds')
       , filterKey = 'filter'
-      , filter = JSON.parse(cookie.get(filterKey)) || {
-          read: false
-        }
+      , filter = JSON.parse(cookie.get(filterKey) || '{"read": false}')
       , id = 0
       , list = false
       , unreads = 0;
