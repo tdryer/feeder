@@ -110,8 +110,8 @@ class Feed(BASE):
     site_url = Column(String(MEDIUM_STR), nullable=True)
     # date of last attempted refresh
     last_refresh_date = Column(Integer, nullable=True)
-    # last-modifed date used for caching
-    last_modified = Column(Integer, nullable=True)
+    # last-modifed date used for caching (string since we don't parse it)
+    last_modified = Column(String(MEDIUM_STR), nullable=True)
     # etag used for caching
     etag = Column(String(MEDIUM_STR), nullable=True)
 
