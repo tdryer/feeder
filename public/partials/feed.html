@@ -28,7 +28,7 @@
       <a
         href="/home/{{article.feed_id}}/{{article.id}}">
         <time
-          title="{{article['pub-date'] | moment}}"
+          title="{{article['pub-date'] | moment | format}}"
           class="pub-date small"
           ng-bind="article['pub-date'] | moment | fromNow"></time>
         <span class="title h6" ng-bind="article.title"></span>

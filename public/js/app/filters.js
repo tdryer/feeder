@@ -5,13 +5,10 @@
    *
    * @filter
    * @param {*} date The date to parse.
-   * @param {String} [format='LLLL'] The format to format `date` with.
-   * @returns {String} Returns `date` in the format `format`.
+   * @returns {String} Returns `date` as a Moment.js date object
    */
   this.filter('moment', function() {
-    return function(date, format) {
-      format || (format = 'LLLL');
-
+    return function(date) {
       if (angular.isNumber(date)) {
         date = moment.unix(date);
       } else {
@@ -19,6 +16,22 @@
       }
 
       return date;
+    }
+  });
+
+  /**
+   * Formats a Moment.js date object into a human-readable format
+   *
+   * @filter
+   * @param {Object} date The Moment.js date object to parse.
+   * @param {String} [format='LLLL'] The format to format `date` with.
+   * @returns {String} Returns `date` in the format `format`.
+   */
+  this.filter('format', function() {
+    return function(date, format) {
+      format || (format = 'LLLL');
+
+      return date.format(format);
     }
   });
 
