@@ -9,9 +9,12 @@
    * @var {Boolean} [loading=false] Is the application is loading something?
    */
   this.factory('State', function() {
+    var error = false
+      , loading = false;
+
     return {
-      error: false,
-      loading: false
+      error: error,
+      loading: loading
     };
   });
 
@@ -30,20 +33,46 @@
       expires: 9001
     };
 
+    /**
+     * Returns the value of a cookie identified by `key`.
+     *
+     * @param {String} key The key of the cookie.
+     * @returns {String|Object} Returns the value of the cookie.
+     */
     function get(key) {
       var value = cookie.get(key);
       return value ? angular.fromJson(value) : value;
     }
 
+    /**
+     * Checks to see if a cookie has been set.
+     *
+     * @param {String} key The key of the cookie.
+     * @returns {Boolean} Returns whether or not a cookie exists.
+     */
     function has(key) {
       return angular.isDefined(this.get(key));
     }
 
+    /**
+     * Deletes a cookie.
+     *
+     * @param {String} key The key of the cookie.
+     * @returns {Model} Returns the current `Cookie` instance.
+     */
     function remove(key) {
       cookie.remove(key);
       return this;
     }
 
+    /**
+     * Stores a cookie.
+     *
+     * @param {String} key The key of the cookie.
+     * @param {String|Object} value The value of the cookie.
+     * @param {Object} [options={}] Any additional parameters of storage.
+     * @returns {Model} Returns the current `Cookie` instance.
+     */
     function set(key, value, options) {
       options = _.extend(defaultOptions, options);
       cookie.set(key, angular.toJson(value), options);
