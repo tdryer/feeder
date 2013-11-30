@@ -71,6 +71,14 @@ class Tasks(object):
 
         logger.info("Fetch feed task STARTED for '{}'".format(feed_url))
 
+        # explicit URL denial
+        if feed_url in {
+            "http://cmpt470.csil.sfu.ca:8004/.*?|cmpt470.csil.sfu.ca:8004/.*?",
+        }:
+            return yaml.safe_dump({
+                "error": "Target URL is forbidden",
+            })
+
         parsed_feed = get_parsed_feed(feed_url)
         if not is_valid(parsed_feed):
             discovered_feed_url = discover_feed(parsed_feed)
@@ -85,6 +93,14 @@ class Tasks(object):
             else:
                 feed_url = discovered_feed_url
                 parsed_feed = discovered_parsed_feed
+
+        if parsed_feed.status != 200:
+            if parsed_feed.status == 301:
+                # update feed's feed_url
+                pass
+            if parsed_feed.status == 410:
+                # delete feed from database
+                pass
 
         # parse the feed
         feed_title = parsed_feed.feed.get("title", "Untitled")
