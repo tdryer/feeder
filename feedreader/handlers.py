@@ -129,7 +129,8 @@ class FeedsHandler(APIRequestHandler):
             feed_id = yield self.subscribe_feed(session, user,
                                                 self.celery_poller, self.tasks,
                                                 body['url'])
-            self.set_header("Location", "GET /feeds/{}".format(feed_id))
+            # TODO: technically this is supposed to be an absolute URL
+            self.set_header("Location", "/feeds/{}".format(feed_id))
         self.set_status(201)
 
 

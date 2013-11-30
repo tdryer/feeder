@@ -102,7 +102,8 @@ class ApiTest(AsyncHTTPTestCase):
                                                db_setup_f=hook)
 
     def assert_api_call(self, api_call, headers=None, json_body=None,
-                        expect_code=None, expect_json=None):
+                        expect_code=None, expect_json=None,
+                        expect_headers=None):
         """Make an API call with optional assertions."""
         method, url = api_call.split(" ", 1)
         body = None if json_body is None else json.dumps(json_body)
@@ -116,6 +117,11 @@ class ApiTest(AsyncHTTPTestCase):
             )
         if expect_json is not None:
             self.assertEqual(json.loads(response.body), expect_json)
+        if expect_headers is not None:
+            # this only allows expressing that a header SHOULD be present
+            for header, val in expect_headers.items():
+                self.assertIn(header, response.headers)
+                self.assertEqual(response.headers[header], val)
         try:
             return json.loads(response.body)
         except ValueError:
@@ -252,9 +258,11 @@ class ApiTest(AsyncHTTPTestCase):
 
     def test_add_feed_success(self):
         with serve_dir(TEST_DATA_DIR, TEST_SERVER_PORT) as url:
-            self.assert_api_call("POST /feeds", headers=self.headers,
-                                 json_body={'url': url + "awesome-blog.xml"},
-                                 expect_code=201)
+            self.assert_api_call(
+                "POST /feeds", headers=self.headers,
+                json_body={'url': url + "awesome-blog.xml"}, expect_code=201,
+                expect_headers={"Location": "/feeds/1"}
+            )
 
     def test_add_feed_autodiscovery_success(self):
         with serve_dir(TEST_DATA_DIR, TEST_SERVER_PORT) as url:
