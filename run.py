@@ -35,7 +35,7 @@ class SingleFileHandler(tornado.web.StaticFileHandler):
 
 def main():
     logging.basicConfig(format='[%(levelname)s][%(name)s]: %(message)s')
-    logging.getLogger().setLevel(logging.INFO)
+    logging.getLogger().setLevel(logging.DEBUG)
 
     config = feedreader.config.Config.from_args()
     feedreader_app = feedreader.main.get_application(config)

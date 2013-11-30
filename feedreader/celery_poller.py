@@ -30,7 +30,7 @@ class CeleryPoller(object):
         self._poll_tasks()
 
     def _poll_tasks(self):
-        logger.info("Polling Celery tasks")
+        logger.debug("Polling Celery tasks")
         results_callbacks = []
         for result, callback in self._results_callbacks:
             if result.ready():
@@ -39,12 +39,12 @@ class CeleryPoller(object):
                 # happen.
                 callback(result)
             else:
-                logger.info("Task is still pending")
+                logger.debug("Task is still pending")
                 results_callbacks.append((result, callback))
         self._results_callbacks = results_callbacks
         if len(self._results_callbacks) > 0:
-            logger.info("Tasks are still pending, scheduling next poll")
+            logger.debug("Tasks are still pending, scheduling next poll")
             ioloop.IOLoop.instance().add_timeout(self._poll_freq,
                                                  self._poll_tasks)
         else:
-            logger.info("All tasks are complete, no polling necessary")
+            logger.debug("All tasks are complete, no polling necessary")
