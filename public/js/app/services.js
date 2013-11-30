@@ -21,6 +21,7 @@
    * @factory
    * @var {Boolean} authenticated Is the visitor authenticated?
    * @var {String} authorization The authorization token of the current user.
+   * @var {Function} call Returns an authenticated `Restangular` instance.
    * @var {Function} getAuthHeader Creates the header needed to make API calls.
    * @var {Function} login Logs the current visitor in.
    * @var {Function} logout Logs the current visitor out.
@@ -34,6 +35,21 @@
       , authenticated = !!$cookieStore.get(authKey)
       , authorization = $cookieStore.get(authKey)
       , username = $cookieStore.get(usernameKey);
+
+    /**
+     * Returns an authenticated `Restangular` instance.
+     *
+     * @returns {Object} Returns a `Restangular` object.
+     */
+    function call() {
+      return Restangular.withConfig(_.bind(function(RestangularConfigurer) {
+        var header = this.getAuthHeader();
+
+        if (header) {
+          RestangularConfigurer.setDefaultHeaders(header);
+        }
+      }, this));
+    }
 
     /**
      * Generates a header object that needs to be used by every other service to
@@ -106,6 +122,7 @@
     return {
       authenticated: authenticated,
       authorization: authorization,
+      call: call,
       getAuthHeader: getAuthHeader,
       login: login,
       logout: logout,
@@ -125,8 +142,8 @@
    * @var {Function} update Fetches and stores the subscribed feeds of the user.
    * @var {Function} remove Unsubscribes a feed.
    */
-  this.factory('Feeds', function($q, User, Restangular) {
-    var endpoint = Restangular.one('feeds')
+  this.factory('Feeds', function($q, User) {
+    var endpoint = User.call().one('feeds')
       , feeds = false
       , unreads = 0;
 
@@ -137,11 +154,9 @@
      * @returns {Promise} Returns the promise of the add feed API hit.
      */
     function add(url) {
-      var header = User.getAuthHeader();
-
       return endpoint.all('').post({
         url: url
-      }, {}, header).then(_.bind(function() {
+      }).then(_.bind(function() {
         return this.update();
       }, this));
     }
@@ -170,9 +185,7 @@
      * @returns {Promise} Returns the promise of the remove feed API hit.
      */
     function remove(id) {
-      var header = User.getAuthHeader();
-
-      return endpoint.one(id).remove({}, header).then(_.bind(function() {
+      return endpoint.one(id).remove().then(_.bind(function() {
         return this.update();
       }, this), $q.reject);
     }
@@ -184,9 +197,7 @@
      * @returns {Promise} Returns the promise of the update feeds API hit.
      */
     function update() {
-      var header = User.getAuthHeader();
-
-      return endpoint.get({}, header).then(_.bind(function(result) {
+      return endpoint.get().then(_.bind(function(result) {
         var feeds = result.feeds;
 
         this.feeds = feeds;
@@ -218,10 +229,12 @@
    * @var {Function} push Adds to the article list, or update an article in it.
    * @var {Function} update Fetches and stores the article ids of a feed.
    */
-  this.factory('ArticleList', function($q, $cookieStore, Restangular, User,
-                                       Article) {
-    var endpoint = Restangular.one('feeds')
-      , filter = $cookieStore.get('statusFilter') || {read:false}
+  this.factory('ArticleList', function($q, $cookieStore, User, Article) {
+    var endpoint = User.call().one('feeds')
+      , filterKey = 'filter'
+      , filter = $cookieStore.get(filterKey) || {
+          read: false
+        }
       , id = 0
       , list = false
       , unreads = 0;
@@ -244,10 +257,7 @@
     }
 
     function update(id) {
-      var header = User.getAuthHeader()
-        , entriesEndpoint = endpoint.one(id).getList('entries', {}, header);
-
-      return entriesEndpoint.then(_.bind(function(result) {
+      return endpoint.one(id).getList('entries').then(_.bind(function(result) {
         return Article.get(result.entries, {
           truncate: 300
         }).then(_.bind(function(result) {
@@ -257,14 +267,16 @@
       }, this), $q.reject);
     }
 
-    function updateFilter(readStatus) {
-      if (readStatus === null) {
-        this.filter = null;
+    function updateFilter(filter) {
+      if (_.isBoolean(filter)) {
+        this.filter = {
+          read: filter
+        };
       } else {
-        this.filter = {read: readStatus};
+        this.filter = null;
       }
 
-      $cookieStore.put('statusFilter', this.filter);
+      $cookieStore.put(filterKey, this.filter);
     }
 
     return {
@@ -288,13 +300,13 @@
    * @var {Function} unread Unreads an article.
    * @var {Function} update Fetches and stores the article ids of a feed.
    */
-  this.factory('Article', function($q, User, Restangular) {
-    var endpoint = Restangular.one('entries')
+  this.factory('Article', function($q, User) {
+    var endpoint = User.call().one('entries')
       , article = false;
 
     function get(id, queryParams) {
       queryParams || (queryParams = {});
-      return endpoint.getList(id, queryParams, User.getAuthHeader());
+      return endpoint.getList(id, queryParams);
     }
 
     function update(id) {
@@ -306,7 +318,7 @@
     function read(id) {
       return endpoint.one(id).patch({
         read: true
-      }, {}, User.getAuthHeader()).then(_.bind(function(result) {
+      }).then(_.bind(function(result) {
         this.article.read = true;
       }, this), $q.reject);
     }
@@ -314,7 +326,7 @@
     function unread(id) {
       return endpoint.one(id).patch({
         read: false
-      }, {}, User.getAuthHeader()).then(_.bind(function(result) {
+      }).then(_.bind(function(result) {
         this.article.read = false;
       }, this), $q.reject);
     }
