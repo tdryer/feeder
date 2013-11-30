@@ -1,7 +1,7 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import (create_engine, Column, ForeignKey, Integer, Table,
-                        Sequence, String)
+                        Sequence, String, UniqueConstraint)
 import yaml
 
 BASE = declarative_base()
@@ -105,7 +105,8 @@ class Feed(BASE):
     id = Column(Integer, Sequence('feed_id_seq'), primary_key=True,
                 nullable=False)
     title = Column(String(SMALL_STR), nullable=False)
-    feed_url = Column(String(MEDIUM_STR), unique=True, nullable=False)  # feed resource
+    #feed resource
+    feed_url = Column(String(MEDIUM_STR), unique=True, nullable=False)
     # url of html page associated with the feed (None if not provided)
     site_url = Column(String(MEDIUM_STR), nullable=True)
     # date of last attempted refresh
@@ -161,6 +162,7 @@ class Feed(BASE):
 
 class Entry(BASE):
     __tablename__ = 'entries'
+    __table_args__ = (UniqueConstraint('feed_id', 'guid', name='feed_guid'),)
 
     id = Column(Integer, Sequence('entry_id_seq'), primary_key=True,
                 nullable=False)
