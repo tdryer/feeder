@@ -83,9 +83,9 @@ class FeedsHandler(APIRequestHandler):
     @classmethod
     @gen.coroutine
     def subscribe_feed(cls, session, user, celery_poller, tasks, url):
-        """Subscribe the user to a feed.
+        """Subscribe the user to a feed and return the feed ID.
 
-        Raises ValueError if the feed at the given url can't be subscribed to.
+        Raises HTTPError if the feed at the given url can't be subscribed to.
         """
         # add a new feed if it doesn't exist already
         feed = session.query(Feed).filter(Feed.feed_url == url).first()
@@ -105,6 +105,7 @@ class FeedsHandler(APIRequestHandler):
         # subscribe the user to the feed
         user.subscribe(feed)
         session.commit()
+        raise gen.Return(feed.id)
 
     @asynchronous
     @gen.coroutine
@@ -119,16 +120,10 @@ class FeedsHandler(APIRequestHandler):
         })
         with self.get_db_session() as session:
             user = session.query(User).get(self.require_auth(session))
-            yield self.subscribe_feed(session, user, self.celery_poller,
-                                      self.tasks, body['url'])
-            try:
-                feed = session.query(Feed).filter(
-                    Feed.feed_url == body['url']
-                ).one()
-                self.set_header("Location", "GET /feeds/{}".format(feed.id))
-            except:
-                # TODO: report error
-                pass
+            feed_id = yield self.subscribe_feed(session, user,
+                                                self.celery_poller, self.tasks,
+                                                body['url'])
+            self.set_header("Location", "GET /feeds/{}".format(feed_id))
         self.set_status(201)
 
 
