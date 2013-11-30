@@ -1,12 +1,17 @@
 header {
-  padding: 0.5em;
   text-align: right;
   position: relative;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 header .header-user {
+  padding: 0.5em;
   text-align: right;
   display: inline-block;
+  z-index: 100;
+  position: absolute;
+  right: 0;
 }
 
 header .greeting {
@@ -14,6 +19,7 @@ header .greeting {
 }
 
 header .breadcrumbs {
+  padding: 0.5em;
   float: left;
 }
 
