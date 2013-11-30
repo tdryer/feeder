@@ -21,6 +21,10 @@ header .breadcrumbs .btn {
   display: none;
 }
 
+header .breadcrumbs .back {
+  display: inline;
+}
+
 @media (min-width: 60em) {
   header .breadcrumbs .btn {
     display: inline;

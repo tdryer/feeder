@@ -1,6 +1,14 @@
 <nav>
   <span class="breadcrumbs">
     <a
+      class="btn btn-primary mrs back"
+      href="/home"
+      ng-show="$routeParams.feed &amp;&amp; !$routeParams.article">Back</a>
+    <a
+      class="btn btn-primary mrs back"
+      href="/home/{{ArticleList.id}}"
+      ng-show="$routeParams.article">Back</a>
+    <a
       class="btn btn-primary mrs"
       href="/home"
       ng-show="User.authenticated">Home</a>
