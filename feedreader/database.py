@@ -3,6 +3,9 @@ from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import (create_engine, Column, ForeignKey, Integer, Table,
                         Sequence, String, UniqueConstraint)
 import yaml
+import logging
+
+logger = logging.getLogger(__name__)
 
 BASE = declarative_base()
 
@@ -49,7 +52,7 @@ class User(BASE):
                                 backref='read_by', lazy='dynamic')
 
     def __init__(self, name, password_hash):
-        self.username = name
+        self.username = column_size(name, SMALL_STR)
         self.password_hash = password_hash
 
     def __repr__(self):
@@ -104,7 +107,7 @@ class Feed(BASE):
 
     id = Column(Integer, Sequence('feed_id_seq'), primary_key=True,
                 nullable=False)
-    title = Column(String(SMALL_STR), nullable=False)
+    title = Column(String(MEDIUM_STR), nullable=False)
     #feed resource
     feed_url = Column(String(MEDIUM_STR), unique=True, nullable=False)
     # url of html page associated with the feed (None if not provided)
@@ -112,7 +115,7 @@ class Feed(BASE):
     # date of last attempted refresh
     last_refresh_date = Column(Integer, nullable=True)
     # last-modifed date used for caching (string since we don't parse it)
-    last_modified = Column(String(MEDIUM_STR), nullable=True)
+    last_modified = Column(String(SMALL_STR), nullable=True)
     # etag used for caching
     etag = Column(String(MEDIUM_STR), nullable=True)
 
@@ -128,10 +131,10 @@ class Feed(BASE):
     def __init__(self, title, feed_url, site_url, last_modified=None,
                  etag=None, last_refresh_date=None, id=None):
         self.id = id
-        self.title = title
+        self.title = column_size(title, MEDIUM_STR)
         self.feed_url = feed_url
         self.site_url = site_url
-        self.last_modified = last_modified
+        self.last_modified = column_size(last_modified, SMALL_STR)
         self.etag = etag
         self.last_refresh_date = last_refresh_date
 
@@ -170,21 +173,34 @@ class Entry(BASE):
                      nullable=False)
     content = Column(String(LARGE_STR), nullable=False)
     url = Column(String(MEDIUM_STR), nullable=False)
-    title = Column(String(SMALL_STR), nullable=False)
+    title = Column(String(MEDIUM_STR), nullable=False)
     author = Column(String(SMALL_STR), nullable=False)
     date = Column(Integer, nullable=False)
-    guid = Column(String(MEDIUM_STR), nullable=False)
+    guid = Column(String(SMALL_STR), nullable=False)
 
     def __init__(self, content, url, title, author, date, guid):
         self.content = content
         self.url = url
-        self.title = title
-        self.author = author
+        self.title = column_size(title, MEDIUM_STR)
+        self.author = column_size(author, SMALL_STR)
         self.date = date
-        self.guid = guid
+        self.guid = column_size(guid, SMALL_STR)
 
     def __repr__(self):
         return '<Entry({!r})>'.format(self.id)
+
+
+def column_size(string, size):
+    if string is None:
+        return string
+    if len(string) > size:
+        truncated_string = string[:size-6]+" . . ."
+        logger.info(
+            "Truncated input '{}' to '{}'".format(string, truncated_string)
+        )
+        return truncated_string
+    else:
+        return string
 
 
 def make_yaml_bindings():
