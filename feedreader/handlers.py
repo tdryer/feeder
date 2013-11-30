@@ -97,9 +97,15 @@ class FeedsHandler(APIRequestHandler):
                                .format(res['error']))
                 raise HTTPError(400, reason=res['error'])
             feed = res['feed']
-            feed.add_all(res['entries'])
-            session.commit()
-        elif user.has_subscription(feed):
+            # feed url may have resolved to a feed that already exists
+            existing_feed = session.query(Feed)\
+                    .filter(Feed.feed_url == feed.feed_url).all()
+            if len(existing_feed) > 0:
+                feed = existing_feed[0]
+            else:
+                feed.add_all(res['entries'])
+                session.commit()
+        if user.has_subscription(feed):
             raise HTTPError(400, reason="Already subscribed to feed")
 
         # subscribe the user to the feed

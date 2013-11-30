@@ -319,6 +319,15 @@ class ApiTest(AsyncHTTPTestCase):
                                  json_body={'url': url + "awesome-blog.xml"},
                                  expect_code=400)
 
+    def test_duplicate_subscription_autodiscover(self):
+        with serve_dir(TEST_DATA_DIR, TEST_SERVER_PORT) as url:
+            self.assert_api_call("POST /feeds", headers=self.headers,
+                                 json_body={'url': url + "awesome-blog.xml"},
+                                 expect_code=201)
+            self.assert_api_call("POST /feeds", headers=self.headers,
+                                 json_body={'url': url + "awesome-blog.html"},
+                                 expect_code=400)
+
     ######################################################################
     # GET /feeds/ID/entries
     ######################################################################
