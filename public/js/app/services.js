@@ -12,7 +12,50 @@
     return {
       error: false,
       loading: false
+    };
+  });
+
+  /**
+   * The `Cookie` service is a cookie service.
+   *
+   * @service
+   * @var {Function} get Fetchs the value of a cookie.
+   * @var {Function} has Check to see if a cookie exists.
+   * @var {Function} remove Deletes a cookie.
+   * @var {Function} set Stores a cookie.
+   */
+  this.service('Cookie', function() {
+    var defaultOptions = {
+      path: '/',
+      expires: 9001
+    };
+
+    function get(key) {
+      var value = cookie.get(key);
+      return value ? angular.fromJson(value) : value;
     }
+
+    function has(key) {
+      return angular.isDefined(this.get(key));
+    }
+
+    function remove(key) {
+      cookie.remove(key);
+      return this;
+    }
+
+    function set(key, value, options) {
+      options = _.extend(defaultOptions, options);
+      cookie.set(key, angular.toJson(value), options);
+      return this;
+    }
+
+    return {
+      get: get,
+      has: has,
+      remove: remove,
+      set: set
+    };
   });
 
   /**
@@ -28,13 +71,13 @@
    * @var {Function} register Creates a user for the current visitor.
    * @var {String} username The username of the user.
    */
-  this.factory('User', function($q, Restangular) {
+  this.factory('User', function($q, Restangular, Cookie) {
     var endpoint = Restangular.one('users')
       , authKey = 'auth'
       , usernameKey = 'username'
-      , authenticated = !!cookie.get(authKey)
-      , authorization = cookie.get(authKey)
-      , username = cookie.get(usernameKey);
+      , authenticated = Cookie.has(authKey)
+      , authorization = Cookie.get(authKey)
+      , username = Cookie.get(usernameKey);
 
     /**
      * Returns an authenticated `Restangular` instance.
@@ -86,15 +129,9 @@
         this.authenticated = true;
         this.authorization = auth;
         this.username = username;
-        cookie.set(authKey, auth, {
-          expires: 9001,
-          path: '/'
-        }).set(usernameKey, username, {
-          expires: 9001,
-          path: '/'
-        });
+        Cookie.set(authKey, auth).set(usernameKey, username);
       }, this), $q.reject);
-    };
+    }
 
     /**
      * Registers a new user.
@@ -113,13 +150,7 @@
         this.authenticated = true;
         this.authorization = auth;
         this.username = username;
-        cookie.set(authKey, auth, {
-          expires: 9001,
-          path: '/'
-        }).set(usernameKey, username, {
-          expires: 9001,
-          path: '/'
-        });
+        Cookie.set(authKey, auth).set(usernameKey, username);
       }, this), $q.reject);
     }
 
@@ -129,7 +160,7 @@
     function logout() {
       this.authenticated = false;
       this.username = '';
-      cookie.remove(authKey).remove(usernameKey);
+      Cookie.remove(authKey).remove(usernameKey);
     }
 
     return {
@@ -242,10 +273,12 @@
    * @var {Function} push Adds to the article list, or update an article in it.
    * @var {Function} update Fetches and stores the article ids of a feed.
    */
-  this.factory('ArticleList', function($q, User, Article) {
+  this.factory('ArticleList', function($q, Cookie, User, Article) {
     var endpoint = User.call().one('feeds')
       , filterKey = 'filter'
-      , filter = JSON.parse(cookie.get(filterKey) || '{"read": false}')
+      , filter = Cookie.has(filterKey) ? Cookie.get(filterKey) : {
+          read: false
+        }
       , id = 0
       , list = false
       , unreads = 0;
@@ -287,10 +320,7 @@
         this.filter = null;
       }
 
-      cookie.set(filterKey, JSON.stringify(this.filter), {
-        expires: 9001,
-        path: '/'
-      });
+      Cookie.set(filterKey, this.filter);
     }
 
     return {
