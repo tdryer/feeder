@@ -25,8 +25,11 @@
   this.directive('header', function() {
     return {
       restrict: 'E',
-      controller: function($scope, User) {
+      controller: function($scope, User, Feeds, ArticleList, Article) {
         $scope.User = User;
+        $scope.Feeds = Feeds;
+        $scope.ArticleList = ArticleList;
+        $scope.Article = Article;
       },
       templateUrl: '/partials/header.html'
     }

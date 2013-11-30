@@ -1,9 +1,19 @@
 <nav>
   <span class="breadcrumbs">
     <a
-      href="/home"
       class="btn btn-primary mrs"
+      href="/home"
       ng-show="User.authenticated">Home</a>
+    <a
+      class="btn btn-primary mrs"
+      href="/home/{{ArticleList.id}}"
+      ng-bind="Feeds.id(ArticleList.id).name"
+      ng-show="$routeParams.feed"></a>
+    <a
+      class="btn btn-primary mrs"
+      href="/home/{{ArticleList.id}}/{{Article.article.id}}"
+      ng-bind="Article.article.title"
+      ng-show="$routeParams.article"></a>
   </span>
   <div class="header-user">
     <span
