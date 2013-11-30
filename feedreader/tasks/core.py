@@ -2,6 +2,7 @@
 
 #pylint: disable=E0202
 
+import re
 import calendar
 import hashlib
 import logging
@@ -72,18 +73,22 @@ class Tasks(object):
         logger.info("Fetch feed task STARTED for '{}'".format(feed_url))
 
         # explicit URL denial
-        if feed_url in {
+        if re.search(
             "http://cmpt470.csil.sfu.ca:8004/.*?|cmpt470.csil.sfu.ca:8004/.*?",
-        }:
+            feed_url,
+        ):
             return yaml.safe_dump({
                 "error": "Target URL is forbidden",
             })
 
-        parsed_feed = get_parsed_feed(feed_url)
+        parsed_feed = get_parsed_feed(feed_url, etag)
         if not is_valid(parsed_feed):
             discovered_feed_url = discover_feed(parsed_feed)
             if discovered_feed_url is not None:
-                discovered_parsed_feed = get_parsed_feed(discovered_feed_url)
+                discovered_parsed_feed = get_parsed_feed(
+                    discovered_feed_url,
+                    etag,
+                )
             if (discovered_feed_url is None
                 or not is_valid(discovered_parsed_feed)):
                 logger.info("Fetch feed task FAILED for '{}'".format(feed_url))
@@ -98,6 +103,10 @@ class Tasks(object):
             if parsed_feed.status == 301:
                 # update feed's feed_url
                 pass
+            if parsed_feed.status == 304:
+                return yaml.safe_dump({
+                    "error": "Feed not modified"
+                })
             if parsed_feed.status == 410:
                 # delete feed from database
                 pass
@@ -160,9 +169,9 @@ FEED_MIME_TYPES = [
 ]
 
 
-def get_parsed_feed(feed_url):
+def get_parsed_feed(feed_url, etag):
     """Return parsed feed from feedparser."""
-    parsed_feed = feedparser.parse(feed_url)
+    parsed_feed = feedparser.parse(feed_url, etag=etag)
     if parsed_feed.bozo:
         logger.warning("Feed '{}' set the bozo bit: '{}'"
                        .format(feed_url, parsed_feed.bozo_exception))
