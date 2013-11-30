@@ -105,7 +105,7 @@ class Feed(BASE):
     id = Column(Integer, Sequence('feed_id_seq'), primary_key=True,
                 nullable=False)
     title = Column(String(SMALL_STR), nullable=False)
-    feed_url = Column(String(MEDIUM_STR), nullable=False)  # feed resource
+    feed_url = Column(String(MEDIUM_STR), unique=True, nullable=False)  # feed resource
     # url of html page associated with the feed (None if not provided)
     site_url = Column(String(MEDIUM_STR), nullable=True)
     # date of last attempted refresh
