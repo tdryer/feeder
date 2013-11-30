@@ -12,11 +12,11 @@
     <a
       href="/login"
       class="btn btn-success mls"
-      ng-show="!User.authenticated">Login</a>
+      ng-show="!User.authenticated && location.$$path !== '/'">Login</a>
     <a
       href="/register"
       class="btn btn-danger mls"
-      ng-show="!User.authenticated">Register</a>
+      ng-show="!User.authenticated && location.$$path !== '/'">Register</a>
     <a
       href="/logout"
       class="btn btn-default mls"

@@ -25,7 +25,8 @@
   this.directive('header', function() {
     return {
       restrict: 'E',
-      controller: function($scope, User) {
+      controller: function($scope, $location, User) {
+        $scope.location= $location;
         $scope.User = User;
       },
       templateUrl: '/partials/header.html'
