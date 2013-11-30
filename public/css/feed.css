@@ -69,13 +69,22 @@
   background: #ecf0f1;
 }
 
+.article-list ul .unread:before {
+  position: absolute;
+  content: '';
+  top: 20%;
+  left: 0;
+  width: 0.2em;
+  height: 60%;
+  background: #1abc9c;
+}
+
 .article-list ul li a {
   border-bottom: 1px solid #bdc3c7;
   padding: 1em;
   display: block;
   color: #34495e;
 }
-
 
 @media (min-width: 60em) {
   .article-list ul li a {
