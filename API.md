@@ -33,10 +33,12 @@ Returns information about the current user.
 None
 
 ### Response
+    {
+        "username": "Heyzeus Crisco"
+    }
 
   - 200 Success
   - 401 Unauthorized: if user credentials are bad
-  - 403 Forbidden: if the user does not have permission to access this feed
 
 ---
 
@@ -66,6 +68,29 @@ None
 
 ---
 
+## Get a single feed
+GET /feeds/:feed\_id
+
+## Description
+Returns the metadata for a particular feed
+
+## Request
+None
+
+## Response
+    {
+        "id": 123,
+        "name": "David yan blog",
+        "url": "awesome-blog.com",
+        "unreads": 123
+    }
+
+  - 200 Success
+  - 401 Unauthorized: if user credentials are bad
+  - 404 Not Found: if feed does not exist or user is not subscribed
+
+---
+
 ## Add feed
 POST /feeds/
 
@@ -86,10 +111,10 @@ Subscribe the user to a new feed by URL.
 ---
 
 ## Get feed items and details
-GET /feeds/:feed\_id/entries[?filter="all|read|unread"]
+GET /feeds/:feed\_id/entries[?filter="read|unread"]
 
 ### Description
-Get the entries (articles) of a feed that the user has access to.
+Get the entry (article) ids of a feed that the user has access to.
 
 ### Request
 
@@ -99,9 +124,9 @@ Get the entries (articles) of a feed that the user has access to.
     }
 
   - 200 Success
+  - 400 Bad Request: if the filter value is not valid
   - 401 Unauthorized: if user credentials are bad
-  - 403 Forbidden: if the user does not have permission to access this feed
-  - 404 Not Found: if the feed does not exist
+  - 404 Not Found: if feed does not exist or user is not subscribed
 
 ---
 
@@ -118,8 +143,7 @@ None
 
   - 204 No Content
   - 401 Unauthorized: if user credentials are bad
-  - 403 Forbidden: if the user does not have permission to access this feed
-  - 404 Not Found: if the feed does not exist
+  - 404 Not Found: if feed does not exist or user is not subscribed
 
 ---
 
@@ -148,8 +172,7 @@ None
 
   - 200 Success
   - 401 Unauthorized: if user credentials are bad
-  - 403 Forbidden: if the user does not have permission to access this feed
-  - 404 Not Found: if the feed/item does not exist
+  - 404 Not Found: if an entry does not exist
 
 ---
 
@@ -169,5 +192,4 @@ Update any modifiable entry metadata for that user.
   - 200 Success
   - 400 Bad Request: if I send gibberish
   - 401 Unauthorized: if user credentials are bad
-  - 403 Forbidden: if the user does not have permission to access this feed
-  - 404 Not Found: if the feed/item does not exist
+  - 404 Not Found: if an entry does not exist
