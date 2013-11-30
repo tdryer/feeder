@@ -1,53 +1,55 @@
-<div class="no-feeds" ng-show="!Feeds.feeds.length">
-  <p class="mbl h6">Welcome to feeder!</p>
-  <p class="mbn">You are not subscribed to any feeds yet!</p>
-  <p class="mtn">Try adding one below!</p>
-</div>
+<div opml-receiver>
+  <div class="no-feeds" ng-show="!Feeds.feeds.length">
+    <p class="mbl h6">Welcome to feeder!</p>
+    <p class="mbn">You are not subscribed to any feeds yet!</p>
+    <p class="mtn">Try adding one below!</p>
+  </div>
 
-<ul class="feeds" ng-class="{empty:!Feeds.feeds.length}">
-  <li ng-repeat="feed in Feeds.feeds">
-    <button
-      class="remove btn btn-danger btn-xs mbs"
-      ng-click="Feeds.remove(feed.id)">Remove</button>
-    <a
-      class="feed"
-      title="{{feed.name}}"
-      href="/home/{{feed.id}}">
-      <img
-        class="icon palette-peter-river"
-        src="//robohash.org/{{feed.name}}">
-      <span class="small unreads palette-belize-hole">{{feed.unreads}}</span>
-      <span class="small name text-primary">{{feed.name}}</span>
-    </a>
-  </li>
-</ul>
+  <ul class="feeds" ng-class="{empty:!Feeds.feeds.length}">
+    <li ng-repeat="feed in Feeds.feeds">
+      <button
+        class="remove btn btn-danger btn-xs mbs"
+        ng-click="Feeds.remove(feed.id)">Remove</button>
+      <a
+        class="feed"
+        title="{{feed.name}}"
+        href="/home/{{feed.id}}">
+        <img
+          class="icon palette-peter-river"
+          src="//robohash.org/{{feed.name}}">
+        <span class="small unreads palette-belize-hole">{{feed.unreads}}</span>
+        <span class="small name text-primary">{{feed.name}}</span>
+      </a>
+    </li>
+  </ul>
 
-<div class="form-container mts">
-  <form
-    name="subscribeForm"
-    ng-submit="subscribe(url)"
-    class="form">
-    <p
-      ng-show="!subscribeForm.$valid"
-      class="small error mbn">Please enter a valid URL.</p>
-    <div class="form-group mbs">
+  <div class="form-container mts">
+    <form
+      name="subscribeForm"
+      ng-submit="subscribe(url)"
+      class="form">
+      <p
+        ng-show="!subscribeForm.$valid"
+        class="small error mbn">Please enter a valid URL.</p>
+      <div class="form-group mbs">
+        <input
+          required
+          class="form-control"
+          id="url"
+          name="url"
+          ng-model="url"
+          placeholder="Site or Feed URL"
+          type="url">
+        <label for="url" class="fui fui-new">Site or Feed URL</label>
+      </div>
+      <p
+        class="small error mbn"
+        ng-show="error">The URL you entered failed to fetch.</p>
       <input
-        required
-        class="form-control"
-        id="url"
-        name="url"
-        ng-model="url"
-        placeholder="Site or Feed URL"
-        type="url">
-      <label for="url" class="fui fui-new">Site or Feed URL</label>
-    </div>
-    <p
-      class="small error mbn"
-      ng-show="error">The URL you entered failed to fetch.</p>
-    <input
-      ng-disabled="!subscribeForm.$valid"
-      type="submit"
-      value="Subscribe"
-      class="btn btn-hg btn-success mts">
-  </form>
+        ng-disabled="!subscribeForm.$valid"
+        type="submit"
+        value="Subscribe"
+        class="btn btn-hg btn-success mts">
+    </form>
+  </div>
 </div>

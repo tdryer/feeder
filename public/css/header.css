@@ -13,9 +13,7 @@ header .header-user {
   padding: 0.5em;
   text-align: right;
   display: inline-block;
-  z-index: 100;
-  position: absolute;
-  right: 0;
+  position: static;
 }
 
 header .greeting {
@@ -36,6 +34,13 @@ header .breadcrumbs .back {
 }
 
 @media (min-width: 60em) {
+  header .header-user {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 100;
+  }
+
   header .breadcrumbs .btn {
     display: inline;
   }

@@ -1,0 +1,38 @@
+[opml-receiver] {
+  position: relative;
+  border: 0.2em dashed transparent;
+}
+
+@media (max-width: 60em) {
+  [opml-receiver] {
+    border: 0;
+  }
+}
+
+.dz-preview {
+  display: none;
+}
+
+.dz-drag-hover {
+  border-color: #1abc9c;
+  -webkit-transition: all 0.5s ease-out;
+  -moz-transition: all 0.5s ease-out;
+  -ms-transition: all 0.5s ease-out;
+  -o-transition: all 0.5s ease-out;
+  transition: all 0.5s ease-out;
+}
+
+.dz-drag-hover:before {
+  content: 'Awaiting OMPL file drop.';
+  text-align: center;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+
+@media (max-width: 60em) {
+  .dz-drag-hover:before {
+    content: '';
+  }
+}

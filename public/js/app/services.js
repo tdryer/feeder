@@ -235,6 +235,26 @@
     }
 
     /**
+     * Adds a bunch of new feeds to the list of subscribed feeds.
+     *
+     * @param {Array} urls The urls of the feed.
+     * @returns {Promise} Returns the promise of all the add feed API hit.
+     */
+    function batchAdd(urls) {
+      urls = _.map(urls, function(url) {
+        return endpoint.all('').post({
+          url: url
+        });
+      });
+
+      return $q.all(urls).then(_.bind(function() {
+        return this.update();
+      }, this), _.bind(function() {
+        return this.update();
+      }, this));
+    }
+
+    /**
      * Returns the feed object with id `id`.
      *
      * @param {String|Number} id The id of the feed.
@@ -284,6 +304,7 @@
 
     return {
       add: add,
+      batchAdd: batchAdd,
       feeds: feeds,
       id: id,
       remove: remove,
