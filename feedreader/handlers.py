@@ -121,7 +121,10 @@ class FeedsHandler(APIRequestHandler):
             user = session.query(User).get(self.require_auth(session))
             yield self.subscribe_feed(session, user, self.celery_poller,
                                       self.tasks, body['url'])
-        # TODO: we should indicate the ID of the new feed (location header?)
+            feed = session.query(Feed).filter(
+                Feed.feed_url == body['url']
+            ).one()
+            self.set_header("Location", "GET /feeds/{}".format(feed.id))
         self.set_status(201)
 
 
