@@ -5,10 +5,11 @@
     title="{{feed.name || feed.url}}"
     href="{{feed.url}}">
     <span class="small name">
-      <img class="icon"
+      <img
+        class="icon"
         ng-show="feed.image_url"
         ng-src="{{feed.image_url}}">
-      {{feed.name || feed.url}}
+      <span class="mls" ng-bind="feed.name || feed.url">
     </span>
     <span class="small unreads">{{feed.unreads}}</span>
   </a>

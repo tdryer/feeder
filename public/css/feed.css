@@ -19,7 +19,7 @@
 }
 
 .article-list .feed .icon {
-  margin: auto 0.5em auto 0;
+  vertical-align: middle;
 }
 
 .article-list .feed .name {
@@ -30,6 +30,10 @@
   overflow: hidden;
   white-space: nowrap;
   width: 100%;
+}
+
+.article-list .feed .name span {
+  vertical-align: middle;
 }
 
 .article-list .feed .unreads {
