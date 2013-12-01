@@ -335,6 +335,7 @@
         }
       , id = 0
       , list = false
+      , scrollYPos = 0
       , unreads = 0;
 
     /**

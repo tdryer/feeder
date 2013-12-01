@@ -87,9 +87,10 @@
    * @scope {Function} subscribe Subscribes to a feed.
    * @scope {Boolean} [error=false] Does the login form have an error?
    */
-  this.controller('HomeCtrl', function($scope, Feeds) {
+  this.controller('HomeCtrl', function($scope, ArticleList, Feeds) {
     $scope.Feeds = Feeds;
     $scope.error = false;
+    ArticleList.scrollYPos = 0;
 
     $scope.subscribe = function(url) {
       $scope.error = false;

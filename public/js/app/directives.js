@@ -166,4 +166,22 @@
     }
   });
 
+  this.directive('keepscroll', function(ArticleList, $timeout, $window) {
+    return {
+      restrict: 'A',
+      link: function(scope) {
+        scope.$on('$routeChangeStart', function() {
+          ArticleList.scrollYPos = $window.scrollY;
+        });
+
+        scope.$on('$routeChangeSuccess', function() {
+          // Wait until the page has fully loaded to update scroll position
+          $timeout(function() {
+            $window.scrollTo(0, ArticleList.scrollYPos);
+          }, 0)
+        });
+      }
+    }
+  })
+
 }).call(angular.module('feeder.directives', []));
