@@ -4,7 +4,12 @@
     class="feed palette-belize-hole"
     title="{{feed.name || feed.url}}"
     href="{{feed.url}}">
-    <span class="small name">{{feed.name || feed.url}}</span>
+    <span class="small name">
+      <img class="icon"
+        ng-show="feed.image_url"
+        ng-src="{{feed.image_url}}">
+      {{feed.name || feed.url}}
+    </span>
     <span class="small unreads">{{feed.unreads}}</span>
   </a>
   <div class="filters small palette-peter-river">

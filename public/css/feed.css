@@ -14,26 +14,29 @@
   color: #fff;
   text-align: left;
   display: block;
+  padding: 1em 0;
   position: relative;
 }
 
+.article-list .feed .icon {
+  margin: auto 0.5em auto 0;
+}
+
 .article-list .feed .name {
-  width: 100%;
   color: #fff;
-  text-align: left;
-  padding: 1em 0;
-  text-indent: 1em;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
   display: block;
+  margin-left: 1em;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
 }
 
 .article-list .feed .unreads {
   display: inline-block;
   width: auto;
   position: absolute;
-  right: 1em;
+  right: 2.5em;
   top: 50%;
   line-height: 0;
 }
