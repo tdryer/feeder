@@ -137,9 +137,10 @@ class Tasks(object):
                 content = ""
             link = entry.get("link", None)
             title = entry.get("title", "Untitled")
-            if "author_detail" in entry:
+            if "author_detail" in entry and "name" in entry.author_detail:
                 author = entry.author_detail.name
-            elif "author_detail" in parsed_feed.feed:
+            elif ("author_detail" in parsed_feed.feed and "name" in
+                  parsed_feed.feed.author_detail):
                 author = parsed_feed.feed.author_detail.name
             else:
                 author = "Unknown Author"
