@@ -75,6 +75,7 @@ class FeedsHandler(APIRequestHandler):
                     'id': feed.id,
                     'name': feed.title,
                     'url': feed.site_url,
+                    'image_url': feed.image_url,
                     'unreads': user.get_num_unread_entries(feed),
                 })
         self.write({'feeds': feeds})
@@ -154,6 +155,7 @@ class FeedHandler(APIRequestHandler):
                 'id': feed.id,
                 'name': feed.title,
                 'url': feed.site_url,
+                'image_url': feed.image_url,
                 'unreads': user.get_num_unread_entries(feed),
             })
         self.set_status(200)

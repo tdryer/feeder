@@ -9,6 +9,8 @@ import logging
 import time
 import yaml
 from celery import Celery
+import urlparse
+import requests
 
 import feedparser
 from feedreader import database
@@ -114,12 +116,14 @@ class Tasks(object):
         # parse the feed
         feed_title = parsed_feed.feed.get("title", "Untitled")
         feed_link = parsed_feed.feed.get("link", None)
+        image_url = discover_image(feed_link)
         etag = parsed_feed.get("etag", None)
         last_modified = parsed_feed.get("modified", None)
         last_refresh_date = int(time.time())
-        feed = database.Feed(feed_title, feed_url, feed_link, etag=etag,
-                             last_modified=last_modified,
-                             last_refresh_date=last_refresh_date)
+        feed = database.Feed(
+            feed_title, feed_url, feed_link, image_url=image_url, etag=etag,
+            last_modified=last_modified, last_refresh_date=last_refresh_date
+        )
         feed.id = feed_id
 
         # parse the entries
@@ -222,4 +226,31 @@ def discover_feed(parsed_feed):
         return url
     else:
         logger.info("Feed discovery failed")
+        return None
+
+
+def discover_image(site_url):
+    """Return the URL of an image associated with the given site URL.
+
+    Returns None if not icon is found.
+
+    TODO: more discovery methods
+    """
+    logging.info("Attempting to discover image for '{}'"
+                 .format(site_url.encode('utf-8')))
+    # hacky way to use urlparse to get favicon path
+    url = urlparse.urlparse(site_url)
+    url = urlparse.urlunparse((url.scheme, url.netloc, "favicon.ico", '', '',
+                               ''))
+    try:
+        response = requests.get(url)
+    except requests.exceptions.RequestException:
+        code = None
+    else:
+        code = response.status_code
+    if code == 200:
+        logging.info("Image found at '{}'".format(url.encode('utf-8')))
+        return url
+    else:
+        logging.info("No image found")
         return None

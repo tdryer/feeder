@@ -18,7 +18,7 @@ import feedreader.main
 
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
-TEST_SERVER_PORT = 8081
+TEST_SERVER_PORT = 8081 # if you change this, change test data as well
 
 
 # TODO: these should probably be attributes of ApiTest
@@ -208,6 +208,7 @@ class ApiTest(AsyncHTTPTestCase):
                     "id": self.feed1.id,
                     "name": self.feed1.title,
                     "url": self.feed1.site_url,
+                    "image_url": None,
                     "unreads": 1,
                 },
             ],
@@ -238,6 +239,7 @@ class ApiTest(AsyncHTTPTestCase):
                     "id": self.feed1.id,
                     "name": self.feed1.title,
                     "url": self.feed1.site_url,
+                    "image_url": None,
                     "unreads": 0,
                 },
             ],
@@ -301,6 +303,7 @@ class ApiTest(AsyncHTTPTestCase):
                     "name": u"David Yan's CMPT 376W Blog😄",
                     "unreads": 1,
                     "url": u"http://awesome-blog.github.io/😄",
+                    "image_url": None,
                 },
             ]
         }
@@ -555,6 +558,7 @@ class ApiTest(AsyncHTTPTestCase):
             'name': self.feed1.title,
             'unreads': 0,
             'url': self.feed1.site_url,
+            'image_url': None,
         }
         self.assert_api_call(
             "GET /feeds/{}".format(self.feed1.id), headers=self.headers,

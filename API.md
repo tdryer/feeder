@@ -56,8 +56,9 @@ None
       "feeds": [{
         "id": 123,
         "name": "David yan blog",
-        "url": "awesome-blog.com",
-        "unreads": 123
+        "url": "http://awesome-blog.com",
+        "unreads": 123,
+        "image_url": "http://awesome-blog.com/favicon.ico"
       }, {
         ...
       }]
@@ -81,8 +82,9 @@ None
     {
         "id": 123,
         "name": "David yan blog",
-        "url": "awesome-blog.com",
-        "unreads": 123
+        "url": "http://awesome-blog.com",
+        "unreads": 123,
+        "image_url": "http://awesome-blog.com/favicon.ico"
     }
 
   - 200 Success

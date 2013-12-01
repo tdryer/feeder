@@ -112,6 +112,8 @@ class Feed(BASE):
     feed_url = Column(String(MEDIUM_STR), unique=True, nullable=False)
     # url of html page associated with the feed (None if not provided)
     site_url = Column(String(MEDIUM_STR), nullable=True)
+    # url of image associated with feed (None if no image)
+    image_url = Column(String(MEDIUM_STR), nullable=True)
     # date of last attempted refresh
     last_refresh_date = Column(Integer, nullable=True)
     # last-modifed date used for caching (string since we don't parse it)
@@ -129,11 +131,12 @@ class Feed(BASE):
                                   .all()
 
     def __init__(self, title, feed_url, site_url, last_modified=None,
-                 etag=None, last_refresh_date=None, id=None):
+                 etag=None, last_refresh_date=None, image_url=None, id=None):
         self.id = id
         self.title = column_size(title, MEDIUM_STR)
         self.feed_url = feed_url
         self.site_url = site_url
+        self.image_url = image_url
         self.last_modified = column_size(last_modified, SMALL_STR)
         self.etag = etag
         self.last_refresh_date = last_refresh_date
