@@ -87,10 +87,10 @@
    * @scope {Function} subscribe Subscribes to a feed.
    * @scope {Boolean} [error=false] Does the login form have an error?
    */
-  this.controller('HomeCtrl', function($scope, ArticleList, Feeds) {
+  this.controller('HomeCtrl', function($scope, $window, ArticleList, Feeds) {
     $scope.Feeds = Feeds;
     $scope.error = false;
-    ArticleList.scrollYPos = 0;
+    $window.prevScrollY = 0; // Reset cached scroll position
 
     $scope.subscribe = function(url) {
       $scope.error = false;
@@ -108,10 +108,21 @@
    * @scope {Model} ArticleList The `ArticleList` model.
    * @scope {Object} feed The parent feed object of the article list.
    */
-  this.controller('FeedCtrl', function($scope, Feeds, ArticleList) {
+  this.controller('FeedCtrl', function($scope, $window, $document, Feeds, 
+                                       ArticleList, State) {
     $scope.feed = Feeds.id(ArticleList.id);
     $scope.ArticleList = ArticleList;
     ArticleList.push();
+
+    $document.ready(function() {
+      $window.scrollTo(0, $window.prevScrollY);
+    })
+
+    $scope.$watch('State.loading', function() {
+      if (State.loading === true) {
+        $window.prevScrollY = $window.scrollY;
+      }
+    })
   });
 
   /**

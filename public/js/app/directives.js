@@ -167,30 +167,6 @@
   });
 
   /**
-   * Scrolls the window back to the position it was at originally
-   *
-   * @directive
-   * @restrict attribute
-   */
-  this.directive('keepscroll', function() {
-    return {
-      restrict: 'A',
-      controller: function($scope, $timeout, $window) {
-        $scope.$on('$routeChangeStart', function() {
-          $window.prevScrollY = $window.scrollY;
-        });
-
-        $scope.$on('$routeChangeSuccess', function() {
-          // Wait until the page has fully loaded to update scroll position
-          $timeout(function() {
-            $window.scrollTo(0, $window.prevScrollY);
-          }, 0);
-        });
-      }
-    };
-  });
-
-  /**
    * Outputs the content of an article.
    *
    * @directive
