@@ -7,7 +7,7 @@
    * @factory
    * @var {Boolean} [error=false] Has the application encountered an error?
    * @var {Boolean} [loading=false] Is the application is loading something?
-   * @var {Boolean} mobile Is the application in mobile view?
+   * @var {Boolean} [mobile=true] Is the application in mobile view?
    * @var {Function} register Registers mobile/desktop listeners.
    * @var {Number} [requests=0] The number of outstanding requests.
    */
@@ -15,7 +15,7 @@
     var error = false
       , loading = false
       , requests = 0
-      , mobile;
+      , mobile = true;
 
     /**
      * Registers listeners for when the screen turns from desktop to mobile.
