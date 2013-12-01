@@ -355,8 +355,7 @@
           read: false
         }
       , id = 0
-      , list = false
-      , unreads = 0;
+      , list = false;
 
     /**
      * Fetchs the first article of the list, if there is one.
