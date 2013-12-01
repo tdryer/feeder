@@ -340,13 +340,15 @@
    * the user is currently viewing.
    *
    * @factory
+   * @var {Object} [filter={read:false}] The default list filter.
+   * @var {Function} first Fetchs the first article of the list.
    * @var {Number} [id=0] The id of the feed parent of the article list.
    * @var {Array|Boolean} [list=false] The list of articles.
    * @var {Function} push Adds to the article list, or update an article in it.
    * @var {Function} update Fetches and stores the article ids of a feed.
    * @var {Function} updateFilter Changes the filter of the article list view.
    */
-  this.factory('ArticleList', function($q, Cookie, User, Article) {
+  this.factory('ArticleList', function($q, $filter, Cookie, User, Article) {
     var endpoint = User.call().one('feeds')
       , filterKey = 'filter'
       , filter = Cookie.has(filterKey) ? Cookie.get(filterKey) : {
@@ -355,6 +357,15 @@
       , id = 0
       , list = false
       , unreads = 0;
+
+    /**
+     * Fetchs the first article of the list, if there is one.
+     *
+     * @returns {Object|Undefined} Returns the first article of the list.
+     */
+    function first() {
+      return $filter('filter')(this.list, this.filter)[0];
+    }
 
     /**
      * Either adds a new article to the article list, or updates an already
@@ -424,6 +435,7 @@
 
     return {
       filter: filter,
+      first: first,
       id: id,
       list: list,
       push: push,
