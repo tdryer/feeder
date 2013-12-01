@@ -31,7 +31,7 @@
           }
         });
       }
-    }
+    };
   });
 
   /**
@@ -77,7 +77,7 @@
           reader.readAsText(file);
         });
       }
-    }
+    };
   });
 
   /**
@@ -92,7 +92,7 @@
       controller: function($scope, State) {
         $scope.State = State;
       }
-    }
+    };
   });
 
   /**
@@ -112,7 +112,7 @@
         $scope.Article = Article;
       },
       templateUrl: '/partials/header.html'
-    }
+    };
   });
 
   /**
@@ -129,7 +129,7 @@
           elem$.find('a').attr('target', '_blank');
         });
       }
-    }
+    };
   });
 
   /**
@@ -163,7 +163,7 @@
           });
         });
       }
-    }
+    };
   });
 
   /**

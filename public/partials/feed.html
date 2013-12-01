@@ -1,49 +1,53 @@
-<div keepscroll class="article-list">
-  <a
-    target="_blank"
-    class="feed palette-belize-hole"
-    title="{{feed.name || feed.url}}"
-    href="{{feed.url}}">
-    <span class="small name">
-      <img
-        class="icon"
-        ng-show="feed.image_url"
-        ng-src="{{feed.image_url}}">
-      <img
-        class="icon"
-        ng-show="!feed.image_url"
-        ng-src="//robohash.org/{{feed.name || feed.url}}">
-      <span class="mls" ng-bind="feed.name || feed.url">
-    </span>
-    <span class="small unreads">{{feed.unreads}}</span>
-  </a>
-  <div class="filters small palette-peter-river">
-    <button
-      class="btn btn-xs btn-info mls"
-      ng-class="{active:ArticleList.filter.read===false}"
-      ng-click="ArticleList.updateFilter(false)">Unread</button>
-    <button
-      class="btn btn-xs btn-info mls"
-      ng-class="{active:ArticleList.filter.read===true}"
-      ng-click="ArticleList.updateFilter(true)">Read</button>
-    <button
-      class="btn btn-xs btn-info mls"
-      ng-class="{active:ArticleList.filter===null}"
-      ng-click="ArticleList.updateFilter(null)">All</button>
+<div class="article-list-view">
+  <div keepscroll class="article-list">
+    <a
+      target="_blank"
+      class="feed palette-belize-hole"
+      title="{{feed.name || feed.url}}"
+      href="{{feed.url}}">
+      <span class="small name">
+        <img
+          class="icon"
+          ng-show="feed.image_url"
+          ng-src="{{feed.image_url}}">
+        <img
+          class="icon"
+          ng-show="!feed.image_url"
+          ng-src="/img/feed-icon-12x12-orange.gif">
+        <span class="mls" ng-bind="feed.name || feed.url"></span>
+      </span>
+      <span class="small unreads" ng-bind="feed.unreads"></span>
+    </a>
+    <div class="filters small palette-peter-river">
+      <button
+        class="btn btn-xs btn-info mls"
+        ng-class="{active:ArticleList.filter.read===false}"
+        ng-click="ArticleList.updateFilter(false)">Unread</button>
+      <button
+        class="btn btn-xs btn-info mls"
+        ng-class="{active:ArticleList.filter.read===true}"
+        ng-click="ArticleList.updateFilter(true)">Read</button>
+      <button
+        class="btn btn-xs btn-info mls"
+        ng-class="{active:ArticleList.filter===null}"
+        ng-click="ArticleList.updateFilter(null)">All</button>
+    </div>
+    <ul>
+      <li
+        ng-class="{unread:!article.read}"
+        ng-repeat="article in ArticleList.list | filter:ArticleList.filter">
+        <a
+          href="/home/{{article.feed_id}}/{{article.id}}">
+          <time
+            title="{{article['pub-date'] | moment | format}}"
+            class="pub-date small"
+            ng-bind="article['pub-date'] | moment | fromNow"></time>
+          <span class="title h6" ng-bind="article.title"></span>
+          <p class="small summary mbn" ng-bind="article.content"></p>
+        </a>
+      </li>
+    </ul>
   </div>
-  <ul>
-    <li
-      ng-class="{unread:!article.read}"
-      ng-repeat="article in ArticleList.list | filter:ArticleList.filter">
-      <a
-        href="/home/{{article.feed_id}}/{{article.id}}">
-        <time
-          title="{{article['pub-date'] | moment | format}}"
-          class="pub-date small"
-          ng-bind="article['pub-date'] | moment | fromNow"></time>
-        <span class="title h6" ng-bind="article.title"></span>
-        <p class="small summary mbn" ng-bind="article.content"></p>
-      </a>
-    </li>
-  </ul>
+
+
 </div>
