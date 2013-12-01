@@ -9,6 +9,10 @@
         class="icon"
         ng-show="feed.image_url"
         ng-src="{{feed.image_url}}">
+      <img
+        class="icon"
+        ng-show="!feed.image_url"
+        ng-src="//robohash.org/{{feed.name || feed.url}}">
       <span class="mls" ng-bind="feed.name || feed.url">
     </span>
     <span class="small unreads">{{feed.unreads}}</span>
