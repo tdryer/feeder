@@ -20,12 +20,12 @@
 
 .article-list .feed .icon {
   vertical-align: middle;
+  padding-left: 1em;
 }
 
 .article-list .feed .name {
   color: #fff;
   display: block;
-  margin-left: 1em;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
