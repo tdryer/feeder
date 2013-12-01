@@ -132,20 +132,27 @@
     }
   });
 
-  this.directive('autofill', function() {
+  this.directive('autocomplete', function() {
     return {
       restrict: 'A',
       priority: -10,
-      link: function ($scope, elem$, attrs) {
+      link: function(scope, elem$, attrs) {
+        if (attrs.autocomplete !== 'on') {
+          return;
+        }
+
         elem$.on('submit', function() {
           angular.forEach(elem$.find('input'), function(element) {
-            var input_elem = angular.element(element)
-              , ng_model = input_elem.attr('ng-model')
-              , type = input_elem.attr('type');
+            var element$ = angular.element(element)
+              , type = element$.attr('type');
 
-            if (ng_model && (type === 'text' || type === 'password')) {
-              input_elem.controller('ngModel').$setViewValue(input_elem.val());
-            } 
+            if (!element$.attr('ng-model')) {
+              return;
+            }
+
+            if (type === 'text' || type === 'password') {
+              element$.controller('ngModel').$setViewValue(element$.val());
+            }
           });
         });
       }
