@@ -447,10 +447,10 @@
      * @returns {Promise} Returns the promise of the read article API hit.
      */
     function read(id) {
-      Feeds.id(this.article.feed_id).unreads--;
       return endpoint.one(id).patch({
         read: true
       }).then(_.bind(function(result) {
+        Feeds.id(this.article.feed_id).unreads--;
         this.article.read = true;
       }, this), $q.reject);
     }
@@ -462,10 +462,10 @@
      * @returns {Promise} Returns the promise of the unread article API hit.
      */
     function unread(id) {
-      Feeds.id(this.article.feed_id).unreads++;
       return endpoint.one(id).patch({
         read: false
       }).then(_.bind(function(result) {
+        Feeds.id(this.article.feed_id).unreads++;
         this.article.read = false;
       }, this), $q.reject);
     }
