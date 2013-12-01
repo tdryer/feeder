@@ -424,7 +424,7 @@
    * @var {Function} unread Unreads an article.
    * @var {Function} update Fetches and stores the article ids of a feed.
    */
-  this.factory('Article', function($q, User) {
+  this.factory('Article', function($q, User, Feeds) {
     var endpoint = User.call().one('entries')
       , article = false;
 
@@ -447,6 +447,7 @@
      * @returns {Promise} Returns the promise of the read article API hit.
      */
     function read(id) {
+      Feeds.id(this.article.feed_id).unreads--;
       return endpoint.one(id).patch({
         read: true
       }).then(_.bind(function(result) {
@@ -461,6 +462,7 @@
      * @returns {Promise} Returns the promise of the unread article API hit.
      */
     function unread(id) {
+      Feeds.id(this.article.feed_id).unreads++;
       return endpoint.one(id).patch({
         read: false
       }).then(_.bind(function(result) {
