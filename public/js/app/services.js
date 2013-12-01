@@ -481,6 +481,7 @@
         return endpoint.one(id).patch({
           read: true
         }).then(_.bind(function(result) {
+          Feeds.unreads--;
           Feeds.id(this.article.feed_id).unreads--;
           this.article.read = true;
         }, this), $q.reject);
@@ -498,7 +499,8 @@
         return endpoint.one(id).patch({
           read: false
         }).then(_.bind(function(result) {
-          Feed.id(this.article.feed_id).unreads++;
+          Feeds.unreads++;
+          Feeds.id(this.article.feed_id).unreads++;
           this.article.read = false;
         }, this), $q.reject);
       }
