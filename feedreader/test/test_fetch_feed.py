@@ -84,7 +84,7 @@ def test_awesome_blog(tasks):
 
     assert res["entries"][0].title == "Return of the OPPO Find 5"
     assert res["entries"][0].url == "http://awesome-blog.github.io/2013/11/20/return-of-the-oppo-find-5.html"
-    assert res["entries"][0].author == "David Yan"
+    assert res["entries"][0].author == None
     assert res["entries"][0].date == 1384934400
     assert res["entries"][0].content.startswith("<p>Yesterday, ")
     assert res["entries"][0].guid == "57785a2b321c948508451096cb98f23a2a697c01"

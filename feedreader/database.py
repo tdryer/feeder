@@ -177,7 +177,7 @@ class Entry(BASE):
     content = Column(String(LARGE_STR), nullable=False)
     url = Column(String(MEDIUM_STR), nullable=False)
     title = Column(String(MEDIUM_STR), nullable=False)
-    author = Column(String(SMALL_STR), nullable=False)
+    author = Column(String(SMALL_STR), nullable=True)
     date = Column(Integer, nullable=False)
     guid = Column(String(SMALL_STR), nullable=False)
 
