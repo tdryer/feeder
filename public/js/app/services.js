@@ -370,6 +370,12 @@
      */
     function update(id) {
       return endpoint.one(id).getList('entries').then(_.bind(function(result) {
+        if (!result.entries.length) {
+          this.id = id;
+          this.list = [];
+          return;
+        }
+
         return Article.get(result.entries, {
           truncate: 300
         }).then(_.bind(function(result) {
