@@ -3,6 +3,7 @@ import pytest
 import httpretty
 from os import path
 import yaml
+import logging
 
 from feedreader.tasks.core import Tasks
 
@@ -10,8 +11,7 @@ from feedreader.tasks.core import Tasks
 TEST_DATA_DIR = path.join(path.dirname(__file__), "data")
 
 
-import logging
-logging.getLogger().setLevel(logging.INFO)
+logging.getLogger().setLevel(logging.DEBUG)
 
 
 @pytest.fixture
@@ -40,8 +40,25 @@ def test_etag_304(tasks):
     httpretty.enable()
     feed_url = "http://example.com/feed.xml"
     httpretty.register_uri(httpretty.GET, feed_url, status=304)
-    res = yaml.safe_load(tasks.fetch_feed.delay(feed_url).get())
-    assert "error" in res
+    res = yaml.safe_load(tasks.fetch_feed.delay(feed_url, etag="foo").get())
+    assert httpretty.last_request().headers['If-None-Match'] == "foo"
+    assert res["feed"] == None
+    assert res["entries"] == []
+    httpretty.disable()
+    httpretty.reset()
+
+
+def test_last_modified_304(tasks):
+    httpretty.enable()
+    feed_url = "http://example.com/feed.xml"
+    httpretty.register_uri(httpretty.GET, feed_url, status=304)
+    res = yaml.safe_load(tasks.fetch_feed.delay(
+        feed_url, last_modified="Sat, 29 Oct 1994 19:43:31 GMT").get()
+    )
+    assert (httpretty.last_request().headers['If-Modified-Since'] ==
+            "Sat, 29 Oct 1994 19:43:31 GMT")
+    assert res["feed"] == None
+    assert res["entries"] == []
     httpretty.disable()
     httpretty.reset()
 

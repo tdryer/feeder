@@ -68,12 +68,6 @@ class Tasks(object):
 
         On error, returns dict containing:
             - error: description of the error
-
-        TODO:
-            disallow local URLs
-            use etag and last-modified if provided
-            check content types and escape html if necessary
-            check the http status code
         """
 
         logger.info("Fetch feed task STARTED for '{}'".format(feed_url))
@@ -84,14 +78,33 @@ class Tasks(object):
                         .format(feed_url))
             return yaml.safe_dump({"error": "Invalid URL"})
 
-        parsed_feed = get_parsed_feed(feed_url, etag)
-        if not is_valid(parsed_feed):
+        # TODO: please refactor me
+        parsed_feed = get_parsed_feed(feed_url, etag=etag,
+                                      last_modified=last_modified)
+        if parsed_feed.get('status', None) == 304:
+            logger.info("Fetch feed task SUCCEEDED for '{}': not modified"
+                        .format(feed_url))
+            return yaml.safe_dump({
+                "feed": None,
+                "entries": [],
+            })
+        elif not is_valid(parsed_feed):
             discovered_feed_url = discover_feed(parsed_feed)
             if discovered_feed_url is not None:
                 discovered_parsed_feed = get_parsed_feed(
                     discovered_feed_url,
-                    etag,
+                    etag=etag,
+                    last_modified=last_modified
                 )
+                if discovered_parsed_feed.get('status', None) == 304:
+                    logger.info(
+                        "Fetch feed task SUCCEEDED for '{}': not modified"
+                        .format(discovered_feed_url)
+                    )
+                    return yaml.safe_dump({
+                        "feed": None,
+                        "entries": [],
+                    })
             if (discovered_feed_url is None
                 or not is_valid(discovered_parsed_feed)):
                 logger.info("Fetch feed task FAILED for '{}'".format(feed_url))
@@ -106,10 +119,6 @@ class Tasks(object):
             if parsed_feed.status == 301:
                 # update feed's feed_url
                 pass
-            if parsed_feed.status == 304:
-                return yaml.safe_dump({
-                    "error": "Feed not modified"
-                })
             if parsed_feed.status == 410:
                 # delete feed from database
                 pass
@@ -176,9 +185,9 @@ FEED_MIME_TYPES = [
 ]
 
 
-def get_parsed_feed(feed_url, etag):
+def get_parsed_feed(feed_url, etag=None, last_modified=None):
     """Return parsed feed from feedparser."""
-    parsed_feed = feedparser.parse(feed_url, etag=etag)
+    parsed_feed = feedparser.parse(feed_url, etag=etag, modified=last_modified)
     if parsed_feed.bozo:
         logger.warning("Feed '{}' set the bozo bit: '{}'"
                        .format(feed_url, parsed_feed.bozo_exception))
