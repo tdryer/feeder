@@ -172,22 +172,22 @@
    * @directive
    * @restrict attribute
    */
-  this.directive('keepscroll', function(ArticleList, $timeout, $window) {
+  this.directive('keepscroll', function() {
     return {
       restrict: 'A',
-      link: function(scope) {
-        scope.$on('$routeChangeStart', function() {
-          ArticleList.scrollYPos = $window.scrollY;
+      controller: function($scope, $timeout, $window) {
+        $scope.$on('$routeChangeStart', function() {
+          $window.prevScrollY = $window.scrollY;
         });
 
-        scope.$on('$routeChangeSuccess', function() {
+        $scope.$on('$routeChangeSuccess', function() {
           // Wait until the page has fully loaded to update scroll position
           $timeout(function() {
-            $window.scrollTo(0, ArticleList.scrollYPos);
-          }, 0)
+            $window.scrollTo(0, $window.prevScrollY);
+          }, 0);
         });
       }
-    }
-  })
+    };
+  });
 
 }).call(angular.module('feeder.directives', []));
