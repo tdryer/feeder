@@ -166,6 +166,12 @@
     }
   });
 
+  /**
+   * Scrolls the window back to the position it was at originally
+   *
+   * @directive
+   * @restrict attribute
+   */
   this.directive('keepscroll', function(ArticleList, $timeout, $window) {
     return {
       restrict: 'A',
