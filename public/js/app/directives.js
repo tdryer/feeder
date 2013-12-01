@@ -132,4 +132,24 @@
     }
   });
 
+  this.directive('autofill', function() {
+    return {
+      restrict: 'A',
+      priority: -10,
+      link: function ($scope, elem$, attrs) {
+        elem$.on('submit', function() {
+          angular.forEach(elem$.find('input'), function(element) {
+            var input_elem = angular.element(element)
+              , ng_model = input_elem.attr('ng-model')
+              , type = input_elem.attr('type');
+
+            if (ng_model && (type === 'text' || type === 'password')) {
+              input_elem.controller('ngModel').$setViewValue(input_elem.val());
+            } 
+          });
+        });
+      }
+    }
+  });
+
 }).call(angular.module('feeder.directives', []));
