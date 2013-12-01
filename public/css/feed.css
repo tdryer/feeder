@@ -1,12 +1,27 @@
+@media (min-width: 60em) {
+  .article-list-view {
+    -webkit-align-items: flex-start;
+    align-items: flex-start;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+  }
+
+  .article-list-view .article-list {
+    flex: 1 0 0;
+    min-width: 16em;
+  }
+
+  .article-list-view .article-pane {
+    flex: 4 0 0;
+  }
+}
+
+
 .article-list {
   position: relative;
   width: auto;
-}
-
-@media (min-width: 60em) {
-  .article-list {
-    /*width: 24em;*/
-  }
 }
 
 .article-list .feed {

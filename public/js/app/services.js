@@ -7,16 +7,35 @@
    * @factory
    * @var {Boolean} [error=false] Has the application encountered an error?
    * @var {Boolean} [loading=false] Is the application is loading something?
+   * @var {Boolean} mobile Is the application in mobile view?
+   * @var {Function} register Registers mobile/desktop listeners.
    * @var {Number} [requests=0] The number of outstanding requests.
    */
   this.factory('State', function() {
     var error = false
       , loading = false
-      , requests = 0;
+      , requests = 0
+      , mobile;
+
+    /**
+     * Registers listeners for when the screen turns from desktop to mobile.
+     */
+    function register() {
+      enquire.register('(min-width: 60em)', {
+        match: _.bind(function() {
+          this.mobile = false;
+        }, this),
+        unmatch: _.bind(function() {
+          this.mobile = true;
+        }, this)
+      });
+    }
 
     return {
       error: error,
       loading: loading,
+      mobile: mobile,
+      register: register,
       requests: requests
     };
   });

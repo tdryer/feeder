@@ -127,6 +127,7 @@
 
   this.run(function($rootScope, $location, $routeParams, State) {
     $rootScope.$routeParams = $routeParams;
+    $rootScope.State = State;
 
     $rootScope.$on('$routeChangeStart', function() {
       State.loading = true;
@@ -143,6 +144,8 @@
       State.loading = false;
       State.error = false;
     });
+
+    State.register();
   });
 
 }).call(angular.module('feeder', [

@@ -37,6 +37,7 @@
         ng-class="{unread:!article.read}"
         ng-repeat="article in ArticleList.list | filter:ArticleList.filter">
         <a
+          article-anchor="{{article.id}}"
           href="/home/{{article.feed_id}}/{{article.id}}">
           <time
             title="{{article['pub-date'] | moment | format}}"
@@ -49,5 +50,5 @@
     </ul>
   </div>
 
-
+  <div article-pane class="article-pane"></div>
 </div>

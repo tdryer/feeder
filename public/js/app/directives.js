@@ -190,4 +190,46 @@
     };
   });
 
+  /**
+   * Outputs the content of an article.
+   *
+   * @directive
+   * @restrict attribute
+   */
+  this.directive('articleAnchor', function() {
+    return {
+      restrict: 'A',
+      link: function(scope, elem$, attrs) {
+        elem$.on('click', function(event) {
+          if (!scope.State.mobile) {
+            event.preventDefault();
+            scope.$apply(function() {
+              scope.Article.update(attrs.articleAnchor).then(function() {
+                scope.Article.read(attrs.articleAnchor).then(function() {
+                  scope.ArticleList.push();
+                });
+              });
+            });
+          }
+        });
+      }
+    };
+  });
+
+  /**
+   * Outputs the content of an article.
+   *
+   * @directive
+   * @restrict attribute
+   */
+  this.directive('articlePane', function() {
+    return {
+      restrict: 'A',
+      templateUrl: '/partials/article.html',
+      controller: function($scope, Article) {
+        $scope.Article = Article;
+      }
+    };
+  });
+
 }).call(angular.module('feeder.directives', []));
