@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 BASE = declarative_base()
 
 SMALL_STR = 100
-MEDIUM_STR = 1024
-LARGE_STR = 10 * MEDIUM_STR
+MEDIUM_STR = 2048
+LARGE_STR = 50 * MEDIUM_STR # ~100k entry content
 
 
 def initialize_db(database_uri='sqlite://'):
@@ -53,7 +53,7 @@ class User(BASE):
 
     def __init__(self, name, password_hash):
         self.username = column_size(name, SMALL_STR)
-        self.password_hash = password_hash
+        self.password_hash = column_size(password_hash, MEDIUM_STR)
 
     def __repr__(self):
         return "<User('%s')>" % (self.username)
@@ -134,11 +134,11 @@ class Feed(BASE):
                  etag=None, last_refresh_date=None, image_url=None, id=None):
         self.id = id
         self.title = column_size(title, MEDIUM_STR)
-        self.feed_url = feed_url
-        self.site_url = site_url
-        self.image_url = image_url
+        self.feed_url = column_size(feed_url, MEDIUM_STR)
+        self.site_url = column_size(site_url, MEDIUM_STR)
+        self.image_url = column_size(image_url, MEDIUM_STR)
         self.last_modified = column_size(last_modified, SMALL_STR)
-        self.etag = etag
+        self.etag = column_size(etag, MEDIUM_STR)
         self.last_refresh_date = last_refresh_date
 
     def __repr__(self):
@@ -182,8 +182,8 @@ class Entry(BASE):
     guid = Column(String(SMALL_STR), nullable=False)
 
     def __init__(self, content, url, title, author, date, guid):
-        self.content = content
-        self.url = url
+        self.content = column_size(content, LARGE_STR)
+        self.url = column_size(url, MEDIUM_STR)
         self.title = column_size(title, MEDIUM_STR)
         self.author = column_size(author, SMALL_STR)
         self.date = date
