@@ -2,7 +2,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import (create_engine, Column, ForeignKey, Integer, Table,
                         Sequence, String, UniqueConstraint)
-from migrate.changeset.schema import alter_column
 import yaml
 import logging
 
@@ -10,25 +9,9 @@ logger = logging.getLogger(__name__)
 
 BASE = declarative_base()
 
-
-# logical constants
 SMALL_STR = 100
 MEDIUM_STR = 1024
 LARGE_STR = 10 * MEDIUM_STR
-
-# column size variables for keeping track of changes
-size_user_username = SMALL_STR
-size_user_pw_hash = MEDIUM_STR
-size_feed_title = MEDIUM_STR
-size_feed_resource = MEDIUM_STR
-size_feed_site = MEDIUM_STR
-size_feed_modified = SMALL_STR
-size_feed_etag = MEDIUM_STR
-size_entry_content = LARGE_STR
-size_entry_content = MEDIUM_STR
-size_entry_title = MEDIUM_STR
-size_entry_author = SMALL_STR
-size_entry_guid = SMALL_STR
 
 
 def initialize_db(database_uri='sqlite://'):
@@ -40,7 +23,6 @@ def initialize_db(database_uri='sqlite://'):
 
     # create tables and prepare to make sessions
     BASE.metadata.create_all(engine)
-    BASE.metadata.bind = engine
     return sessionmaker(bind=engine)
 
 
@@ -61,13 +43,8 @@ read_table = Table('read', BASE.metadata,
 class User(BASE):
     __tablename__ = 'users'
 
-    username = Column(
-        'username',
-        String(SMALL_STR),
-        primary_key=True,
-        nullable=False,
-    )
-    password_hash = Column('pw_hash', String(MEDIUM_STR), nullable=False)
+    username = Column(String(SMALL_STR), primary_key=True, nullable=False)
+    password_hash = Column(String(MEDIUM_STR), nullable=False)
 
     subscriptions = relationship('Feed', secondary=subscriptions_table,
                                  backref='users', order_by='Feed.title')
@@ -75,18 +52,8 @@ class User(BASE):
                                 backref='read_by', lazy='dynamic')
 
     def __init__(self, name, password_hash):
-        self.username = column_size(
-            name,
-            size_user_username,
-            'users',
-            'username'
-        )
-        self.password_hash = column_size(
-            password_hash,
-            size_user_pw_hash,
-            'users',
-            'pw_hash'
-        )
+        self.username = column_size(name, SMALL_STR)
+        self.password_hash = password_hash
 
     def __repr__(self):
         return "<User('%s')>" % (self.username)
@@ -140,22 +107,17 @@ class Feed(BASE):
 
     id = Column(Integer, Sequence('feed_id_seq'), primary_key=True,
                 nullable=False)
-    title = Column('title', String(MEDIUM_STR), nullable=False)
+    title = Column(String(MEDIUM_STR), nullable=False)
     #feed resource
-    feed_url = Column(
-        'resource',
-        String(MEDIUM_STR),
-        unique=True,
-        nullable=False,
-    )
+    feed_url = Column(String(MEDIUM_STR), unique=True, nullable=False)
     # url of html page associated with the feed (None if not provided)
-    site_url = Column('site', String(MEDIUM_STR), nullable=True)
+    site_url = Column(String(MEDIUM_STR), nullable=True)
     # date of last attempted refresh
     last_refresh_date = Column(Integer, nullable=True)
     # last-modifed date used for caching (string since we don't parse it)
-    last_modified = Column('modified', String(SMALL_STR), nullable=True)
+    last_modified = Column(String(SMALL_STR), nullable=True)
     # etag used for caching
-    etag = Column('etag', String(MEDIUM_STR), nullable=True)
+    etag = Column(String(MEDIUM_STR), nullable=True)
 
     entries = relationship('Entry', backref='feed', lazy='dynamic',
                            order_by='desc(Entry.date)')
@@ -169,31 +131,11 @@ class Feed(BASE):
     def __init__(self, title, feed_url, site_url, last_modified=None,
                  etag=None, last_refresh_date=None, id=None):
         self.id = id
-        self.title = column_size(
-            title,
-            size_feed_title,
-            'feeds',
-            'title'
-        )
-        self.feed_url = column_size(
-            feed_url,
-            size_feed_resource,
-            'feeds',
-            'resource'
-        )
-        self.site_url = column_size(
-            site_url,
-            size_feed_site,
-            'feeds',
-            'site'
-        )
-        self.last_modified = column_size(
-            last_modified,
-            size_feed_modified,
-            'feeds',
-            'modified'
-        )
-        self.etag = column_size(etag, size_feed_etag, 'feeds', 'etag')
+        self.title = column_size(title, MEDIUM_STR)
+        self.feed_url = feed_url
+        self.site_url = site_url
+        self.last_modified = column_size(last_modified, SMALL_STR)
+        self.etag = etag
         self.last_refresh_date = last_refresh_date
 
     def __repr__(self):
@@ -229,57 +171,36 @@ class Entry(BASE):
                 nullable=False)
     feed_id = Column(Integer, ForeignKey('feeds.id', ondelete='CASCADE'),
                      nullable=False)
-    content = Column('content', String(LARGE_STR), nullable=False)
-    url = Column('url', String(MEDIUM_STR), nullable=False)
-    title = Column('title', String(MEDIUM_STR), nullable=False)
-    author = Column('author', String(SMALL_STR), nullable=False)
+    content = Column(String(LARGE_STR), nullable=False)
+    url = Column(String(MEDIUM_STR), nullable=False)
+    title = Column(String(MEDIUM_STR), nullable=False)
+    author = Column(String(SMALL_STR), nullable=False)
     date = Column(Integer, nullable=False)
-    guid = Column('guid', String(SMALL_STR), nullable=False)
+    guid = Column(String(SMALL_STR), nullable=False)
 
     def __init__(self, content, url, title, author, date, guid):
-        self.content = column_size(
-            content,
-            size_entry_content,
-            'entries',
-            'content'
-        )
-        self.url = column_size(url, size_entry_content, 'entries', 'url')
-        self.title = column_size(
-            title,
-            size_entry_title,
-            'entries',
-            'title'
-        )
-        self.author = column_size(
-            author,
-            size_entry_author,
-            'entries',
-            'author'
-        )
+        self.content = content
+        self.url = url
+        self.title = column_size(title, MEDIUM_STR)
+        self.author = column_size(author, SMALL_STR)
         self.date = date
-        self.guid = column_size(guid, size_entry_guid, 'entries', 'guid')
+        self.guid = column_size(guid, SMALL_STR)
 
     def __repr__(self):
         return '<Entry({!r})>'.format(self.id)
 
 
-def column_size(string, size, table, column):
+def column_size(string, size):
     if string is None:
         return string
-    length = len(string)
-    if length > size:
-        table_obj = Table(table, BASE.metadata, autoload=True)
-        # alter the username columns in Subscription and Read
-        if table == 'users' and column == 'username':
-            sub_table = Table('subscriptions', BASE.metadata, autoload=True)
-            read_table = Table('read', BASE.metadata, autoload=True)
-            alter_column(column, table=sub_table, type=String(length))
-            alter_column(column, table=read_table, type=String(length))
-        # alter the target column
-        alter_column(column, table=table_obj, type=String(length))
-        # TODO: update size variables so that alter_column isn't called a lot
-
-    return string
+    if len(string) > size:
+        truncated_string = string[:size-6]+" . . ."
+        logger.info(
+            "Truncated input '{}' to '{}'".format(string, truncated_string)
+        )
+        return truncated_string
+    else:
+        return string
 
 
 def make_yaml_bindings():
