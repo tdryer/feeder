@@ -14,9 +14,16 @@
         class="feed"
         title="{{feed.name}}"
         href="/home/{{feed.id}}">
-        <img
-          class="icon palette-peter-river"
-          src="//robohash.org/{{feed.name}}">
+        <div class="img-container palette-peter-river">
+          <img
+            class="icon"
+            ng-show="feed.image_url !== null"
+            src="{{feed.image_url}}">
+          <img
+            class="icon"
+            ng-show="feed.image_url === null"
+            src="//robohash.org/{{feed.name}}">
+        </div>
         <span class="small unreads palette-belize-hole">{{feed.unreads}}</span>
         <span class="small name text-primary">{{feed.name}}</span>
       </a>
