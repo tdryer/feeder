@@ -238,8 +238,8 @@ def discover_image(site_url):
 
     TODO: more discovery methods
     """
-    logging.info("Attempting to discover image for '{}'"
-                 .format(site_url.encode('utf-8')))
+    logger.info("Attempting to discover image for '{}'"
+                .format(site_url.encode('utf-8')))
     # hacky way to use urlparse to get favicon path
     url = urlparse.urlparse(site_url)
     url = urlparse.urlunparse((url.scheme, url.netloc, "favicon.ico", '', '',
@@ -251,8 +251,8 @@ def discover_image(site_url):
     else:
         code = response.status_code
     if code == 200:
-        logging.info("Image found at '{}'".format(url.encode('utf-8')))
+        logger.info("Image found at '{}'".format(url.encode('utf-8')))
         return url
     else:
-        logging.info("No image found")
+        logger.info("No image found")
         return None
