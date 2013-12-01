@@ -116,7 +116,8 @@ class Tasks(object):
         # parse the feed
         feed_title = parsed_feed.feed.get("title", "Untitled")
         feed_link = parsed_feed.feed.get("link", None)
-        image_url = discover_image(feed_link)
+        # TODO should be able to find favicon without site url
+        image_url = None if feed_link is None else discover_image(feed_link)
         etag = parsed_feed.get("etag", None)
         last_modified = parsed_feed.get("modified", None)
         last_refresh_date = int(time.time())
