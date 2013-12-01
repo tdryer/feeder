@@ -30,26 +30,16 @@ def test_connection_refused(tasks):
     httpretty.reset()
 
 
+def test_invalid_url(tasks):
+    res = yaml.safe_load(tasks.fetch_feed.delay("/etc/passwd").get())
+    assert "error" in res
+    assert res["error"] == "Invalid URL"
+
+
 def test_etag_304(tasks):
     httpretty.enable()
     feed_url = "http://example.com/feed.xml"
     httpretty.register_uri(httpretty.GET, feed_url, status=304)
-    res = yaml.safe_load(tasks.fetch_feed.delay(feed_url).get())
-    assert "error" in res
-    httpretty.disable()
-    httpretty.reset()
-
-
-def test_local_url(tasks):
-    httpretty.enable()
-    feed_url = "http://cmpt470.csil.sfu.ca:8004/"
-    feed = open(path.join(TEST_DATA_DIR, "awesome-blog.xml")).read()
-    httpretty.register_uri(httpretty.GET, feed_url,
-                           body=feed, content_type="application/atom+xml",
-                           adding_headers={
-                                "ETag": "1337",
-                                "Last-Modified": "Tue, 15 Nov 1994 12:45:26 +0000",
-                           })
     res = yaml.safe_load(tasks.fetch_feed.delay(feed_url).get())
     assert "error" in res
     httpretty.disable()

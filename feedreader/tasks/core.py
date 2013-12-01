@@ -19,6 +19,10 @@ from feedreader import database
 logger = logging.getLogger(__name__)
 
 
+# valid schemes for feed URLs
+VALID_SCHEMES = ['http', 'https']
+
+
 class Tasks(object):
 
     def __init__(self, amqp_uri=''):
@@ -74,14 +78,11 @@ class Tasks(object):
 
         logger.info("Fetch feed task STARTED for '{}'".format(feed_url))
 
-        # explicit URL denial
-        if re.search(
-            "http://cmpt470.csil.sfu.ca:8004/.*?|cmpt470.csil.sfu.ca:8004/.*?",
-            feed_url,
-        ):
-            return yaml.safe_dump({
-                "error": "Target URL is forbidden",
-            })
+        # fail if the url does not have a valid scheme
+        if urlparse.urlparse(feed_url).scheme not in VALID_SCHEMES:
+            logger.info("Fetch feed task FAILED for '{}' because invalid url"
+                        .format(feed_url))
+            return yaml.safe_dump({"error": "Invalid URL"})
 
         parsed_feed = get_parsed_feed(feed_url, etag)
         if not is_valid(parsed_feed):
