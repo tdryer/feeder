@@ -2,9 +2,9 @@
   <a
     target="_blank"
     class="feed palette-belize-hole"
-    title="{{feed.name}}"
+    title="{{feed.name || feed.url}}"
     href="{{feed.url}}">
-    <span class="small name">{{feed.name}}</span>
+    <span class="small name">{{feed.name || feed.url}}</span>
     <span class="small unreads">{{feed.unreads}}</span>
   </a>
   <div class="filters small palette-peter-river">

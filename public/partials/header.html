@@ -19,7 +19,7 @@
     <a
       class="btn btn-primary mrs"
       href="/home/{{ArticleList.id}}"
-      ng-bind="Feeds.id(ArticleList.id).name"
+      ng-bind="Feeds.id(ArticleList.id).name || Feeds.id(ArticleList.id).url"
       ng-show="$routeParams.feed"></a>
     <a
       class="btn btn-primary mrs"

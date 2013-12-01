@@ -12,20 +12,20 @@
         ng-click="Feeds.remove(feed.id)">Remove</button>
       <a
         class="feed"
-        title="{{feed.name}}"
+        title="{{feed.name || feed.url}}"
         href="/home/{{feed.id}}">
         <div class="img-container palette-peter-river">
           <img
             class="icon"
-            ng-show="feed.image_url !== null"
-            src="{{feed.image_url}}">
+            ng-show="feed.image_url"
+            ng-src="{{feed.image_url}}">
           <img
             class="icon"
-            ng-show="feed.image_url === null"
-            src="//robohash.org/{{feed.name}}">
+            ng-show="!feed.image_url"
+            ng-src="//robohash.org/{{feed.name || feed.url}}">
         </div>
         <span class="small unreads palette-belize-hole">{{feed.unreads}}</span>
-        <span class="small name text-primary">{{feed.name}}</span>
+        <span class="small name text-primary">{{feed.name || feed.url}}</span>
       </a>
     </li>
   </ul>
