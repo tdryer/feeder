@@ -132,6 +132,13 @@
     }
   });
 
+  /**
+   * Solves autocomplete issues with AngularJS and browsers by forcing an
+   * update of the view value for forms when a form is submitted.
+   *
+   * @directive
+   * @restrict attribute
+   */
   this.directive('autocomplete', function() {
     return {
       restrict: 'A',
