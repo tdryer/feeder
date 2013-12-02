@@ -1,6 +1,9 @@
-.update {
-  padding: 0.5em 1em;
-  text-align: right;
+.update-bar {
+  padding: 0.5em;
+}
+
+.update-bar .update{
+  margin-right: 0.5em;
 }
 
 .no-feeds {

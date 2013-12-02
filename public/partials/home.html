@@ -1,13 +1,3 @@
-<div 
-    class="update small"
-    ng-show="Feeds.feeds.length">
-      Last updated {{Feeds.lastUpdated | fromNow}}
-      <button
-        class="btn btn-xs btn-primary mls"
-        ng-click="Feeds.update()">
-        Force Update
-      </button>
-</div>
 <div opml-receiver>
   <div class="no-feeds" ng-show="!Feeds.feeds.length">
     <p class="mbl h6">Welcome to feeder!</p>
@@ -39,6 +29,17 @@
       </a>
     </li>
   </ul>
+
+  <div 
+  class="update-bar small"
+  ng-show="Feeds.feeds.length">
+    <button
+      class="update btn btn-xs btn-primary mls"
+      ng-click="Feeds.update()">
+        Force Update
+    </button>
+    Last updated {{Feeds.lastUpdated | fromNow}}
+  </div>
 
   <div class="form-container mts">
     <form
