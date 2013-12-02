@@ -108,6 +108,10 @@
   list-style-type: none;
 }
 
+.article-list ul .small {
+  line-height: 2;
+}
+
 .article-list ul li {
   position: relative;
 }
@@ -128,9 +132,13 @@
 
 .article-list ul li a {
   border-bottom: 1px solid #bdc3c7;
-  padding: 1em;
+  padding: 0.5em 1em;
   display: block;
   color: #34495e;
+}
+
+.article-list ul li a .title {
+  font-size: 111%;
 }
 
 @media (min-width: 60em) {
