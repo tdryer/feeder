@@ -14,6 +14,8 @@ from feedreader.config import ConnectionConfig, FeederConfig
 from feedreader.tasks.core import Tasks
 from feedreader.updater import Updater
 
+logger = logging.getLogger(__name__)
+
 
 def get_application(feeder_config, conn_config, db_setup_f=None):
     """Return Tornado application instance."""
@@ -127,6 +129,7 @@ def main():
     logging.getLogger().setLevel(logging.INFO)
 
     get_application(feeder_config, conn_config).listen(feeder_config.port)
+    logger.info('It\'s going to be legend... Wait for it, dary!')
     tornado.ioloop.IOLoop.instance().start()
 
 
