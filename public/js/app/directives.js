@@ -180,11 +180,7 @@
           if (!scope.State.mobile) {
             event.preventDefault();
             scope.$apply(function() {
-              scope.Article.update(attrs.articleAnchor).then(function() {
-                scope.Article.read(attrs.articleAnchor).then(function() {
-                  scope.ArticleList.push();
-                });
-              });
+              scope.Article.update(attrs.articleAnchor);
             });
           }
         });

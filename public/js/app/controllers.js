@@ -110,11 +110,12 @@
    * @scope {Object} feed The parent feed object of the article list.
    */
   this.controller('FeedCtrl', function($scope, $window, $document, Feeds,
-                                       ArticleList, State) {
+                                       ArticleList, Article, State) {
     $scope.feed = Feeds.id(ArticleList.id);
     $scope.ArticleList = ArticleList;
+    $scope.Article = Article;
     ArticleList.push();
-    Tinycon.setBubble($scope.feed.unreads)
+    Tinycon.setBubble($scope.feed.unreads);
 
     $document.ready(function() {
       $window.scrollTo(0, $window.prevScrollY);
