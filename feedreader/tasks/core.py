@@ -93,7 +93,7 @@ class Tasks(object):
                                                entry.title, entry.author,
                                                entry.date, entry.guid))
 
-        logger.info("Fetch feed task SUCCEEDED for '{}'".format(feed_url))
+        logger.info("Fetch feed task SUCCEEDED for '{}'".format(feed.url))
 
         # Serialize manually so tests that run in eager mode cover
         # serialization.
