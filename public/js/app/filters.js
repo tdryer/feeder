@@ -48,4 +48,21 @@
     }
   });
 
+  this.filter('filterArticles', function() {
+    return function(data, filter) {
+      var filtered = [];
+
+      if (filter === null) {
+        return data;
+      }
+      angular.forEach(data, function(current) {
+        if (current.read === filter.read || _.indexOf(filter.ids, current.id) >= 0) {
+          filtered.push(current);
+        }
+      });
+
+      return filtered;
+    }
+  });
+
 }).call(angular.module('feeder.filters', []));

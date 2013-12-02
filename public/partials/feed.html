@@ -36,7 +36,7 @@
       <li
         id="article-anchor-{{article.id}}"
         ng-class="{unread:!article.read}"
-        ng-repeat="article in ArticleList.list | filter:ArticleList.filter">
+        ng-repeat="article in ArticleList.list | filterArticles:ArticleList.filter">
         <a
           article-anchor="{{article.id}}"
           href="/home/{{article.feed_id}}/{{article.id}}">

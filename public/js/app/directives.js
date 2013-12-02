@@ -180,12 +180,13 @@
           if (!scope.State.mobile) {
             event.preventDefault();
             scope.$apply(function() {
-              scope.ArticleList.currentAnchor = elem$.parent();
+              scope.ArticleList.filter.ids.push(
+                parseInt(attrs.articleAnchor));
               scope.Article.update(attrs.articleAnchor).then(function() {
                 scope.Article.read(attrs.articleAnchor).then(function() {
+                  scope.ArticleList.push();
                 });
               });
-              scope.ArticleList.currentAnchor.removeClass('unread');
             });
           }
         });
@@ -201,11 +202,11 @@
           var id = scope.Article.article.id;
           if (scope.Article.article.read) {
             scope.Article.unread(id).then(function() {
-              scope.ArticleList.currentAnchor.addClass('unread');
+              scope.ArticleList.push();
             });
           } else {
             scope.Article.read(id).then(function() {
-              scope.ArticleList.currentAnchor.removeClass('unread');
+              scope.ArticleList.push();
             });
           }
         });

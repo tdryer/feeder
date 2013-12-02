@@ -369,7 +369,8 @@
     var endpoint = User.call().one('feeds')
       , filterKey = 'filter'
       , filter = Cookie.has(filterKey) ? Cookie.get(filterKey) : {
-          read: false
+          read: false,
+          ids: []
         }
       , id = 0
       , list = false;
@@ -440,7 +441,8 @@
     function updateFilter(filter) {
       if (_.isBoolean(filter)) {
         this.filter = {
-          read: filter
+          read: filter,
+          ids: []
         };
       } else {
         this.filter = null;
