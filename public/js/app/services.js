@@ -277,20 +277,12 @@
           this.batchAdd(urls);
         }, this));
       }
-
-      // urls = _.map(urls, function(url) {
-      //   return endpoint.all('').post({
-      //     url: url
-      //   });
-      // });
-
-      // return $q.all(urls).then(_.bind(function() {
-      //   return this.update();
-      // }, this), _.bind(function() {
-      //   return this.update();
-      // }, this));
     }
 
+    /**
+     * Clears the feeds and sets lastUpdated to zero to force an
+     * update the next time the feeds route is visited
+     */
     function clear() {
       this.feeds = false;
       this.lastUpdated = 0;
