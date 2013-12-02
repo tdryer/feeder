@@ -279,7 +279,6 @@
       } else if (num > 50) {
         return 50;
       }
-
       return num;
     }
 
@@ -291,14 +290,18 @@
           , index = _.findIndex(list, {id: id})
           , prev = scope.ArticleList.get(index - 1)
           , next = scope.ArticleList.get(index + 1)
-          , delta;
+          , delta
+          , hammerInstance;
 
         if (scope.swipe === false) {
           return;
         }
 
-        Hammer(elem$[0]).on('dragleft dragright', function(event) {
-          delta = maxMagnitude(event.gesture.deltaX);
+        hammerInstance = Hammer(elem$[0]);
+        hammerInstance.options.prevent_mouseevents = true;
+
+        hammerInstance.on('dragleft dragright', function(event) {
+          delta = maxMagnitude(event.gesture.deltaX * 10);
         }).on('dragend', function() {
           if (delta === -50 && next) {
             scope.$apply(function() {
