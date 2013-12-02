@@ -92,6 +92,7 @@ def test_awesome_blog(tasks):
     httpretty.disable()
     httpretty.reset()
 
+
 def test_awesome_blog_favicon(tasks):
     httpretty.enable()
     feed_url = "http://example.com/feed.xml"
@@ -99,7 +100,8 @@ def test_awesome_blog_favicon(tasks):
     feed = open(path.join(TEST_DATA_DIR, "awesome-blog.xml")).read()
     httpretty.register_uri(httpretty.GET, feed_url,
                            body=feed, content_type="application/atom+xml")
-    httpretty.register_uri(httpretty.GET, favicon_url, body="foo")
+    httpretty.register_uri(httpretty.HEAD, favicon_url, body="foo",
+                           content_type="image/ico")
 
     res = yaml.safe_load(tasks.fetch_feed.delay(feed_url).get())
 

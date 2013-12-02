@@ -129,7 +129,7 @@ def _discover_url(result):
     ]
 
     if len(discovered_feeds) == 0:
-        _fail(None, "Failed to download or parse feed") # XXX
+        _fail(None, "Failed to download or parse feed")  # XXX
 
     return discovered_feeds[0]
 
@@ -149,7 +149,7 @@ def _validate_url(url):
 def _parse_result(url, result, find_image_url=False):
     """Parse feedparser result info ParsedFeed."""
     feed = ParsedFeed()
-    feed.url = url # TODO use feed.id
+    feed.url = url  # TODO use feed.id
     feed.title = result.feed.get("title", None)
     feed.link = result.feed.get("link", None)
     feed.etag = result.get("etag", None)
@@ -188,7 +188,7 @@ def _parse_result_entry(result):
         entry.date = int(time.time())
     # try to find something to use as GUID, or fall back to static string
     guid_content = result.get("id", entry.title)
-    if guid_content == None:
+    if guid_content is None:
         guid_content = "None"
     entry.guid = hashlib.sha1(guid_content.encode('utf-8')).hexdigest()
     return entry
@@ -206,14 +206,18 @@ def discover_image(url):
     favicon_url = urlparse.urlunparse((parsed_url.scheme, parsed_url.netloc,
                                        "favicon.ico", '', '', ''))
     try:
-        response = requests.get(favicon_url)
+        response = requests.head(favicon_url)
     except requests.exceptions.RequestException:
-        code = None
-    else:
-        code = response.status_code
-    if code == 200:
-        LOG.info("Image found at '{}'".format(url.encode('utf-8')))
-        return favicon_url
-    else:
-        LOG.info("No image found")
-        return None
+        response = None
+
+    if response:
+        good_status = response.status_code == 200
+        good_content_type = response.headers.get('content-type', '')\
+                                            .startswith('image/')
+        good_content_size = int(response.headers.get('content-length', 0)) > 0
+        if good_status and good_content_type and good_content_size:
+            LOG.info("Image found at '{}'".format(url.encode('utf-8')))
+            return favicon_url
+
+    LOG.info("No image found")
+    return None
