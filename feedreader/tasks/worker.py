@@ -18,7 +18,7 @@ def main():
     args = get_args()
     conn_config = ConnectionConfig.from_file(args.config)
     kwargs = {
-        'concurrency': 1,
+        'concurrency': 3,
         'events': True,
         'hostname': '%h.worker.{}'.format(args.number),
         'loglevel': 'info',
