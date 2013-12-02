@@ -266,6 +266,14 @@ class ApiTest(AsyncHTTPTestCase):
                 expect_headers={"Location": "/feeds/1"}
             )
 
+    def test_add_feed_duplicate_guid(self):
+        with serve_dir(TEST_DATA_DIR, TEST_SERVER_PORT) as url:
+            self.assert_api_call(
+                "POST /feeds", headers=self.headers,
+                json_body={'url': url + "test-dup-guid.xml"}, expect_code=201,
+                expect_headers={"Location": "/feeds/1"}
+            )
+
     def test_add_feed_autodiscovery_success(self):
         with serve_dir(TEST_DATA_DIR, TEST_SERVER_PORT) as url:
             self.assert_api_call("POST /feeds", headers=self.headers,

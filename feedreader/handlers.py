@@ -143,7 +143,13 @@ class FeedsHandler(APIRequestHandler):
             if len(existing_feed) > 0:
                 feed = existing_feed[0]
             else:
-                feed.add_all(res['entries'])
+                # only add the first entry with a given guid
+                # this assumes the first one is the newest
+                entries_by_guid = {}
+                for entry in res['entries']:
+                    if entry.guid not in entries_by_guid:
+                        entries_by_guid[entry.guid] = entry
+                feed.add_all(entries_by_guid.values())
                 session.commit()
         if user.has_subscription(feed):
             raise HTTPError(400, reason="Already subscribed to feed")
