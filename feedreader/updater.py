@@ -1,5 +1,6 @@
 import logging
 import time
+import yaml
 
 from tornado import ioloop
 
@@ -22,14 +23,14 @@ class Updater(object):
 
     def do_updates(self):
         """Collect stale feeds and force_update them."""
-        logger.info("Collecting stale feeds...")
+        logger.debug("Collecting stale feeds...")
 
         session = self._create_session_f()
 
         stale_date = int(time.time()) - self._update_period.total_seconds()
         stale_feeds = database.Feed.find_last_updated_before(session,
                                                              stale_date)
-        logger.info("Found stale feeds: {}".format(stale_feeds))
+        logger.debug("Found stale feeds: {}".format(stale_feeds))
 
         for feed in stale_feeds:
             self.force_update(session, feed)
@@ -45,36 +46,58 @@ class Updater(object):
         feed.last_refresh_date = int(time.time())
         session.commit()
 
-        # TODO: use etag / last-modified
-        future = self._celery_poller.run_task(self._tasks.fetch_feed,
-                                              feed.feed_url, feed_id=feed.id)
+        # Fetch feed without url or image discover, using any etag or
+        # last-modified headers.
+        future = self._celery_poller.run_task(
+            self._tasks.fetch_feed, feed.feed_url, feed_id=feed.id,
+            etag=feed.etag, last_modified=feed.last_modified,
+            find_image_url=False, use_discovery=False
+        )
         ioloop.IOLoop.instance().add_future(future, self._post_feed_update)
 
     def _post_feed_update(self, future):
         """Given result from fetch_feed task, update the feed in the DB."""
-        res = future.result()
+        res = yaml.safe_load(future.result())
+
+        if "error" in res:
+            logger.warning("Failed to update stale feed: '{}'"
+                           .format(res["error"]))
+            return
+
         feed = res["feed"]
         entries = res["entries"]
-        logger.info("Got fetch result for stale feed {}".format(feed.id))
 
-        if len(entries) == 0:
-            logger.info("Feed {} has not been modified".format(feed.id))
+        if feed is None:
+            logger.info("Stale feed has not been modified")
+            return
+        else:
+            logger.info("Got result for stale feed {}".format(feed.id))
 
         session = self._create_session_f()
 
+        # only add the first entry with a given guid
+        # this assumes the first one is the newest
+        entries_by_guid = {}
         for entry in entries:
+            if entry.guid not in entries_by_guid:
+                entries_by_guid[entry.guid] = entry
+
+        for entry in entries_by_guid.values():
             # if guid is unique for this feed's entries, this is a new entry
             existing_entry = session.query(database.Entry)\
                                     .filter(database.Entry.feed_id == feed.id)\
                                     .filter(database.Entry.guid == entry.guid)\
                                     .all()
             if len(existing_entry) == 0:
-                logger.info("Adding new entry for feed {}".format(feed.id))
-                entry.feed_id = feed.id
-                session.add(entry)
+                logger.info("Adding new entry for stale feed {}"
+                            .format(feed.id))
             else:
-                logger.info("Updating entry for feed {}".format(feed.id))
-                # TODO: update existing entry
+                logger.info("Updating entry for stale feed {}".format(feed.id))
+                # modify the existing entry
+                entry.id = existing_entry[0].id
+
+            entry.feed_id = feed.id
+            session.merge(entry)
 
         session.commit()
         session.close()

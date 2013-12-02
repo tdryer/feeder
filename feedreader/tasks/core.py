@@ -43,7 +43,7 @@ class Tasks(object):
     # celery tasks
 
     def fetch_feed(self, feed_url, last_modified=None, etag=None,
-                   feed_id=None):
+                   feed_id=None, find_image_url=True, use_discovery=True):
         """Fetch and parse the feed at the given URL.
 
         If the given URL is not a feed, this will attempt to find one.
@@ -63,8 +63,10 @@ class Tasks(object):
         logger.info("Fetch feed task STARTED for '{}'".format(feed_url))
 
         try:
-            feed = get_parsed_feed(feed_url, last_modified=last_modified,
-                                   etag=etag, find_image_url=True)
+            feed = get_parsed_feed(
+                feed_url, last_modified=last_modified, etag=etag,
+                find_image_url=find_image_url, use_discovery=use_discovery
+            )
         except FeedParseError as e:
             logger.info("Fetch feed task FAILED for '{}': {}"
                         .format(feed_url, e))

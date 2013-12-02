@@ -59,13 +59,15 @@ class ParsedEntry(object):
         self.title = ""
 
 
-def get_parsed_feed(url, find_image_url=False, last_modified=None, etag=None):
+def get_parsed_feed(url, find_image_url=False, use_discovery=True,
+                    last_modified=None, etag=None):
     """Parse feed from given URL.
 
     Raises FeedParseError if feed cannot be parsed.
     """
     return _parse_result(*_get_result(
-        url, etag=etag, last_modified=last_modified, use_discovery=True,
+        url, etag=etag, last_modified=last_modified,
+        use_discovery=use_discovery,
     ), find_image_url=find_image_url)
 
 
@@ -82,6 +84,8 @@ def _get_result(url, etag=None, last_modified=None, use_discovery=False):
     _validate_url(url)
 
     result = feedparser.parse(url, etag=etag, modified=last_modified)
+    # update URL for any redirects that feedparser followed
+    url = result.get('href', url)
 
     if _is_not_modified_result(result):
         raise FeedNotModifiedError
