@@ -45,7 +45,7 @@
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  width: 100%;
+  width: 80%;
 }
 
 .article-list .feed .name span {
@@ -56,7 +56,7 @@
   display: inline-block;
   width: auto;
   position: absolute;
-  right: 2.5em;
+  right: 1.5em;
   top: 50%;
   line-height: 0;
 }
