@@ -109,7 +109,7 @@ class Feed(BASE):
                 nullable=False)
     title = Column(String(MEDIUM_STR), nullable=True)
     #feed resource
-    feed_url = Column(String(MEDIUM_STR), unique=True, nullable=False)
+    feed_url = Column(String(191), unique=True, nullable=False)
     # url of html page associated with the feed (None if not provided)
     site_url = Column(String(MEDIUM_STR), nullable=True)
     # url of image associated with feed (None if no image)
@@ -134,7 +134,7 @@ class Feed(BASE):
                  etag=None, last_refresh_date=None, image_url=None, id=None):
         self.id = id
         self.title = column_size(title, MEDIUM_STR)
-        self.feed_url = column_size(feed_url, MEDIUM_STR)
+        self.feed_url = column_size(feed_url, 191)
         self.site_url = column_size(site_url, MEDIUM_STR)
         self.image_url = column_size(image_url, MEDIUM_STR)
         self.last_modified = column_size(last_modified, SMALL_STR)
