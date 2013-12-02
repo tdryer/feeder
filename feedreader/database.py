@@ -141,7 +141,7 @@ class Feed(BASE):
         self.last_refresh_date = last_refresh_date
 
     def __repr__(self):
-        return "<RSSFeed('%s','%s')>" % (self.title, self.site_url)
+        return "<RSSFeed('{}')>".format(self.id)
 
     # Entry related stuff
 
