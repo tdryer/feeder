@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title>David Yan's CMPT 376W Blog</title>
+
+    <entry>
+      <title>foo UPDATED</title>
+      <id>foo</id>
+    </entry>
+
+    <entry>
+      <title>foo</title>
+      <id>foo</id>
+    </entry>
+
+</feed>
