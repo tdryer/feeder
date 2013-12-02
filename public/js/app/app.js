@@ -35,7 +35,12 @@
       templateUrl: '/partials/home.html',
       resolve: {
         fetchFeeds: function(Feeds) {
-          return Feeds.update();
+          var currentTime = new Date().getTime()
+            , timeDiff = currentTime - Feeds.lastUpdate;
+
+          if (Feeds.feeds === false || (timeDiff/60000 >= 15)) {
+            return Feeds.update();
+          }
         }
       }
     });

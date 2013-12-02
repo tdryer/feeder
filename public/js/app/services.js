@@ -239,6 +239,7 @@
    */
   this.factory('Feeds', function($q, User) {
     var endpoint = User.call().one('feeds')
+      , lastUpdate = 0
       , feeds = false
       , unreads = 0;
 
@@ -315,6 +316,7 @@
       return endpoint.get().then(_.bind(function(result) {
         var feeds = result.feeds;
 
+        this.lastUpdate = new Date().getTime();
         this.feeds = feeds;
         this.unreads = _.reduce(feeds, function(unreads, feed) {
           return unreads + feed.unreads;
