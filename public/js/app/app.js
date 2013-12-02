@@ -159,6 +159,10 @@
       State.error = false;
     });
 
+    $rootScope.goToArticle = function(feedId, articleId) {
+      $location.path('/home/' + feedId + '/' + articleId);
+    }
+
     State.register();
   });
 

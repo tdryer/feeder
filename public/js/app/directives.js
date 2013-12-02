@@ -225,11 +225,22 @@
       templateUrl: '/partials/article.html',
       controller: function($scope, Article) {
         $scope.Article = Article;
+        $scope.swipe = false;
       }
     };
   });
 
   this.directive('swipe', function() {
+    function maxMagnitude(num) {
+      if (num < -50) {
+        return -50;
+      } else if (num > 50) {
+        return 50;
+      }
+
+      return num;
+    }
+
     return {
       restrict: 'A',
       link: function(scope, elem$, attrs) {
@@ -237,7 +248,26 @@
           , list = scope.ArticleList.get()
           , index = _.findIndex(list, {id: id})
           , prev = scope.ArticleList.get(index - 1)
-          , next = scope.ArticleList.get(index + 1);
+          , next = scope.ArticleList.get(index + 1)
+          , delta;
+
+        if (scope.swipe === false) {
+          return;
+        }
+
+        Hammer(elem$[0]).on('dragleft dragright', function(event) {
+          delta = maxMagnitude(event.gesture.deltaX);
+        }).on('dragend', function() {
+          if (delta === -50 && next) {
+            scope.$apply(function() {
+              scope.goToArticle(next.feed_id, next.id);
+            });
+          } else if (delta === 50 && prev) {
+            scope.$apply(function() {
+              scope.goToArticle(prev.feed_id, prev.id);
+            });
+          }
+        });
       }
     }
   });

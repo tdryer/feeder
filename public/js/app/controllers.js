@@ -138,6 +138,8 @@
   this.controller('ArticleCtrl', function($scope, Article, ArticleList) {
     $scope.Article = Article;
     $scope.ArticleList = ArticleList;
+
+    Article.read(Article.article.id);
   });
 
 }).call(angular.module('feeder.controllers', []));
