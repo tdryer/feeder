@@ -37,6 +37,12 @@
   }
 }
 
+@media (max-width: 60em) {
+  .split-view .article-list-view .article-pane {
+    display: none;
+  }
+}
+
 .article-list {
   position: relative;
   width: auto;
