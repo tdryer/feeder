@@ -197,8 +197,8 @@
     return {
       restrict: 'A',
       link: function(scope, elem$) {
-        var id = scope.Article.article.id;
         elem$.on('click', function(event) {
+          var id = scope.Article.article.id;
           if (scope.Article.article.read) {
             scope.Article.unread(id).then(function() {
               scope.ArticleList.currentAnchor.addClass('unread');
