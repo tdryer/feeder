@@ -30,6 +30,11 @@ class APIRequestHandler(tornado.web.RequestHandler):
         HTTP basic auth is used. If the auth method is xBasic, no
         WWW-Authenticate header will be sent for failed authentication
         attempts, as a workaround for using the API via JavaScript.
+
+        Furthermore, doing authentication in this way will protect us from
+        general CSRF attacks. The user's browser will not automatically include
+        our auth header in arbitrary requests to our API, even when the user is
+        logged in due to our usage of xBasic.
         """
         try:
             auth_header = self.request.headers.get("Authorization")
