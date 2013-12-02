@@ -29,14 +29,20 @@
   this.controller('LoginCtrl', function($scope, $location, User) {
     $scope.username = '';
     $scope.password = '';
+    $scope.serverError = false;
     $scope.error = false;
 
     $scope.login = function(username, password) {
+      $scope.serverError = false;
       $scope.error = false;
       User.login(username, password).then(function() {
         $location.path('/home');
-      }, function() {
-        $scope.error = true;
+      }, function(rejection) {
+        if (rejection.status === 400) {
+          $scope.error = true;
+        } else {
+          $scope.serverError = true;
+        }
       });
     }
   });
@@ -68,13 +74,19 @@
     $scope.username = '';
     $scope.password = '';
     $scope.error = false;
+    $scope.serverError = false;
 
     $scope.register = function(username, password) {
       $scope.error = false;
+      $scope.serverError = false;
       User.register(username, password).then(function() {
         $location.path('/home');
-      }, function() {
-        $scope.error = true;
+      }, function(rejection) {
+        if (rejection.status === 400) {
+          $scope.error = true;
+        } else {
+          $scope.serverError = true;
+        }
       });
     }
   });
