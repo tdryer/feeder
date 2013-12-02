@@ -1,23 +1,41 @@
 @media (min-width: 60em) {
-  .article-list-view {
+  .split-view,
+  .split-view body {
+    height: 100%;
+  }
+
+  .split-view header {
+    height: 50px;
+  }
+
+  .split-view [ng-view] {
+    height: calc(100% - 50px);
+    overflow: hidden;
+  }
+
+  .split-view .article-list-view {
     -webkit-align-items: flex-start;
     align-items: flex-start;
     display: -webkit-flex;
     display: flex;
     -webkit-flex-direction: row;
     flex-direction: row;
+    height: 100%;
   }
 
-  .article-list-view .article-list {
+  .split-view .article-list-view .article-list {
     flex: 1 0 0;
     min-width: 16em;
+    height: 100%;
+    overflow-y: auto;
   }
 
-  .article-list-view .article-pane {
+  .split-view .article-list-view .article-pane {
     flex: 4 0 0;
+    height: 100%;
+    overflow-y: auto;
   }
 }
-
 
 .article-list {
   position: relative;
