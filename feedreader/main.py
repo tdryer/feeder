@@ -34,7 +34,8 @@ def get_application(feeder_config, conn_config, db_setup_f=None):
     # TODO: make this configurable
     tasks = Tasks(conn_config.amqp_uri)
 
-    celery_poller = CeleryPoller(timedelta(milliseconds=5))
+    # higher poll frequency -> less blocking but more delay adding feeds
+    celery_poller = CeleryPoller(timedelta(seconds=1))
 
     if feeder_config.dummy_data:
         # add some test feeds
