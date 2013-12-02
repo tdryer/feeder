@@ -1,12 +1,12 @@
 <article class="article" ng-show="Article.article">
   <button
+    toggle-article-status
     ng-show="!Article.article.read"
-    class="btn btn-xs btn-primary"
-    ng-click="Article.read(Article.article.id)">Mark as read</button>
+    class="btn btn-xs btn-primary">Mark as read</button>
   <button
+    toggle-article-status
     ng-show="Article.article.read"
-    class="btn btn-xs btn-primary"
-    ng-click="Article.unread(Article.article.id)">Mark as unread</button>
+    class="btn btn-xs btn-primary">Mark as unread</button>
   <div class="metadata">
     <time
       class="pub-date small"

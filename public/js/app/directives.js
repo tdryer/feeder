@@ -180,12 +180,34 @@
           if (!scope.State.mobile) {
             event.preventDefault();
             scope.$apply(function() {
+              scope.ArticleList.currentAnchor = elem$.parent();
+              scope.ArticleList.currentAnchor.removeClass('unread');
               scope.Article.update(attrs.articleAnchor);
             });
           }
         });
       }
     };
+  });
+
+  this.directive('toggleArticleStatus', function() {
+    return {
+      restrict: 'A',
+      link: function(scope, elem$) {
+        var id = scope.Article.article.id;
+        elem$.on('click', function(event) {
+          if (scope.Article.article.read) {
+            scope.Article.unread(id).then(function() {
+              scope.ArticleList.currentAnchor.addClass('unread');
+            });
+          } else {
+            scope.Article.read(id).then(function() {
+              scope.ArticleList.currentAnchor.removeClass('unread');
+            });
+          }
+        });
+      }
+    }
   });
 
   /**

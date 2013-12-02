@@ -135,8 +135,9 @@
    * @route '/home/:feed/:article'
    * @scope {Model} Article The `Article` model.
    */
-  this.controller('ArticleCtrl', function($scope, Article) {
+  this.controller('ArticleCtrl', function($scope, Article, ArticleList) {
     $scope.Article = Article;
+    $scope.ArticleList = ArticleList;
   });
 
 }).call(angular.module('feeder.controllers', []));
