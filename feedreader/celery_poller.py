@@ -4,6 +4,7 @@ from tornado import concurrent
 from tornado import ioloop
 from tornado import stack_context
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -32,15 +33,19 @@ class CeleryPoller(object):
     def _poll_tasks(self):
         logger.debug("Polling Celery tasks")
         results_callbacks = []
+        t = time.time()
         for result, callback in self._results_callbacks:
             if result.ready():
-                logger.info("Task is done")
+                logger.info("Finished task")
                 # Exception should never be raised here or bad things will
                 # happen.
                 callback(result)
             else:
                 logger.debug("Task is still pending")
                 results_callbacks.append((result, callback))
+        t = time.time() - t
+        logger.info("Polled {} task(s) in {}ms"
+                    .format(len(self._results_callbacks), int(t * 1000)))
         self._results_callbacks = results_callbacks
         if len(self._results_callbacks) > 0:
             logger.debug("Tasks are still pending, scheduling next poll")
