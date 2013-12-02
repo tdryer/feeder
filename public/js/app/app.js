@@ -58,14 +58,14 @@
           var id = parseInt($route.current.params.feed, 10);
           if (ArticleList.list === false || ArticleList.id !== id) {
             return ArticleList.update(id).then(function() {
-              var first;
+              // var first;
 
-              if (!State.mobile) {
-                first = ArticleList.first();
-                if (first) {
-                  return Article.update(first.id);
-                }
-              }
+              // if (!State.mobile) {
+              //   first = ArticleList.first();
+              //   if (first) {
+              //     return Article.update(first.id);
+              //   }
+              // }
             }, $q.reject);
           } else {
             return ArticleList.list;
