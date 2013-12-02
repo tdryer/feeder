@@ -24,4 +24,3 @@ def restart():
     with prefix('[ ! -e /tmp/supervisor.sock ] || exit 0'):
         run('supervisord -c ~/project/deploy/feeder_supervisor.conf')
     run('supervisorctl -c ~/project/deploy/feeder_supervisor.conf reload')
-    run('supervisorctl -c ~/project/deploy/feeder_supervisor.conf restart all || exit 0')
