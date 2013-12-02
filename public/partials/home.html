@@ -1,7 +1,7 @@
 <div 
     class="update small"
     ng-show="Feeds.feeds.length">
-      Last updated {{Feeds.lastUpdate | moment | fromNow}}
+      Last updated {{Feeds.lastUpdated | fromNow}}
       <button
         class="btn btn-xs btn-primary mls"
         ng-click="Feeds.update()">
