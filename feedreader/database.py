@@ -1,7 +1,7 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import (create_engine, Column, ForeignKey, Integer, Table,
-                        Sequence, String, UniqueConstraint)
+                        Sequence, String, Text, UniqueConstraint)
 import yaml
 import logging
 
@@ -11,7 +11,6 @@ BASE = declarative_base()
 
 SMALL_STR = 100
 MEDIUM_STR = 2048
-LARGE_STR = 50 * MEDIUM_STR # ~100k entry content
 
 
 def initialize_db(database_uri='sqlite://'):
@@ -174,7 +173,7 @@ class Entry(BASE):
                 nullable=False)
     feed_id = Column(Integer, ForeignKey('feeds.id', ondelete='CASCADE'),
                      nullable=False)
-    content = Column(String(LARGE_STR), nullable=True)
+    content = Column(Text, nullable=True)
     url = Column(String(MEDIUM_STR), nullable=True)
     title = Column(String(MEDIUM_STR), nullable=True)
     author = Column(String(SMALL_STR), nullable=True)
@@ -182,7 +181,7 @@ class Entry(BASE):
     guid = Column(String(SMALL_STR), nullable=False)
 
     def __init__(self, content, url, title, author, date, guid):
-        self.content = column_size(content, LARGE_STR)
+        self.content = content
         self.url = column_size(url, MEDIUM_STR)
         self.title = column_size(title, MEDIUM_STR)
         self.author = column_size(author, SMALL_STR)
