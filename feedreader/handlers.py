@@ -6,7 +6,6 @@ from tornado import gen
 import pbkdf2
 import logging
 import yaml
-import urlparse
 
 from feedreader.api_request_handler import APIRequestHandler
 from feedreader.database import Feed, User
@@ -99,45 +98,6 @@ class FeedsHandler(APIRequestHandler):
                                .format(res['error']))
                 raise HTTPError(400, reason=res['error'])
             feed = res['feed']
-            entries = res['entries']
-            parsed_url = urlparse.urlparse(url)
-            new_url = urlparse.urlunparse([
-                parsed_url.scheme,
-                parsed_url.netloc,
-                parsed_url.path,
-                '',
-                '',
-                ''
-            ])
-            new_feed = session.query(Feed).filter(
-                Feed.feed_url == new_url
-            ).first()
-            if new_feed is not None:
-                url = new_url
-            if new_url != url:
-                new_res = yield celery_poller.run_task(
-                    tasks.fetch_feed,
-                    new_url,
-                )
-                new_res = yaml.safe_load(new_res)
-                if "error" in new_res:
-                    logger.warning("Failed to fetch new feed: '{}'"
-                               .format(new_res['error']))
-                    raise HTTPError(400, reason=new_res['error'])
-                new_entries = new_res['entries']
-                if len(entries) == len(new_entries):
-                    # assume they are the same until proven wrong
-                    same = True
-                    for i in range(len(entries)):
-                        if entries[i].title != new_entries[i].title or\
-                           entries[i].content != new_entries[i].content or\
-                           entries[i].author != new_entries[i].author or\
-                           entries[i].guid != new_entries[i].guid:
-                            same = False
-                            break
-                    if same:
-                        feed.feed_url = new_url
-            # feed url may have resolved to a feed that already exists
             existing_feed = session.query(Feed)\
                     .filter(Feed.feed_url == feed.feed_url).all()
             if len(existing_feed) > 0:
