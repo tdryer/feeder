@@ -316,7 +316,7 @@
       return endpoint.get().then(_.bind(function(result) {
         var feeds = result.feeds;
 
-        this.lastUpdate = new Date().getTime();
+        this.lastUpdate = new Date().getTime()/1000;
         this.feeds = feeds;
         this.unreads = _.reduce(feeds, function(unreads, feed) {
           return unreads + feed.unreads;

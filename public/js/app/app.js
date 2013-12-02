@@ -35,10 +35,10 @@
       templateUrl: '/partials/home.html',
       resolve: {
         fetchFeeds: function(Feeds) {
-          var currentTime = new Date().getTime()
+          var currentTime = new Date().getTime()/1000
             , timeDiff = currentTime - Feeds.lastUpdate;
 
-          if (Feeds.feeds === false || (timeDiff/60000 >= 15)) {
+          if (Feeds.feeds === false || (timeDiff/60 >= 15)) {
             return Feeds.update();
           }
         }
