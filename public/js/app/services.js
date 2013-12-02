@@ -291,6 +291,11 @@
       // }, this));
     }
 
+    function clear() {
+      this.feeds = false;
+      this.lastUpdated = 0;
+    }
+
     /**
      * Returns the feed object with id `id`.
      *
@@ -345,6 +350,7 @@
     return {
       add: add,
       batchAdd: batchAdd,
+      clear: clear,
       feeds: feeds,
       id: id,
       lastUpdated: lastUpdated,

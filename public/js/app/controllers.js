@@ -48,8 +48,9 @@
    * @controller
    * @route '/logout'
    */
-  this.controller('LogoutCtrl', function($location, User) {
+  this.controller('LogoutCtrl', function($location, Feeds, User) {
     User.logout();
+    Feeds.clear();
     $location.path('/');
   });
 
