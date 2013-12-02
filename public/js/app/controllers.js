@@ -108,7 +108,7 @@
    * @scope {Model} ArticleList The `ArticleList` model.
    * @scope {Object} feed The parent feed object of the article list.
    */
-  this.controller('FeedCtrl', function($scope, $window, $document, Feeds, 
+  this.controller('FeedCtrl', function($scope, $window, $document, Feeds,
                                        ArticleList, State) {
     $scope.feed = Feeds.id(ArticleList.id);
     $scope.ArticleList = ArticleList;
@@ -116,13 +116,13 @@
 
     $document.ready(function() {
       $window.scrollTo(0, $window.prevScrollY);
-    })
+    });
 
     $scope.$watch('State.loading', function() {
       if (State.loading === true) {
         $window.prevScrollY = $window.scrollY;
       }
-    })
+    });
   });
 
   /**

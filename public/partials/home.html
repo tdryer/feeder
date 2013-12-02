@@ -30,15 +30,13 @@
     </li>
   </ul>
 
-  <div 
-  class="update-bar small"
-  ng-show="Feeds.feeds.length">
+  <div
+    class="update-bar"
+    ng-show="Feeds.feeds.length">
     <button
       class="update btn btn-xs btn-primary mls"
-      ng-click="Feeds.update()">
-        Force Update
-    </button>
-    Last updated {{Feeds.lastUpdated | fromNow}}
+      ng-click="Feeds.update()">Force Update</button>
+    <span class="small">Last updated {{Feeds.lastUpdated | fromNow}}</span>
   </div>
 
   <div class="form-container mts">

@@ -2,7 +2,7 @@
   padding: 0.5em;
 }
 
-.update-bar .update{
+.update-bar .update {
   margin-right: 0.5em;
 }
 
@@ -73,6 +73,10 @@
 }
 
 @media (max-width: 60em) {
+  .update-bar {
+    text-align: center;
+  }
+
   .feeds {
     padding: 0;
   }
