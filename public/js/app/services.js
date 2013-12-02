@@ -264,17 +264,31 @@
      * @returns {Promise} Returns the promise of all the add feed API hit.
      */
     function batchAdd(urls) {
-      urls = _.map(urls, function(url) {
+
+      var url = urls.pop()
+        , promise;
+
+      if (url) {
         return endpoint.all('').post({
           url: url
-        });
-      });
+        }).then(_.bind(function() {
+          this.batchAdd(urls);
+        }, this), _.bind(function() {
+          this.batchAdd(urls);
+        }, this));
+      }
 
-      return $q.all(urls).then(_.bind(function() {
-        return this.update();
-      }, this), _.bind(function() {
-        return this.update();
-      }, this));
+      // urls = _.map(urls, function(url) {
+      //   return endpoint.all('').post({
+      //     url: url
+      //   });
+      // });
+
+      // return $q.all(urls).then(_.bind(function() {
+      //   return this.update();
+      // }, this), _.bind(function() {
+      //   return this.update();
+      // }, this));
     }
 
     /**
