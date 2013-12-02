@@ -107,7 +107,7 @@ class Feed(BASE):
 
     id = Column(Integer, Sequence('feed_id_seq'), primary_key=True,
                 nullable=False)
-    title = Column(String(MEDIUM_STR), nullable=False)
+    title = Column(String(MEDIUM_STR), nullable=True)
     #feed resource
     feed_url = Column(String(MEDIUM_STR), unique=True, nullable=False)
     # url of html page associated with the feed (None if not provided)
@@ -174,9 +174,9 @@ class Entry(BASE):
                 nullable=False)
     feed_id = Column(Integer, ForeignKey('feeds.id', ondelete='CASCADE'),
                      nullable=False)
-    content = Column(String(LARGE_STR), nullable=False)
-    url = Column(String(MEDIUM_STR), nullable=False)
-    title = Column(String(MEDIUM_STR), nullable=False)
+    content = Column(String(LARGE_STR), nullable=True)
+    url = Column(String(MEDIUM_STR), nullable=True)
+    title = Column(String(MEDIUM_STR), nullable=True)
     author = Column(String(SMALL_STR), nullable=True)
     date = Column(Integer, nullable=False)
     guid = Column(String(SMALL_STR), nullable=False)

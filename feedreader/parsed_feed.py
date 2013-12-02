@@ -186,7 +186,10 @@ def _parse_result_entry(result):
         entry.date = int(calendar.timegm(result.published_parsed))
     else:
         entry.date = int(time.time())
+    # try to find something to use as GUID, or fall back to static string
     guid_content = result.get("id", entry.title)
+    if guid_content == None:
+        guid_content = "None"
     entry.guid = hashlib.sha1(guid_content.encode('utf-8')).hexdigest()
     return entry
 

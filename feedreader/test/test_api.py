@@ -310,6 +310,23 @@ class ApiTest(AsyncHTTPTestCase):
         self.assert_api_call("GET /feeds", headers=self.headers,
                              expect_code=200, expect_json=expect_json)
 
+    def test_add_feed_nulls_success(self):
+        with serve_dir(TEST_DATA_DIR, TEST_SERVER_PORT) as url:
+            self.assert_api_call("POST /feeds", headers=self.headers,
+                                 json_body={'url': url + "null-test.xml"},
+                                 expect_code=201)
+        expect_json = {
+            "feeds": [
+                {
+                    "id": 1,
+                    "name": None,
+                    "unreads": 1,
+                    "url": None,
+                    "image_url": None,
+                },
+            ]
+        }
+
     def test_add_feed_connection_refused(self):
         url = "http://localhost:{}/{}".format(TEST_SERVER_PORT, "null.xml")
         self.assert_api_call("POST /feeds", headers=self.headers,
