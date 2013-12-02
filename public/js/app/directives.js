@@ -240,7 +240,7 @@
             , prev
             , next;
 
-          if (event.keyCode === left || event.keyCode === j) {
+          if (event.keyCode === left || event.keyCode === k) {
             list = scope.ArticleList.get();
             index = _.findIndex(list, {id: id});
             prev = scope.ArticleList.get(index - 1);
@@ -254,7 +254,7 @@
             }
           }
 
-          if (event.keyCode === right || event.keyCode === k) {
+          if (event.keyCode === right || event.keyCode === j) {
             list = scope.ArticleList.get();
             index = _.findIndex(list, {id: id});
             next = scope.ArticleList.get(index + 1);

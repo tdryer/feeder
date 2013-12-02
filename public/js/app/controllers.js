@@ -103,13 +103,22 @@
   this.controller('HomeCtrl', function($scope, $window, ArticleList, Feeds) {
     $scope.Feeds = Feeds;
     $scope.error = false;
+    $scope.serverError = false;
+    $scope.message = '';
     $window.prevScrollY = 0; // Reset cached scroll position
     Tinycon.setBubble($scope.Feeds.unreads);
 
     $scope.subscribe = function(url) {
+      $scope.message = '';
       $scope.error = false;
-      Feeds.add(url).then(angular.noop, function() {
-        $scope.error = true;
+      $scope.serverError = false;
+      Feeds.add(url).then(angular.noop, function(rejection) {
+        if (rejection.status === 400) {
+          $scope.error = true;
+          $scope.message = rejection.data.error.message;
+        } else {
+          $scope.serverError = true;
+        }
       });
     }
   });
