@@ -38,8 +38,7 @@
         ng-repeat="article in ArticleList.list | filter:ArticleList.filter">
         <a
           article-anchor="{{article.id}}"
-          href="/home/{{article.feed_id}}/{{article.id}}"
-          ng-click="Article.read(article.id)">
+          href="/home/{{article.feed_id}}/{{article.id}}">
           <time
             title="{{article['pub-date'] | moment | format}}"
             class="pub-date small"

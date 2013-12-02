@@ -181,8 +181,11 @@
             event.preventDefault();
             scope.$apply(function() {
               scope.ArticleList.currentAnchor = elem$.parent();
+              scope.Article.update(attrs.articleAnchor).then(function() {
+                scope.Article.read(attrs.articleAnchor).then(function() {
+                });
+              });
               scope.ArticleList.currentAnchor.removeClass('unread');
-              scope.Article.update(attrs.articleAnchor);
             });
           }
         });

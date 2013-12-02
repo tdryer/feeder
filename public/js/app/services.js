@@ -483,7 +483,7 @@
      */
     function read(id) {
       if (this.article.read) {
-        return $q.reject;
+        return $q.reject();
       }
 
       return endpoint.one(id).patch({
@@ -504,7 +504,7 @@
      */
     function unread(id) {
       if (!this.article.read) {
-        return $q.reject;
+        return $q.reject();
       }
 
       return endpoint.one(id).patch({
