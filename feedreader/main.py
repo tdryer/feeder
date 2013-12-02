@@ -91,6 +91,9 @@ def get_application(feeder_config, conn_config, db_setup_f=None):
         )
         periodic_callback.start()
 
+    # log if the IOLoop gets blocked
+    tornado.ioloop.IOLoop.instance().set_blocking_log_threshold(0.1)
+
     # create tornado application and listen on the provided port
     default_injections = dict(
         create_session=create_session,
