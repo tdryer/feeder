@@ -322,6 +322,8 @@
           return unreads + feed.unreads;
         }, 0);
 
+        Tinycon.setBubble(this.unreads);
+
         return result;
       }, this), $q.reject);
     }
@@ -486,6 +488,7 @@
         }).then(_.bind(function(result) {
           Feeds.unreads--;
           Feeds.id(this.article.feed_id).unreads--;
+          Tinycon.setBubble(Feeds.id(this.article.feed_id).unreads);
           this.article.read = true;
         }, this), $q.reject);
       }
@@ -504,6 +507,7 @@
         }).then(_.bind(function(result) {
           Feeds.unreads++;
           Feeds.id(this.article.feed_id).unreads++;
+          Tinycon.setBubble(Feeds.id(this.article.feed_id).unreads);
           this.article.read = false;
         }, this), $q.reject);
       }

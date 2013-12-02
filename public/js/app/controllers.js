@@ -91,6 +91,7 @@
     $scope.Feeds = Feeds;
     $scope.error = false;
     $window.prevScrollY = 0; // Reset cached scroll position
+    Tinycon.setBubble($scope.Feeds.unreads);
 
     $scope.subscribe = function(url) {
       $scope.error = false;
@@ -113,6 +114,7 @@
     $scope.feed = Feeds.id(ArticleList.id);
     $scope.ArticleList = ArticleList;
     ArticleList.push();
+    Tinycon.setBubble($scope.feed.unreads)
 
     $document.ready(function() {
       $window.scrollTo(0, $window.prevScrollY);
