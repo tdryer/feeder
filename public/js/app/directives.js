@@ -247,6 +247,8 @@
             if (prev) {
               scope.Article.update(prev.id).then(function() {
                 scope.Article.read(prev.id).then(function() {
+                  var el = document.getElementById('article-anchor-' + prev.id);
+                  angular.element(el).removeClass('unread');
                 });
               });
             }
@@ -259,6 +261,8 @@
             if (next) {
               scope.Article.update(next.id).then(function() {
                 scope.Article.read(next.id).then(function() {
+                  var el = document.getElementById('article-anchor-' + next.id);
+                  angular.element(el).removeClass('unread');
                 });
               });
             }
