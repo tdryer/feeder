@@ -482,8 +482,7 @@
   });
 
   /**
-   * The `Article` model represents the list of articles for the feed that
-   * the user is currently viewing.
+   * The `Article` model represents the current article.
    *
    * @factory
    * @var {Object|Boolean} [article=false] The article.

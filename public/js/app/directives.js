@@ -220,12 +220,50 @@
    * @restrict attribute
    */
   this.directive('articlePane', function() {
+    var left = 37
+      , right = 39
+      , j = 74
+      , k = 75;
+
     return {
       restrict: 'A',
       templateUrl: '/partials/article.html',
       controller: function($scope, Article) {
         $scope.Article = Article;
         $scope.swipe = false;
+      },
+      link: function(scope, elem$) {
+        angular.element(document).on('keydown', function(event) {
+          var id = scope.Article.article.id
+            , list
+            , index
+            , prev
+            , next;
+
+          if (event.keyCode === left || event.keyCode === j) {
+            list = scope.ArticleList.get();
+            index = _.findIndex(list, {id: id});
+            prev = scope.ArticleList.get(index - 1);
+            if (prev) {
+              scope.Article.update(prev.id).then(function() {
+                scope.Article.read(prev.id).then(function() {
+                });
+              });
+            }
+          }
+
+          if (event.keyCode === right || event.keyCode === k) {
+            list = scope.ArticleList.get();
+            index = _.findIndex(list, {id: id});
+            next = scope.ArticleList.get(index + 1);
+            if (next) {
+              scope.Article.update(next.id).then(function() {
+                scope.Article.read(next.id).then(function() {
+                });
+              });
+            }
+          }
+        });
       }
     };
   });
