@@ -180,8 +180,7 @@
           if (!scope.State.mobile) {
             event.preventDefault();
             scope.$apply(function() {
-              scope.ArticleList.filter.ids.push(
-                parseInt(attrs.articleAnchor));
+              scope.ArticleList.filter.ids.push(parseInt(attrs.articleAnchor));
               scope.Article.update(attrs.articleAnchor).then(function() {
                 scope.Article.read(attrs.articleAnchor).then(function() {
                   scope.ArticleList.push();
