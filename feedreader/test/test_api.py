@@ -290,6 +290,16 @@ class ApiTest(AsyncHTTPTestCase):
                                             url + "awesome-blog.noauto.html"},
                                  expect_code=400)
 
+    def test_add_feed_autodiscovery_bad_link(self):
+        with serve_dir(TEST_DATA_DIR, TEST_SERVER_PORT) as url:
+            self.assert_api_call("POST /feeds", headers=self.headers,
+                                 json_body={'url':
+                                            url + "awesome-blog.badlink.html"},
+                                 expect_code=400, expect_json={
+                                     "error": {"code": 400,
+                                               "message": "Invalid URL"}
+                                 })
+
     def test_add_feed_failure_then_success(self):
         with serve_dir(TEST_DATA_DIR, TEST_SERVER_PORT) as url:
             self.assert_api_call("POST /feeds", headers=self.headers,
