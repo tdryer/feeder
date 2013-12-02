@@ -1,4 +1,8 @@
-<article class="article" ng-show="Article.article">
+<article
+  class="article"
+  id="{{Article.article.id}}"
+  swipe
+  ng-show="Article.article">
   <button
     toggle-article-status
     ng-show="!Article.article.read"

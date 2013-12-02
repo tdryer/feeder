@@ -437,10 +437,29 @@
       Cookie.set(filterKey, this.filter);
     }
 
+    /**
+     * Gets the filter article list, or an article item within it.
+     *
+     * @param {Number} index The index of the article item to get.
+     * @returns {Array|Object} Returns the list or an article item.
+     */
+    function get(index) {
+      var list = $filter('filter')(this.list, this.filter);
+
+      if (!angular.isNumber(index)) {
+        return list;
+      }
+
+      if (index >= 0 && index < list.length) {
+        return list[index];
+      }
+    }
+
     return {
       filter: filter,
       first: first,
       id: id,
+      get: get,
       list: list,
       push: push,
       update: update,

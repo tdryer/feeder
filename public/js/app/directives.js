@@ -229,4 +229,17 @@
     };
   });
 
+  this.directive('swipe', function() {
+    return {
+      restrict: 'A',
+      link: function(scope, elem$, attrs) {
+        var id = parseInt(attrs.id)
+          , list = scope.ArticleList.get()
+          , index = _.findIndex(list, {id: id})
+          , prev = scope.ArticleList.get(index - 1)
+          , next = scope.ArticleList.get(index + 1);
+      }
+    }
+  });
+
 }).call(angular.module('feeder.directives', []));

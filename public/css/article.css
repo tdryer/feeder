@@ -19,6 +19,10 @@
   border-top: 1px solid #bdc3c7;
 }
 
+.article .content pre {
+  max-width: 100%;
+}
+
 .article .content h1 {
   font-size: 2em;
 }
