@@ -5,6 +5,7 @@ have sensible values: None indicates they are not present in the feed.
 """
 
 import calendar
+import cgi
 import feedparser
 import hashlib
 import logging
@@ -18,6 +19,11 @@ LOG = logging.getLogger(__name__)
 FEED_MIME_TYPES = [
     'application/rss+xml',
     'application/atom+xml',
+]
+# content type attributes that indicate feedparser sanitized the content
+HTML_MIME_TYPES = [
+    'text/html',
+    'application/xhtml+xml',
 ]
 # valid schemes for feed URLs
 VALID_SCHEMES = ['http', 'https']
@@ -174,8 +180,14 @@ def _parse_result_entry(result):
 
     if "content" in result and len(result.content) > 0:
         entry.content = result.content[0].value
-    elif "summary" in result:
-        entry.content = result.description
+        # if not html, have to escape
+        if result.content[0].type not in HTML_MIME_TYPES:
+            entry.content = cgi.escape(entry.content)
+    elif "summary_detail" in result:
+        entry.content = result.summary_detail.value
+        # if not html, have to escape
+        if result.summary_detail.type not in HTML_MIME_TYPES:
+            entry.content = cgi.escape(entry.content)
     else:
         entry.content = ""
     entry.link = result.get("link", None)

@@ -93,6 +93,23 @@ def test_awesome_blog(tasks):
     httpretty.reset()
 
 
+def test_plain_text_sanitization(tasks):
+    httpretty.enable()
+    feed_url = "http://example.com/feed.xml"
+    feed = open(path.join(TEST_DATA_DIR, "test-sani.xml")).read()
+    httpretty.register_uri(httpretty.GET, feed_url,
+                           body=feed, content_type="application/atom+xml")
+    res = yaml.safe_load(tasks.fetch_feed.delay(feed_url).get())
+
+    # content must always be html
+    assert res["entries"][0].content == "&lt;script&gt;"
+    # title is plain text, angle brackets are allowed
+    assert res["entries"][0].title == "<script>"
+
+    httpretty.disable()
+    httpretty.reset()
+
+
 def test_awesome_blog_favicon(tasks):
     httpretty.enable()
     feed_url = "http://example.com/feed.xml"

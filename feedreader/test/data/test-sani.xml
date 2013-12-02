@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title>David Yan's CMPT 376W Blog</title>
+  <link href="http://awesome-blog.github.io/atom.xml" rel="self"/>
+  <link href="http://localhost:8081/awesome-blog.html"/>
+  <updated>2013-11-20T08:14:56-08:00</updated>
+  <id>http://awesome-blog.github.io/</id>
+  <author>
+    <name>David Yan</name>
+    <email>yandongy@sfu.ca</email>
+  </author>
+
+    <entry>
+      <title>&lt;script&gt;</title>
+      <link href="http://awesome-blog.github.io/2013/11/20/return-of-the-oppo-find-5.html"/>
+      <updated>2013-11-20T00:00:00-08:00</updated>
+      <id>http://awesome-blog.github.io/2013/11/20/return-of-the-oppo-find-5</id>
+      <content type="text">&lt;script&gt;
+      </content>
+    </entry>
+
+</feed>
