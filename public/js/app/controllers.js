@@ -38,7 +38,7 @@
       User.login(username, password).then(function() {
         $location.path('/home');
       }, function(rejection) {
-        if (rejection.status === 400) {
+        if (rejection.status === 401) {
           $scope.error = true;
         } else {
           $scope.serverError = true;
