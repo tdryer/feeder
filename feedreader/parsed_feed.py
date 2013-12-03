@@ -196,9 +196,9 @@ def _parse_result_entry(result):
         entry.author = result.author_detail.name
     else:
         entry.author = None
-    if "updated_parsed" in result:
+    if "updated_parsed" in result and result.updated_parsed is not None:
         entry.date = int(calendar.timegm(result.updated_parsed))
-    elif "published_parsed" in result:
+    elif "published_parsed" in result and result.published_parsed is not None:
         entry.date = int(calendar.timegm(result.published_parsed))
     else:
         entry.date = int(time.time())
