@@ -130,11 +130,18 @@
   background: #1abc9c;
 }
 
-.article-list ul li a {
+.article-list ul li {
   border-bottom: 1px solid #bdc3c7;
+}
+
+.article-list ul li a {
   padding: 0.5em 1em;
   display: block;
   color: #34495e;
+}
+
+.article-list ul li.selected {
+  background: #95A5A6;
 }
 
 .article-list ul li a .title {

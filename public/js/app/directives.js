@@ -184,6 +184,8 @@
           if (!scope.State.mobile) {
             event.preventDefault();
             scope.$apply(function() {
+              elem$.parent().parent().children().removeClass('selected');
+              elem$.parent().addClass('selected');
               if (scope.ArticleList.filter !== null) {
                 scope.ArticleList.filter.ids.push(parseInt(attrs.articleAnchor));
               }
