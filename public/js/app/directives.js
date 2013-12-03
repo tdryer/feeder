@@ -60,12 +60,15 @@
 
           reader.onload = function(event) {
             var result = event.target.result
-              , links = [];
+              , links = []
+              , parser;
 
             try {
-              result = angular.element(result).children().find('outline');
+              parser = new DOMParser();
+              result = parser.parseFromString(result, 'text/xml');
+              result = angular.element(result).find('outline');
               angular.forEach(result, function(element) {
-                var url = angular.element(element).attr('xmlurl');
+                var url = angular.element(element).attr('xmlUrl');
                 if (url) {
                   links.push(url);
                 }

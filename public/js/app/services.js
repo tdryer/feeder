@@ -264,18 +264,18 @@
      * @returns {Promise} Returns the promise of all the add feed API hit.
      */
     function batchAdd(urls) {
-
-      var url = urls.pop()
-        , promise;
+      var url = urls.pop();
 
       if (url) {
         return endpoint.all('').post({
           url: url
         }).then(_.bind(function() {
-          this.batchAdd(urls);
+          return this.batchAdd(urls);
         }, this), _.bind(function() {
-          this.batchAdd(urls);
+          return this.batchAdd(urls);
         }, this));
+      } else {
+        return this.update();
       }
     }
 
