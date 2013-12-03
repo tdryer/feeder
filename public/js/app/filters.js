@@ -48,6 +48,14 @@
     }
   });
 
+  /**
+   * Filters a list of articles to include recently read ones and ones
+   * that match a given read status.
+   *
+   * @filter
+   * @param {Object} data The list of Articles to filter.
+   * @param {Object} filter The filter too apply to the list.
+   */
   this.filter('filterArticles', function() {
     return function(data, filter) {
       var filtered = [];

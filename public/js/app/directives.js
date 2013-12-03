@@ -193,6 +193,12 @@
     };
   });
 
+  /**
+   * Toggles the status of an Article on click.
+   *
+   * @directive
+   * @restrict: attribute
+   */
   this.directive('toggleArticleStatus', function() {
     return {
       restrict: 'A',
