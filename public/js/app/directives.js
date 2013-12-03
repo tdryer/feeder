@@ -260,8 +260,10 @@
             prev = scope.ArticleList.get(index - 1);
             if (prev) {
               scope.Article.update(prev.id).then(function() {
+                var el = document.getElementById('article-anchor-' + prev.id);
+                angular.element(el).parent().children().removeClass('selected');
+                angular.element(el).addClass('selected');
                 scope.Article.read(prev.id).then(function() {
-                  var el = document.getElementById('article-anchor-' + prev.id);
                   angular.element(el).removeClass('unread');
                 });
               });
@@ -274,8 +276,10 @@
             next = scope.ArticleList.get(index + 1);
             if (next) {
               scope.Article.update(next.id).then(function() {
+                var el = document.getElementById('article-anchor-' + next.id);
+                angular.element(el).parent().children().removeClass('selected');
+                angular.element(el).addClass('selected');
                 scope.Article.read(next.id).then(function() {
-                  var el = document.getElementById('article-anchor-' + next.id);
                   angular.element(el).removeClass('unread');
                 });
               });
