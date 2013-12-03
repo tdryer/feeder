@@ -29,6 +29,8 @@ class UsersHandler(APIRequestHandler):
         with self.get_db_session() as session:
             user = session.query(User).get(self.require_auth(session))
             username = user.username
+        logger.info("Returning information about user '{}'"
+                    .format(username.encode('utf-8')))
         self.write({'username': username})
         self.set_status(200)
 
@@ -60,6 +62,8 @@ class UsersHandler(APIRequestHandler):
             new_user = User(body["username"], password_hash)
             session.add(new_user)
             session.commit()
+            logger.info("Registered new user '{}'"
+                        .format(body["username"].encode('utf-8')))
         self.set_status(201)
 
 
