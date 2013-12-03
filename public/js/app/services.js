@@ -458,7 +458,7 @@
      * @returns {Array|Object} Returns the list or an article item.
      */
     function get(index) {
-      var list = $filter('filter')(this.list, this.filter);
+      var list = $filter('filterArticles')(this.list, this.filter);
 
       if (!angular.isNumber(index)) {
         return list;
