@@ -52,6 +52,7 @@
 
         OPMLReceiver = new Dropzone(elem$[0], {
           autoProcessQueue: false,
+          clickable: false,
           url: '/opml-receiver'
         });
 
