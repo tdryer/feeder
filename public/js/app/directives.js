@@ -186,8 +186,9 @@
             scope.$apply(function() {
               elem$.parent().parent().children().removeClass('selected');
               elem$.parent().addClass('selected');
-              if (scope.ArticleList.filter !== null) {
-                scope.ArticleList.filter.ids.push(parseInt(attrs.articleAnchor));
+              if (scope.ArticleList.filter !== null &&
+                _.indexOf(scope.ArticleList.filter.ids, attrs.articleAnchor) === -1) {
+                  scope.ArticleList.filter.ids.push(parseInt(attrs.articleAnchor));
               }
               scope.Article.update(attrs.articleAnchor).then(function() {
                 scope.Article.read(attrs.articleAnchor).then(function() {
@@ -259,12 +260,16 @@
             index = _.findIndex(list, {id: id});
             prev = scope.ArticleList.get(index - 1);
             if (prev) {
+              if (scope.ArticleList.filter !== null &&
+                _.indexOf(scope.ArticleList.filter.ids, prev.id) === -1) {
+                  scope.ArticleList.filter.ids.push(prev.id);
+              }
               scope.Article.update(prev.id).then(function() {
                 var el = document.getElementById('article-anchor-' + prev.id);
                 angular.element(el).parent().children().removeClass('selected');
                 angular.element(el).addClass('selected');
                 scope.Article.read(prev.id).then(function() {
-                  angular.element(el).removeClass('unread');
+                  scope.ArticleList.push();
                 });
               });
             }
@@ -275,12 +280,16 @@
             index = _.findIndex(list, {id: id});
             next = scope.ArticleList.get(index + 1);
             if (next) {
+              if (scope.ArticleList.filter !== null &&
+                _.indexOf(scope.ArticleList.filter.ids, next.id) === -1) {
+                  scope.ArticleList.filter.ids.push(next.id);
+              }
               scope.Article.update(next.id).then(function() {
                 var el = document.getElementById('article-anchor-' + next.id);
                 angular.element(el).parent().children().removeClass('selected');
                 angular.element(el).addClass('selected');
                 scope.Article.read(next.id).then(function() {
-                  angular.element(el).removeClass('unread');
+                  scope.ArticleList.push();
                 });
               });
             }
