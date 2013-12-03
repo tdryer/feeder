@@ -5,6 +5,7 @@
 import logging
 import yaml
 from celery import Celery
+import celery.exceptions
 
 from feedreader import database
 from feedreader.parsed_feed import (get_parsed_feed, FeedParseError,
@@ -25,6 +26,7 @@ class Tasks(object):
             CELERY_TASK_SERIALIZER='json',
             CELERY_RESULT_SERIALIZER='json',
             CELERY_TIMEZONE='America/Vancouver',
+            CELERYD_TASK_SOFT_TIME_LIMIT=10,
         )
 
         if amqp_uri:
@@ -80,6 +82,15 @@ class Tasks(object):
                 "feed": None,
                 "entries": [],
             })
+        except celery.exceptions.SoftTimeLimitExceeded:
+            # probably never reach this because feedparser has a try/except
+            e = "Timed out"
+            logger.info("Fetch feed task FAILED for '{}': {}"
+                        .format(feed_url, e))
+            return yaml.safe_dump({
+                "error": str(e),
+            })
+
 
         feed_model = database.Feed(
             feed.title, feed.url, feed.link, image_url=feed.image_url,
