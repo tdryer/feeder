@@ -1,6 +1,6 @@
-# Unnamed Feed Reader
+# Feeder
 
-A project by Elders of the Internet.
+A feed reader by Elders of the Internet.
 
 ## Getting Started
 
