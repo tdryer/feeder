@@ -1,6 +1,10 @@
 # Feeder
 
-A feed reader by Elders of the Internet.
+Feeder is a feed reader backend written in Python and browser frontend written
+using AngularJS.
+
+Feeder was our project in CMPT 470 "Web-Based Information Systems" at Simon
+Fraser University.
 
 ## Getting Started
 
